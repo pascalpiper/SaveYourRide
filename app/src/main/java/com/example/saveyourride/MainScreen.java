@@ -14,24 +14,5 @@ public class MainScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
 
-        try {
-            getSupportActionBar().setTitle(R.string.app_name);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-
-        //Listener für "click" auf Banner1
-
-        Button deleteEventButton = (Button) findViewById(R.id.deleteEvent);
-
-        deleteEventButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteEvent();
-            }
-        });
-
     }
-
- //Test
 }
