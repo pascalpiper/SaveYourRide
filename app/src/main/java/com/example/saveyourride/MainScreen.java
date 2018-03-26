@@ -33,11 +33,5 @@ public class MainScreen extends AppCompatActivity {
 
     }
 
-    private void deleteEvent() {
-
-        ParseServer ps = ParseServer.getInstance(this);
-        ps.deleteEventData("nvUP4HrcGG");
-        Toast.makeText(this, "Event deleted", Toast.LENGTH_SHORT).show();
-
-    }
+ //Test
 }
