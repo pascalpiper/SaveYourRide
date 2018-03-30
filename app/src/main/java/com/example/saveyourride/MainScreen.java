@@ -20,7 +20,7 @@ public class MainScreen extends AppCompatActivity implements SensorEventListener
 
     private long lastUpdate = 0;
     private float last_x, last_y, last_z;
-    private static final int SHAKE_THRESHOLD = 600;
+    private static final int SHAKE_THRESHOLD = 2000;
 
     /** Called when the activity is first created. */
     @Override
@@ -52,7 +52,7 @@ public class MainScreen extends AppCompatActivity implements SensorEventListener
 
                 if (speed > SHAKE_THRESHOLD) {
                     /// TEST
-                    System.out.println("Wir haben das Handy geschüttelt");
+                    System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit" + speed);
                     ///
                 }
 
