@@ -49,7 +49,6 @@ public class MainScreen extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) { //click listener quasi.
-
         switch (item.getItemId()) {
             case R.id.settingsButton:
                 System.out.println("SETTINGS");
