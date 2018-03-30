@@ -1,7 +1,10 @@
 package com.example.saveyourride;
 
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,37 +12,77 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import java.util.List;
 
+public class MainScreen extends AppCompatActivity implements SensorEventListener {
 
-public class MainScreen extends AppCompatActivity {
+    private SensorManager senSensorManager;
+    private Sensor senAccelerometer;
 
+    private long lastUpdate = 0;
+    private float last_x, last_y, last_z;
+    private static final int SHAKE_THRESHOLD = 600;
+
+    /** Called when the activity is first created. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
-        final SensorManager mSensorManager;
-        final Sensor mAccelerometer;
-        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        print(mSensorManager);
+
+        senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        senSensorManager.registerListener(this, senAccelerometer , SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    private void print(SensorManager m) {
-        int i = 0;
-        while (i < 2) {
-            List<Sensor> list = m.getSensorList(Sensor.TYPE_ALL);
-            System.out.println("Hallo");
-            for (Sensor each : list) {
-                System.out.println(each.getName());
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        Sensor mySensor = sensorEvent.sensor;
+
+        if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float x = sensorEvent.values[0];
+            float y = sensorEvent.values[1];
+            float z = sensorEvent.values[2];
+
+            long curTime = System.currentTimeMillis();
+
+            if ((curTime - lastUpdate) > 100) {
+                long diffTime = (curTime - lastUpdate);
+                lastUpdate = curTime;
+
+                float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
+
+                if (speed > SHAKE_THRESHOLD) {
+                    /// TEST
+                    System.out.println("Wir haben das Handy geschüttelt");
+                    ///
+                }
+
+                last_x = x;
+                last_y = y;
+                last_z = z;
+
+                /// TEST
+                System.out.println("X: " + x + "Y: " + y + "Z: " + z);
+                ///
             }
-            i++;
         }
     }
 
-    // New Branch //
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
-    // Edit Pascal
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        senSensorManager.unregisterListener(this);
+    }
+
+    protected void onResume() {
+        super.onResume();
+        senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) { //menu activity bekannt
         MenuInflater inflater = getMenuInflater();
