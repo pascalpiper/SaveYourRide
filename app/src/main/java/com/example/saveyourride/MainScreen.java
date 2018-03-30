@@ -44,7 +44,11 @@ public class MainScreen extends AppCompatActivity implements SensorEventListener
 
             long curTime = System.currentTimeMillis();
 
-            if ((curTime - lastUpdate) > 100) {
+            /// TEST
+            System.out.println("X: " + x + "Y: " + y + "Z: " + z);
+            ///
+
+            if ((curTime - lastUpdate) > 1000) {
                 long diffTime = (curTime - lastUpdate);
                 lastUpdate = curTime;
 
@@ -61,7 +65,7 @@ public class MainScreen extends AppCompatActivity implements SensorEventListener
                 last_z = z;
 
                 /// TEST
-                System.out.println("X: " + x + "Y: " + y + "Z: " + z);
+                System.out.println("EINE SEKUNDE");
                 ///
             }
         }
