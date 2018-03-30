@@ -16,7 +16,7 @@ public class MainScreen extends AppCompatActivity {
         setContentView(R.layout.activity_main_screen);
         final SensorManager mSensorManager;
         final Sensor mAccelerometer;
-        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         print(mSensorManager);
     }
@@ -26,10 +26,12 @@ public class MainScreen extends AppCompatActivity {
         while (i < 2) {
             List<Sensor> list = m.getSensorList(Sensor.TYPE_ALL);
             System.out.println("Hallo");
-            for (Sensor each: list) {
+            for (Sensor each : list) {
                 System.out.println(each.getName());
             }
             i++;
         }
     }
+
+    // New Branch //
 }
