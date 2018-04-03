@@ -45,10 +45,10 @@ public class MainScreen extends AppCompatActivity implements SensorEventListener
             long curTime = System.currentTimeMillis();
 
             /// TEST
-            System.out.println("X: " + x + "Y: " + y + "Z: " + z);
+            //System.out.println("X: " + x + "Y: " + y + "Z: " + z);
             ///
 
-            if ((curTime - lastUpdate) > 1000) {
+            if ((curTime - lastUpdate) > 100) {
                 long diffTime = (curTime - lastUpdate);
                 lastUpdate = curTime;
 
@@ -56,7 +56,7 @@ public class MainScreen extends AppCompatActivity implements SensorEventListener
 
                 if (speed > SHAKE_THRESHOLD) {
                     /// TEST
-                    System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit" + speed);
+                    System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit " + speed);
                     ///
                 }
 
@@ -65,7 +65,7 @@ public class MainScreen extends AppCompatActivity implements SensorEventListener
                 last_z = z;
 
                 /// TEST
-                System.out.println("EINE SEKUNDE");
+                //System.out.println("EINE SEKUNDE");
                 ///
             }
         }
