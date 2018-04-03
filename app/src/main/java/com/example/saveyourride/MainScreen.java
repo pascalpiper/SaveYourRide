@@ -100,7 +100,7 @@ public class MainScreen extends AppCompatActivity implements SensorEventListener
             case R.id.settingsButton:
                 System.out.println("SETTINGS");
                 // Intent erzeugen und Starten der AktiendetailActivity mit explizitem Intent
-                Intent settingsIntent = new Intent(this, MainScreen.class);
+                Intent settingsIntent = new Intent(this, Activity_Active.class);
                 // settingsIntent.putExtra(Intent.EXTRA_TEXT, aktienInfo);
                 startActivity(settingsIntent);
                 break;
