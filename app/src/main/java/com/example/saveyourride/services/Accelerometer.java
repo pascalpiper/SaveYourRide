@@ -1,19 +1,17 @@
-package com.example.saveyourride;
+package com.example.saveyourride.services;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 
-
-public class MainScreen extends AppCompatActivity implements SensorEventListener {
+/*
+ * Created by taraszaika on 03.04.18.
+ * new Accelerometer
+ */
+public class Accelerometer implements SensorEventListener {
 
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
@@ -22,13 +20,8 @@ public class MainScreen extends AppCompatActivity implements SensorEventListener
     private float last_x, last_y, last_z;
     private static final int SHAKE_THRESHOLD = 2000;
 
-    /** Called when the activity is first created. */
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_screen);
-
-        senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+    public Accelerometer(Activity activity) {
+        senSensorManager = (SensorManager) activity.getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         senSensorManager.registerListener(this, senAccelerometer , SensorManager.SENSOR_DELAY_NORMAL);
     }
@@ -76,35 +69,4 @@ public class MainScreen extends AppCompatActivity implements SensorEventListener
 
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        senSensorManager.unregisterListener(this);
-    }
-
-    protected void onResume() {
-        super.onResume();
-        senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) { //menu activity bekannt
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.toolbar, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) { //click listener quasi.
-        switch (item.getItemId()) {
-            case R.id.settingsButton:
-                System.out.println("SETTINGS");
-                // Intent erzeugen und Starten der AktiendetailActivity mit explizitem Intent
-                Intent settingsIntent = new Intent(this, Activity_Active.class);
-                // settingsIntent.putExtra(Intent.EXTRA_TEXT, aktienInfo);
-                startActivity(settingsIntent);
-                break;
-        }
-        return super.onOptionsItemSelected(item); //To change body of generated methods, choose Tools | Templates.
-    }
 }

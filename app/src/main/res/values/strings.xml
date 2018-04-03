@@ -3,4 +3,11 @@
     <string name="edit_message">Enter a message</string>
     <string name="settings">Settings</string>
     <string name="title_activity__active">Activity_Active</string>
+
+    <string name="passive">Passiv</string>
+    <string name="active">Aktiv</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

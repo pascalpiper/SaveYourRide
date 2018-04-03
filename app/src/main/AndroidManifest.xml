@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainScreen">
+        <activity android:name=".activities.MainScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,9 +19,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activity_Active"
+            android:name=".fragments.Activity_Active"
+            android:launchMode="singleTop"
             android:label="@string/title_activity__active"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:parentActivityName="com.example.saveyourride.activities.MainScreen">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.saveyourride.activities.MainScreen" />>
+        </activity>
     </application>
 
 </manifest>
