@@ -91,6 +91,7 @@ public class Activity_Active extends AppCompatActivity {
         customHandler.removeCallbacks(intervallThread);
         intervallCounter = 0;
         customHandler.post(intervallThread);
+
     }
 
     
