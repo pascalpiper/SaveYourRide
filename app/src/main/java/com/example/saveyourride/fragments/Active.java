@@ -1,5 +1,6 @@
 package com.example.saveyourride.fragments;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +12,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.example.saveyourride.R;
+import com.example.saveyourride.activities.MainScreen;
+import com.example.saveyourride.services.IntervallTimer;
 
 public class Active extends Fragment {
 
@@ -47,10 +50,11 @@ public class Active extends Fragment {
             public void onClick(View view) {
 
                 if (timerStart) {
-                    System.out.println("Custom Handler - Button");
-                    intervallCounter = 0;
-                    timerStart = false;
-                    customHandler.post(intervallThread);
+//                    System.out.println("Custom Handler - Button");
+//                    intervallCounter = 0;
+//                    timerStart = false;
+//                    customHandler.post(intervallThread);
+getActivity().startService(new Intent(getActivity(),IntervallTimer.class));
                 } else resetTimer();
             }
         });

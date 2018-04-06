@@ -49,6 +49,7 @@ public class IntervallTimer extends IntentService {
 
             if (intervallCounter < maxIntervalls) {
                 //intervallBenachrichtigung(intervallCounter);
+                System.out.println(intervallCounter);
                 intervallCounter++;
                 customHandler.postDelayed(this, intervallTime);
 
