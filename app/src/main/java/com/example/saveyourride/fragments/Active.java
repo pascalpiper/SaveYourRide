@@ -1,8 +1,12 @@
 package com.example.saveyourride.fragments;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -23,11 +27,13 @@ public class Active extends Fragment {
     boolean timerStart = true;
 
     Button button;
-    ProgressBar progressBar;
+
+    //BroadcastReceiver for ActiveFragment
+    BroadcastReceiver mReceiver;
+    IntentFilter intentFilter = new IntentFilter(
+            "android.intent.action.FINISHED");
 
     private Handler customHandler = new Handler();
-
-    int aufruf = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -36,13 +42,11 @@ public class Active extends Fragment {
 
         //get Views
         button = (Button) fragmentView.findViewById(R.id.button);
-        progressBar = (ProgressBar) fragmentView.findViewById(R.id.progressBar);
         ///
 
         button.setText("Starten");
         button.setBackgroundColor(Color.GRAY);
 
-        progressBar.setMax(maxIntervalls);
 
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -54,10 +58,35 @@ public class Active extends Fragment {
 //                    intervallCounter = 0;
 //                    timerStart = false;
 //                    customHandler.post(intervallThread);
-getActivity().startService(new Intent(getActivity(),IntervallTimer.class));
+                    getActivity().startService(new Intent(getActivity(), IntervallTimer.class));
+                    time();
+
                 } else resetTimer();
             }
         });
+
+
+        //BroadcastReceiver for ActiveFraagment
+
+
+        mReceiver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //extract our message from intent
+                String msg_for_me = intent.getStringExtra("some_msg");
+                System.out.println("Fragment-Receiver: "+ msg_for_me);
+
+                button.setText(msg_for_me);
+
+
+            }
+        };
+
+        //registering our receiver
+        getActivity().registerReceiver(mReceiver, intentFilter);
+
+        ///End - BroadcastReceiver for ActiveFragment
 
         return fragmentView;
     }
@@ -91,7 +120,6 @@ getActivity().startService(new Intent(getActivity(),IntervallTimer.class));
             button.setBackgroundColor(Color.YELLOW);
 
         button.setText(intervallCounter + " / " + maxIntervalls);
-        progressBar.setProgress(intervallCounter);
     }
 
     public void resetTimer() {
@@ -99,5 +127,35 @@ getActivity().startService(new Intent(getActivity(),IntervallTimer.class));
         intervallCounter = 0;
         customHandler.post(intervallThread);
 
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //unregister our receiver
+       // getActivity().unregisterReceiver(this.mReceiver);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //register our receiver
+        getActivity().registerReceiver(mReceiver, intentFilter);
+    }
+
+    public void time(){
+        new CountDownTimer(300000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                System.out.println("seconds remaining: " + millisUntilFinished / 1000);
+                //here you can have your logic to set text to edittext
+            }
+
+            public void onFinish() {
+                System.out.println("done!");
+            }
+
+        }.start();
     }
 }

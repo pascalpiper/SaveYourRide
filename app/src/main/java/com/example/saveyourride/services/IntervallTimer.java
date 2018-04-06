@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 
 public class IntervallTimer extends IntentService {
 
@@ -12,6 +13,7 @@ public class IntervallTimer extends IntentService {
     int maxIntervalls = 6;
 
     Handler customHandler = new Handler();
+    public static final String SERVICE_REQUEST = "com.example.app.service.SERVICE_REQUEST";
 
 
     /**
@@ -32,10 +34,7 @@ public class IntervallTimer extends IntentService {
         // Normally we would do some work here, like download a file.
         // For our sample, we just sleep for 5 seconds.
         try {
-//            Thread.sleep(5000);
-
             customHandler.post(intervallThread);
-
 
         } catch (Exception e) {
             // Restore interrupt status.
@@ -49,9 +48,14 @@ public class IntervallTimer extends IntentService {
 
             if (intervallCounter < maxIntervalls) {
                 //intervallBenachrichtigung(intervallCounter);
-                System.out.println(intervallCounter);
+
+                sendBroadcastToMainScreen(intervallCounter);
+                System.out.println("Service: " + intervallCounter);
                 intervallCounter++;
                 customHandler.postDelayed(this, intervallTime);
+
+// ...
+
 
 
             } else {
@@ -61,5 +65,10 @@ public class IntervallTimer extends IntentService {
 
         }
     };
+
+    public void sendBroadcastToMainScreen(int intervallCounter){
+        Intent i = new Intent("android.intent.action.FINISHED").putExtra("some_msg", Integer.toString(intervallCounter));
+        this.sendBroadcast(i);
+    }
 
 }

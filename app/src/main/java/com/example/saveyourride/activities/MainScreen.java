@@ -1,6 +1,10 @@
 package com.example.saveyourride.activities;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -11,6 +15,7 @@ import android.view.MenuItem;
 
 import com.example.saveyourride.fragments.Activity_Active;
 import com.example.saveyourride.R;
+import com.example.saveyourride.fragments.Passive;
 import com.example.saveyourride.utils.PagerAdapter;
 
 import java.util.Objects;
@@ -60,8 +65,6 @@ public class MainScreen extends AppCompatActivity {
                 // IMPLEMENT LATER
             }
         });
-
-        // First selected Tab
         viewPager.setCurrentItem(PASSIVE_TAB);
     }
 
@@ -86,10 +89,8 @@ public class MainScreen extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.settingsButton:
                 System.out.println("SETTINGS");
-
-                activeIntent = activeIntent != null? activeIntent : new Intent(this, Activity_Active.class);
-
                 // settingsIntent.putExtra(Intent.EXTRA_TEXT, aktienInfo);
+                Intent activeIntent = new Intent(getApplicationContext(), Activity_Active.class);
                 startActivityIfNeeded(activeIntent, 0);
                 //startActivity(activeIntent);
                 break;
