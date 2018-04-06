@@ -54,7 +54,7 @@ public class Active extends Fragment {
 //                    intervallCounter = 0;
 //                    timerStart = false;
 //                    customHandler.post(intervallThread);
-getActivity().startService(new Intent(getActivity(),IntervallTimer.class));
+                    getActivity().startService(new Intent(getActivity(), IntervallTimer.class));
                 } else resetTimer();
             }
         });
