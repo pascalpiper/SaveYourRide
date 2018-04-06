@@ -1,4 +1,7 @@
 <resources>
+
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyB6LKT60C_EPzIXzTo13PFcZKFFABt9q3E</string>
+
     <string name="app_name">SaveYourRide</string>
     <string name="edit_message">Enter a message</string>
     <string name="settings">Settings</string>
