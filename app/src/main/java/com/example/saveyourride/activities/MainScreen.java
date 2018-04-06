@@ -13,6 +13,8 @@ import com.example.saveyourride.fragments.Activity_Active;
 import com.example.saveyourride.R;
 import com.example.saveyourride.utils.PagerAdapter;
 
+import java.util.Objects;
+
 
 public class MainScreen extends AppCompatActivity {
 
@@ -29,6 +31,8 @@ public class MainScreen extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
+
+        Objects.requireNonNull(getSupportActionBar()).setElevation(0);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.passive)));
