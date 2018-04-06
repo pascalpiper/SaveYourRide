@@ -15,7 +15,8 @@
         <service android:name=".services.IntervallTimer" />
 
 
-        <activity android:name=".activities.MainScreen">
+        <activity android:name=".activities.MainScreen"
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
