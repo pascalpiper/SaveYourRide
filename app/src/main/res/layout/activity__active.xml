@@ -1,27 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_active"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="1">
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    tools:context="com.example.saveyourride.activities.Activity_Active">
 
     <Button
-        android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Button"
-        android:background="@drawable/round_button"/>
-
-    <Button
-        android:id="@+id/button2"
+        android:text="START"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
-        android:background="@drawable/round_button"/>
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="158dp"
+        android:id="@+id/buttonStartTimer"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold|italic" />
 
-</LinearLayout>
+    <Button
+        android:id="@+id/buttonStopTimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="100dp"
+        android:text="STOP"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold|italic" />
+
+    <TextView
+        android:text="TIMER"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/buttonStartTimer"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="63dp"
+        android:id="@+id/textViewTimerCount"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="40sp" />
+
+</RelativeLayout>

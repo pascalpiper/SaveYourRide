@@ -34,7 +34,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".fragments.Activity_Active"
+            android:name=".activities.Activity_Active"
             android:launchMode="singleTop"
             android:label="@string/title_activity__active"
             android:parentActivityName="com.example.saveyourride.activities.MainScreen">

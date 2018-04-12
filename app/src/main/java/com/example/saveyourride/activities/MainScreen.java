@@ -1,10 +1,6 @@
 package com.example.saveyourride.activities;
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -13,9 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.example.saveyourride.fragments.Activity_Active;
 import com.example.saveyourride.R;
-import com.example.saveyourride.fragments.Passive;
 import com.example.saveyourride.utils.PagerAdapter;
 
 import java.util.Objects;
