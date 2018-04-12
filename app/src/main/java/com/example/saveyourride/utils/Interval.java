@@ -28,6 +28,9 @@ public class Interval {
         timer = new CountDownTimer(intervalTime, MILLISECONDS_IN_SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
+                // TEST
+                System.out.println("millisUntilFinished = " + millisUntilFinished + "(in Seconds: " + ((int) millisUntilFinished / 1000) + ")");
+                //
                 timerService.setValues(minutes, seconds);
                 if (seconds < SECONDS_IN_MINUTE) {
                     seconds = seconds + 1;
@@ -45,17 +48,11 @@ public class Interval {
 //                }
             }
         };
+        timer.start();
     }
 
     public void stop() {
         timer.cancel();
 
     }
-
-    public void reset() {
-        timer.cancel();
-        start();
-    }
-
-
 }

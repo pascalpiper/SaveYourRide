@@ -18,18 +18,23 @@ import com.example.saveyourride.services.TimerService;
 
 public class Active extends Fragment {
 
-    private Intent intentTimerService;
+    // TODO: Pick Up values for number of intervals and interval time
     private final int numberOfIntervals = 6;
-    private final long intervalTime = 100L;
+    private final long intervalTime = 10000L;
 
-    //BroadcastReceiver for ActiveFragment
+    private Intent intentTimerService;
+
+    // BroadcastReceiver for messages from TimerService
     private BroadcastReceiver timerServiceReceiver;
+
+    // IntentFilter filters messages received by BroadcastReceiver
     private IntentFilter filter;
+
     private Button buttonStartTimer;
     private Button buttonStopTimer;
     private TextView textViewTime;
-    private boolean isStarted = false; /// TODO: check when it must be set.
-    //
+
+    private boolean isStarted = false; // TODO: check when it must be set.
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -41,8 +46,7 @@ public class Active extends Fragment {
 
         filter.addAction("android.intent.action.TIMER_SERVICE_READY");
         filter.addAction("android.intent.action.INTERVAL_COUNT");
-        filter.addAction("android.intent.action.INTERVAL_TIME");
-
+        filter.addAction("android.intent.action.REST_INTERVAL_TIME");
 
         buttonStartTimer = (Button) fragmentView.findViewById(R.id.buttonStartTimer);
         buttonStopTimer = (Button) fragmentView.findViewById(R.id.buttonStopTimer);
@@ -55,100 +59,104 @@ public class Active extends Fragment {
                     // DEBUG
                     System.out.println("isStarted is true");
                     //
-                    resetTimer(); /// TODO: RESET BUTTON
+                    resetTimer(); // TODO: RESET BUTTON
                 } else {
                     getActivity().startService(intentTimerService);
                     isStarted = true;
-                    //sendBroadcastToTimerService("start");
                 }
             }
         });
+
         buttonStopTimer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                sendBroadcastToTimerService("stopTimer");
                 getActivity().stopService(intentTimerService);
             }
         });
 
-        //BroadcastReceiver for ActiveFraagment
+        /// BroadcastReceiver for ActiveFragment
         /*
-         * This BroadcastReceiver receive the broadcasts from the TimerService
+         * This BroadcastReceiver receives the broadcasts from the TimerService
          * It can receive following broadcasts:
-         * -intervallCount
-         * -restIntervallTime
-         * -finish-message from the Timer
-         * -status, that the Service is ready
+         * - intervalCount
+         * - restIntervalTime
+         * - finish-message from the Timer
+         * - status, that the Service is ready
          */
         timerServiceReceiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
                 //extract our message from intent
-                switch (intent.getAction()){
-                    case "android.intent.action.TIMER_SERVICE_READY" : {
-                        sendBroadcastToTimerService("start");
+                switch (intent.getAction()) {
+                    case "android.intent.action.TIMER_SERVICE_READY": {
+                        // DEBUG
+                        System.out.println("Fragment-Receiver received 'service-ready'-broadcast");
+                        //
+                        sendBroadcastToTimerService("startTimer");
                         break;
                     }
-                    case "android.intent.action.INTERVAL_COUNT" : {
+                    case "android.intent.action.INTERVAL_COUNT": {
                         String intervalCount = intent.getStringExtra("interval_count");
-                        System.out.println("Fragment-Receiver: " + intervalCount);
+                        System.out.println("Fragment-Receiver received interval count: " + intervalCount);
                         buttonStartTimer.setText(intervalCount);
                         break;
                     }
-                    case "android.intent.action.INTERVAL_TIME" : {
-                        String intervalTimeSec = intent.getStringExtra("interval_time_sec");
-                        String intervalTimeMin = intent.getStringExtra("interval_time_min");
-                        System.out.println("Fragment-Receiver: " + intervalTimeMin + " Min : "+ intervalTimeSec + " sec ");
-                        setTime(intervalTimeMin, intervalTimeSec);
+                    case "android.intent.action.REST_INTERVAL_TIME": {
+                        String intervalTimeSec = intent.getStringExtra("rest_interval_time_sec");
+                        String intervalTimeMin = intent.getStringExtra("rest_interval_time_min");
+                        System.out.println("Fragment-Receiver received interval time : " + intervalTimeMin + " Min : " + intervalTimeSec + " Sec ");
+                        setTextViewTime(intervalTimeMin, intervalTimeSec);
                         break;
                     }
-                default:
-                    Toast.makeText(getActivity(),"Unkown Broadcast receive", Toast.LENGTH_LONG).show();
-               }
-
-
+                    default:
+                        Toast.makeText(getActivity(), "Unknown Broadcast received", Toast.LENGTH_LONG).show();
+                }
             }
         };
-        //registering our receiver
+
+        // register our receiver
         getActivity().registerReceiver(timerServiceReceiver, filter);
         ///End - BroadcastReceiver for ActiveFragment
 
         return fragmentView;
     }
 
-    private void setTime(String intervalTimeMin, String intervalTimeSec) {
+    private void setTextViewTime(String intervalTimeMin, String intervalTimeSec) {
         String time = String.format("%02d:%02d", intervalTimeMin, intervalTimeSec);
         textViewTime.setText(time);
-
     }
 
-    public void resetTimer() {
-        sendBroadcastToTimerService("reset");
+    private void resetTimer() {
+        sendBroadcastToTimerService("resetTimer");
     }
 
     /**
-     * This method will send a broadcast to the service TimerService
-     * case reset => TimerService will reset and restart
-     * case start => TierService got the numberOfIntervals and the intervalTime. Then it will start.
+     * This method will send a broadcast to the service TimerService.
+     * case start => TierService becomes the numberOfIntervals and the intervalTime and start the timer.
+     * case reset => TimerService will reset the timer and start the new one.
      */
-    public void sendBroadcastToTimerService(String broadcast) {
-
+    private void sendBroadcastToTimerService(String broadcast) {
         switch (broadcast) {
-
-            case "reset": {
-                Intent i = new Intent("android.intent.action.INTERVAL_RESET");
-                getActivity().sendBroadcast(i);
+            case "startTimer": {
+                Intent startTimerIntent = new Intent("android.intent.action.START_TIMER").putExtra("numberOfIntervals", numberOfIntervals).putExtra("intervalTime", intervalTime);
+                getActivity().sendBroadcast(startTimerIntent);
                 break;
             }
-            case "start": {
-                Intent i = new Intent("android.intent.action.INTERVAL_START").putExtra("numberOfIntervals", numberOfIntervals).putExtra("intervalTime", intervalTime);
-                getActivity().sendBroadcast(i);
+            case "resetTimer": {
+                Intent resetTimerIntent = new Intent("android.intent.action.RESET_TIMER");
+                getActivity().sendBroadcast(resetTimerIntent);
+                break;
+            }
+            case "stopTimer": {
+                Intent stopTimerIntent = new Intent("android.intent.action.STOP_TIMER");
+                getActivity().sendBroadcast(stopTimerIntent);
                 break;
             }
             default: {
-                Toast.makeText(getActivity(),"No such broadcast!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Unknown broadcast!", Toast.LENGTH_LONG).show();
             }
         }
     }
-
 }
