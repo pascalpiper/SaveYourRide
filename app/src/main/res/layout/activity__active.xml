@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_active"
+    android:id="@+id/activity_active1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.saveyourride.activities.Activity_Active">
@@ -13,12 +13,12 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="158dp"
-        android:id="@+id/buttonStartTimer"
+        android:id="@+id/buttonStartTimer1"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textStyle="bold|italic" />
 
     <Button
-        android:id="@+id/buttonStopTimer"
+        android:id="@+id/buttonStopTimer1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -32,10 +32,10 @@
         android:text="TIMER"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/buttonStartTimer"
+        android:layout_above="@+id/buttonStartTimer1"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="63dp"
-        android:id="@+id/textViewTimerCount"
+        android:id="@+id/textViewTimerCount1"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="40sp" />
 
