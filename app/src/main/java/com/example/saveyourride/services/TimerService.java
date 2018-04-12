@@ -67,9 +67,30 @@ public class TimerService extends Service {
 
     }
 
-    public void sendBroadcastToMainScreen(int intervalCount) {
-        Intent i = new Intent("android.intent.action.INTERVAL_COUNT").putExtra("interval_count", Integer.toString(intervalCount));
-        this.sendBroadcast(i);
+    public void sendBroadcastToActiveFragment(String broadcast) {
+        switch (broadcast){
+            case "serviceReady" : {
+                Intent i = new Intent("android.intent.action.TIMER_SERVICE_READY");
+                this.sendBroadcast(i);
+                break;
+            }
+            case "sendIntervallCount" : {
+                Intent i = new Intent("android.intent.action.INTERVAL_COUNT").putExtra("interval_count", Integer.toString(intervalCount));
+                this.sendBroadcast(i);
+                break;
+            }
+            case "sendIntervallTime" : {
+                // TODO send IntervallTime
+                int restIntervalTimeSec = 20;
+                int restIntervalTimeMin = 2;
+                Intent i = new Intent("android.intent.action.REST_INTERVAL_TIME").putExtra("rest_interval_time_sec", Integer.toString(restIntervalTimeSec)).putExtra("rest_interval_time_min", Integer.toString(restIntervalTimeMin));
+                this.sendBroadcast(i);
+                break;
+            }
+            default:
+                System.out.println("TimerService: No Such Broadcast");
+        }
+
     }
 
     private void runIntervals(int numberOfIntervals, long intervalTime) {

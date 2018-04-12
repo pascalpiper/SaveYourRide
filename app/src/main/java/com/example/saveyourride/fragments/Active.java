@@ -37,7 +37,12 @@ public class Active extends Fragment {
         View fragmentView = inflater.inflate(R.layout.fragment_active, container, false);
 
         intentTimerService = new Intent(getActivity(), TimerService.class);
-        filter = new IntentFilter("android.intent.action.INTERVAL_COUNT");
+        filter = new IntentFilter();
+
+        filter.addAction("android.intent.action.TIMER_SERVICE_READY");
+        filter.addAction("android.intent.action.INTERVAL_COUNT");
+        filter.addAction("android.intent.action.INTERVAL_TIME");
+
 
         buttonStartTimer = (Button) fragmentView.findViewById(R.id.buttonStartTimer);
         buttonStopTimer = (Button) fragmentView.findViewById(R.id.buttonStopTimer);
@@ -49,7 +54,6 @@ public class Active extends Fragment {
                 if (isStarted) {
                     // DEBUG
                     System.out.println("isStarted is true");
-                    sendBroadcastToTimerService("start");
                     //
                     resetTimer(); /// TODO: RESET BUTTON
                 } else {
@@ -68,17 +72,41 @@ public class Active extends Fragment {
 
         //BroadcastReceiver for ActiveFraagment
         /*
-         * This BroadcastReceiver receive the intervallCounter and a finish-message from the
-         * service "TimerService". They will be shown in this fragment.
+         * This BroadcastReceiver receive the broadcasts from the TimerService
+         * It can receive following broadcasts:
+         * -intervallCount
+         * -restIntervallTime
+         * -finish-message from the Timer
+         * -status, that the Service is ready
          */
         timerServiceReceiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
                 //extract our message from intent
-                String intervalCount = intent.getStringExtra("interval_count");
-                System.out.println("Fragment-Receiver: " + intervalCount);
-                buttonStartTimer.setText(intervalCount);
+                switch (intent.getAction()){
+                    case "android.intent.action.TIMER_SERVICE_READY" : {
+                        sendBroadcastToTimerService("start");
+                        break;
+                    }
+                    case "android.intent.action.INTERVAL_COUNT" : {
+                        String intervalCount = intent.getStringExtra("interval_count");
+                        System.out.println("Fragment-Receiver: " + intervalCount);
+                        buttonStartTimer.setText(intervalCount);
+                        break;
+                    }
+                    case "android.intent.action.INTERVAL_TIME" : {
+                        String intervalTimeSec = intent.getStringExtra("interval_time_sec");
+                        String intervalTimeMin = intent.getStringExtra("interval_time_min");
+                        System.out.println("Fragment-Receiver: " + intervalTimeMin + " Min : "+ intervalTimeSec + " sec ");
+                        setTime(intervalTimeMin, intervalTimeSec);
+                        break;
+                    }
+                default:
+                    Toast.makeText(getActivity(),"Unkown Broadcast receive", Toast.LENGTH_LONG).show();
+               }
+
+
             }
         };
         //registering our receiver
@@ -88,12 +116,20 @@ public class Active extends Fragment {
         return fragmentView;
     }
 
+    private void setTime(String intervalTimeMin, String intervalTimeSec) {
+        String time = String.format("%02d:%02d", intervalTimeMin, intervalTimeSec);
+        textViewTime.setText(time);
+
+    }
+
     public void resetTimer() {
         sendBroadcastToTimerService("reset");
     }
 
     /**
      * This method will send a broadcast to the service TimerService
+     * case reset => TimerService will reset and restart
+     * case start => TierService got the numberOfIntervals and the intervalTime. Then it will start.
      */
     public void sendBroadcastToTimerService(String broadcast) {
 
