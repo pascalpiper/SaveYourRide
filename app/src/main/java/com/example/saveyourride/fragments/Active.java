@@ -27,6 +27,8 @@ public class Active extends Fragment {
     private Button buttonStartTimer;
     private Button buttonStopTimer;
     private TextView textViewTimerCount;
+    private boolean isStarted = false;
+    private final Intent intentStartIntervallTimer = new Intent(getActivity(), IntervallTimer.class);;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -43,22 +45,19 @@ public class Active extends Fragment {
         buttonStartTimer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new CountDownTimer(totalTime, interval) {
-                    public void onTick(long millisUntilFinished) {
-                        textViewTimerCount.setText(String.valueOf(counter));
-                        counter++;
-                    }
-
-                    public void onFinish() {
-                        textViewTimerCount.setText("FINISH!!");
-                    }
-                }.start();
+                if(isStarted){
+                    // TODO: Reset Timer
+                }
+                else {
+                    getActivity().startService(intentStartIntervallTimer);
+                }
             }
+
         });
         buttonStopTimer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /// NICHTS PASSIERT
+                getActivity().stopService(intentStartIntervallTimer);
             }
         });
 

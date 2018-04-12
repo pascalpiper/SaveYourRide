@@ -4,62 +4,23 @@ import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
-public class IntervallTimer extends IntentService implements Runnable {
+public class IntervallTimer extends Service {
 
-    int intervallCounter = 0;
-    int intervallTime = 10000;
-    int maxIntervalls = 6;
-
-    Handler customHandler = new Handler();
-
-
-    /**
-     * A constructor is required, and must call the super IntentService(String)
-     * constructor with a name for the worker thread.
-     */
-    public IntervallTimer() {
-        super("IntervallTimer");
-    }
-
-    /**
-     * The IntentService calls this method from the default worker thread with
-     * the intent that started the service. When this method returns, IntentService
-     * stops the service, as appropriate.
-     */
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        // Normally we would do some work here, like download a file.
-        // For our sample, we just sleep for 5 seconds.
-        try {
-            customHandler.post(this);
-
-        } catch (Exception e) {
-            // Restore interrupt status.
-            Thread.currentThread().interrupt();
-        }
-    }
+    private int intervalCounter = 0;
 
     @Override
-    public void run() {
-        if (intervallCounter < maxIntervalls) {
-            //intervallBenachrichtigung(intervallCounter);
+    public void onCreate() {
+        super.onCreate();
 
-            sendBroadcastToMainScreen(intervallCounter);
-            System.out.println("Service: " + intervallCounter);
-            intervallCounter++;
-            customHandler.postDelayed(this, intervallTime);
-
-        } else {
-            System.out.println("Notruf");
-            // button.setText("Notruf");
-        }
+        System.out.println("Service gestartet");
     }
-
 
     public void sendBroadcastToMainScreen(int intervallCounter){
-        Intent i = new Intent("android.intent.action.FINISHED").putExtra("some_msg", Integer.toString(intervallCounter));
+        Intent i = new Intent("android.intent.action.INTERVAL_COUNTER").putExtra("intervall_counter", Integer.toString(intervalCounter));
         this.sendBroadcast(i);
     }
 
@@ -67,5 +28,11 @@ public class IntervallTimer extends IntentService implements Runnable {
     public void onDestroy() {
         super.onDestroy();
         System.out.println("ich wurde zerstört");
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 }
