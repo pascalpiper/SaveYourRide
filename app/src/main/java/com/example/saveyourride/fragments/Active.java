@@ -98,14 +98,14 @@ public class Active extends Fragment {
                         break;
                     }
                     case "android.intent.action.INTERVAL_COUNT": {
-                        String intervalCount = intent.getStringExtra("interval_count");
+                        int intervalCount = intent.getIntExtra("interval_count", -1);
                         System.out.println("Fragment-Receiver received interval count: " + intervalCount);
-                        buttonStartTimer.setText(intervalCount);
+                        buttonStartTimer.setText(Integer.toString(intervalCount));
                         break;
                     }
                     case "android.intent.action.REST_INTERVAL_TIME": {
-                        String intervalTimeSec = intent.getStringExtra("rest_interval_time_sec");
-                        String intervalTimeMin = intent.getStringExtra("rest_interval_time_min");
+                        int intervalTimeMin = intent.getIntExtra("rest_interval_time_min", -1);
+                        int intervalTimeSec = intent.getIntExtra("rest_interval_time_sec", -1);
                         System.out.println("Fragment-Receiver received interval time : " + intervalTimeMin + " Min : " + intervalTimeSec + " Sec ");
                         setTextViewTime(intervalTimeMin, intervalTimeSec);
                         break;
@@ -123,8 +123,8 @@ public class Active extends Fragment {
         return fragmentView;
     }
 
-    private void setTextViewTime(String intervalTimeMin, String intervalTimeSec) {
-        String time = String.format("%02d:%02d", intervalTimeMin, intervalTimeSec);
+    private void setTextViewTime(int intervalTimeMin, int intervalTimeSec) {
+        String time = String.format("%02d", intervalTimeMin) + ":" + String.format("%02d", intervalTimeSec);
         textViewTime.setText(time);
     }
 

@@ -141,6 +141,11 @@ public class TimerService extends Service {
     public void setValues(int minutes, int seconds) {
         this.minutes = minutes;
         this.seconds = seconds;
+
+        // DEBUG
+        System.out.println("SetValues: Min: " + minutes + ", Sec: " + seconds);
+        //
+
         sendBroadcastToActiveFragment("intervalTime");
     }
 
@@ -152,12 +157,12 @@ public class TimerService extends Service {
                 break;
             }
             case "intervalCount" : {
-                Intent intervalCountIntent = new Intent("android.intent.action.INTERVAL_COUNT").putExtra("interval_count", Integer.toString(intervalCount));
+                Intent intervalCountIntent = new Intent("android.intent.action.INTERVAL_COUNT").putExtra("interval_count", intervalCount);
                 this.sendBroadcast(intervalCountIntent);
                 break;
             }
-            case "itervalTime" : {
-                Intent intervalTimeIntent = new Intent("android.intent.action.REST_INTERVAL_TIME").putExtra("rest_interval_time_sec", Integer.toString(seconds)).putExtra("rest_interval_time_min", Integer.toString(minutes));
+            case "intervalTime": {
+                Intent intervalTimeIntent = new Intent("android.intent.action.REST_INTERVAL_TIME").putExtra("rest_interval_time_min", minutes).putExtra("rest_interval_time_sec", seconds);
                 this.sendBroadcast(intervalTimeIntent);
                 break;
             }
