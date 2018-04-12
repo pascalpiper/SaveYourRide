@@ -6,18 +6,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.saveyourride.R;
-import com.example.saveyourride.activities.MainScreen;
 import com.example.saveyourride.services.IntervallTimer;
 
 public class Active extends Fragment {
@@ -28,7 +24,15 @@ public class Active extends Fragment {
     private Button buttonStopTimer;
     private TextView textViewTimerCount;
     private boolean isStarted = false;
-    private final Intent intentStartIntervallTimer = new Intent(getActivity(), IntervallTimer.class);;
+    private final Intent intentStartIntervallTimer = new Intent(getActivity(), IntervallTimer.class);
+
+    private int maxIntervals = 6;
+
+    //BroadcastReceiver for ActiveFragment
+    BroadcastReceiver mReceiver;
+    IntentFilter intentFilter = new IntentFilter(
+            "android.intent.action.INTERVAL_COUTNER");
+    //
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,7 +65,64 @@ public class Active extends Fragment {
             }
         });
 
+        //BroadcastReceiver for ActiveFraagment
+        /**
+         * This BroadcastReceiver receive the intervallCounter and a finish-message from the
+         * service "IntervallTimer". They will be shown in this fragment.
+         */
+        mReceiver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //extract our message from intent
+                String stringIntervallCounter = intent.getStringExtra("intervall_counter");
+                System.out.println("Fragment-Receiver: "+ stringIntervallCounter);
+                buttonStartTimer.setText(stringIntervallCounter);
+            }
+        };
+        //registering our receiver
+        getActivity().registerReceiver(mReceiver, intentFilter);
+        ///End - BroadcastReceiver for ActiveFragment
+
         return fragmentView;
     }
 
+    /**
+     * Method for showing the current Intervall
+     * @param intervallCounter
+     */
+    private void intervallBenachrichtigung(int intervallCounter) {
+        int übrigeIntervalle = maxIntervals - intervallCounter;
+        System.out.println("übrige Intervalle: " + übrigeIntervalle);
+        if (intervallCounter < 2)
+            buttonStartTimer.setBackgroundColor(Color.GREEN);
+        else if (übrigeIntervalle <= 2)
+            buttonStartTimer.setBackgroundColor(Color.RED);
+        else
+            buttonStartTimer.setBackgroundColor(Color.YELLOW);
+
+        buttonStartTimer.setText(intervallCounter + " / " + maxIntervals);
+    }
+
+    /**
+     * This Method reset the Timer. The IntervallCounter will be set to 0
+     */
+    public void resetTimer() {
+
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //unregister our receiver
+        // getActivity().unregisterReceiver(this.mReceiver);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //register our receiver
+        getActivity().registerReceiver(mReceiver, intentFilter);
+    }
 }

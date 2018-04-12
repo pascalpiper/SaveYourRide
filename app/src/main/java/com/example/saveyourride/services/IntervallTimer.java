@@ -1,25 +1,29 @@
 package com.example.saveyourride.services;
 
-import android.app.IntentService;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.os.Handler;
+import android.content.IntentFilter;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 
 public class IntervallTimer extends Service {
 
     private int intervalCounter = 0;
 
+    //BroadcastReceiver for ActiveFragment
+    BroadcastReceiver intervallTimerReceiver;
+    IntentFilter intentFilter = new IntentFilter(
+            "android.intent.action.INTERVAL_COUTNER");
+    //
+
     @Override
     public void onCreate() {
         super.onCreate();
-
         System.out.println("Service gestartet");
     }
 
-    public void sendBroadcastToMainScreen(int intervallCounter){
+    public void sendBroadcastToMainScreen(int intervallCounter) {
         Intent i = new Intent("android.intent.action.INTERVAL_COUNTER").putExtra("intervall_counter", Integer.toString(intervalCounter));
         this.sendBroadcast(i);
     }
