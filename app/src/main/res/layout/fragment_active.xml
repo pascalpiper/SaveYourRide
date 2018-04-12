@@ -33,7 +33,7 @@
         android:layout_above="@+id/buttonStartTimer"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="63dp"
-        android:id="@+id/textViewTimerCount"
+        android:id="@+id/textViewTimer"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="40sp" />
 
