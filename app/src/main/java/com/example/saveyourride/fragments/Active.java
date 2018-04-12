@@ -1,16 +1,13 @@
 package com.example.saveyourride.fragments;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.saveyourride.R;
@@ -56,7 +53,6 @@ public class Active extends Fragment {
                     getActivity().startService(intentStartIntervallTimer);
                 }
             }
-
         });
         buttonStopTimer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,42 +83,4 @@ public class Active extends Fragment {
         return fragmentView;
     }
 
-    /**
-     * Method for showing the current Intervall
-     * @param intervallCounter
-     */
-    private void intervallBenachrichtigung(int intervallCounter) {
-        int übrigeIntervalle = maxIntervals - intervallCounter;
-        System.out.println("übrige Intervalle: " + übrigeIntervalle);
-        if (intervallCounter < 2)
-            buttonStartTimer.setBackgroundColor(Color.GREEN);
-        else if (übrigeIntervalle <= 2)
-            buttonStartTimer.setBackgroundColor(Color.RED);
-        else
-            buttonStartTimer.setBackgroundColor(Color.YELLOW);
-
-        buttonStartTimer.setText(intervallCounter + " / " + maxIntervals);
-    }
-
-    /**
-     * This Method reset the Timer. The IntervallCounter will be set to 0
-     */
-    public void resetTimer() {
-
-    }
-
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        //unregister our receiver
-        // getActivity().unregisterReceiver(this.mReceiver);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        //register our receiver
-        getActivity().registerReceiver(mReceiver, intentFilter);
-    }
 }
