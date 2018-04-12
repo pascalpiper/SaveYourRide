@@ -13,12 +13,10 @@ import com.example.saveyourride.utils.Interval;
 public class TimerService extends Service {
 
     //BroadcastReceiver for ActiveFragment
-    BroadcastReceiver activeFragmentReceiver;
-    IntentFilter filter = new IntentFilter();
-    private int intervalCount = 0;
-    private long intervalTime;
-    private int numberOfIntervals;
-    private Interval interval;
+    private BroadcastReceiver activeFragmentReceiver;
+    private IntentFilter filter;
+
+    private int minutes, seconds;
 
     @Override
     public void onCreate() {
@@ -39,18 +37,17 @@ public class TimerService extends Service {
                         // DEBUG
                         System.out.println("Service hat start bekommen");
                         //
-                        setIntervalTime(intent.getLongExtra("intervalTime", 0));
-                        setNumberOfIntervals(intent.getIntExtra("numberOfIntervals", 0));
+                        int numberOfIntervals = intent.getIntExtra("numberOfIntervals", 0);
+                        long intervalTime = intent.getLongExtra("intervalTime", 0);
 
-                        //Interval
-                        interval = new Interval(intervalTime);
-                        interval.start();
+                        //run the Intervals
+                        runIntervals(numberOfIntervals, intervalTime);
+
                         break;
                     }
                     case "android.intent.action.INTERVAL_RESET": {
                         //reset CountDownTimer
                         System.out.println("Timer reseten!");
-                        interval.reset();
                         break;
                     }
                     default: {
@@ -61,6 +58,7 @@ public class TimerService extends Service {
             }
         };
 
+        filter = new IntentFilter();
         filter.addAction("android.intent.action.INTERVAL_RESET");
         filter.addAction("android.intent.action.INTERVAL_START");
         //registering our receiver
@@ -69,24 +67,39 @@ public class TimerService extends Service {
 
     }
 
-    public void sendBroadcastToMainScreen(int intervallCounter) {
+    public void sendBroadcastToMainScreen(int intervalCount) {
         Intent i = new Intent("android.intent.action.INTERVAL_COUNT").putExtra("interval_count", Integer.toString(intervalCount));
         this.sendBroadcast(i);
     }
 
-    public void setNumberOfIntervals(int numberOfIntervals) {
-        this.numberOfIntervals = numberOfIntervals;
-    }
+    private void runIntervals(int numberOfIntervals, long intervalTime) {
+        Interval[] intervals = new Interval[numberOfIntervals];
+        for (int i = 0; i < intervals.length; i++) {
+            intervals[i] = new Interval(intervalTime, this);
 
-    public void setIntervalTime(long intervalTime) {
-        this.intervalTime = intervalTime;
+            if(i == 0) {
+                intervals[i].start();
+            }
+            else {
+                synchronized (this) {
+                    try {
+                        this.wait();
+                        intervals[i].start();
+                    }
+                    catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        interval.stop();
         System.out.println("ich wurde zerstört");
+        // TODO: INTERVAL TIMER STOPEN
     }
 
     @Nullable
@@ -95,4 +108,8 @@ public class TimerService extends Service {
         return null;
     }
 
+    public void setValues(int minutes, int seconds) {
+        this.minutes = minutes;
+        this.seconds = seconds;
+    }
 }
