@@ -16,7 +16,7 @@ public class TimerService extends Service {
     private BroadcastReceiver activeFragmentReceiver;
     private IntentFilter filter;
 
-    private int minutes, seconds;
+    private int minutes, seconds, intervalCount;
 
     @Override
     public void onCreate() {
@@ -64,6 +64,8 @@ public class TimerService extends Service {
         //registering our receiver
         registerReceiver(activeFragmentReceiver, filter);
         ///End - BroadcastReceiver for TimerService
+        // TODO Check if it is not async...
+        sendBroadcastToActiveFragment("serviceReady");
 
     }
 
@@ -80,10 +82,7 @@ public class TimerService extends Service {
                 break;
             }
             case "sendIntervallTime" : {
-                // TODO send IntervallTime
-                int restIntervalTimeSec = 20;
-                int restIntervalTimeMin = 2;
-                Intent i = new Intent("android.intent.action.REST_INTERVAL_TIME").putExtra("rest_interval_time_sec", Integer.toString(restIntervalTimeSec)).putExtra("rest_interval_time_min", Integer.toString(restIntervalTimeMin));
+                Intent i = new Intent("android.intent.action.REST_INTERVAL_TIME").putExtra("rest_interval_time_sec", Integer.toString(seconds)).putExtra("rest_interval_time_min", Integer.toString(minutes));
                 this.sendBroadcast(i);
                 break;
             }
@@ -95,9 +94,10 @@ public class TimerService extends Service {
 
     private void runIntervals(int numberOfIntervals, long intervalTime) {
         Interval[] intervals = new Interval[numberOfIntervals];
-        for (int i = 0; i < intervals.length; i++) {
+        for (int i = 0; i < 1; i++) {
             intervals[i] = new Interval(intervalTime, this);
 
+            intervalCount = i;
             if(i == 0) {
                 intervals[i].start();
             }
@@ -112,6 +112,7 @@ public class TimerService extends Service {
                     }
                 }
             }
+            sendBroadcastToActiveFragment("sendIntervallCount");
 
         }
     }
@@ -132,5 +133,6 @@ public class TimerService extends Service {
     public void setValues(int minutes, int seconds) {
         this.minutes = minutes;
         this.seconds = seconds;
+        sendBroadcastToActiveFragment("sendIntervallTime");
     }
 }

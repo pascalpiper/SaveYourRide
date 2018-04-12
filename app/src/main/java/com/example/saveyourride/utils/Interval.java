@@ -39,9 +39,10 @@ public class Interval {
 
             @Override
             public void onFinish() {
-                synchronized (timerService) {
-                    timerService.notify();
-                }
+                System.out.println("ON FINISH!");
+//                synchronized (timerService) {
+//                    timerService.notify();
+//                }
             }
         };
     }
