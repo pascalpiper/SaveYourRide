@@ -27,7 +27,8 @@ public class Active extends Fragment {
     private boolean isStarted = false;
     private final Intent intentStartIntervallTimer = new Intent(getActivity(), IntervallTimer.class);
 
-    private int maxIntervals = 6;
+    private final int maxIntervals = 6;
+    private final long intervalTime = 100L;
 
     //BroadcastReceiver for ActiveFragment
     BroadcastReceiver mReceiver;
@@ -44,17 +45,14 @@ public class Active extends Fragment {
         buttonStopTimer = (Button) fragmentView.findViewById(R.id.buttonStopTimer);
         textViewTimerCount = (TextView) fragmentView.findViewById(R.id.textViewTimerCount);
 
-        totalTime = 10000;
-        interval = 1000;
-
         buttonStartTimer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isStarted){
-                    // TODO: Reset Timer
-                }
-                else {
+                if (isStarted) {
+                    resetTimer();
+                } else {
                     getActivity().startService(intentStartIntervallTimer);
+                    sendBroadcastToIntervallTimer("starts");
                 }
             }
         });
@@ -76,7 +74,7 @@ public class Active extends Fragment {
             public void onReceive(Context context, Intent intent) {
                 //extract our message from intent
                 String stringIntervallCounter = intent.getStringExtra("intervall_counter");
-                System.out.println("Fragment-Receiver: "+ stringIntervallCounter);
+                System.out.println("Fragment-Receiver: " + stringIntervallCounter);
                 buttonStartTimer.setText(stringIntervallCounter);
             }
         };
@@ -85,6 +83,30 @@ public class Active extends Fragment {
         ///End - BroadcastReceiver for ActiveFragment
 
         return fragmentView;
+    }
+
+    public void resetTimer(){
+            sendBroadcastToIntervallTimer("reset");
+        }
+
+    /**
+     * This method will send a broadcast to the service IntervallTimer
+     */
+    public void sendBroadcastToIntervallTimer(String broadcast) {
+
+        switch (broadcast) {
+
+            case "reset": {
+                Intent i = new Intent("android.intent.action.INTERVAL_RESET");
+                getActivity().sendBroadcast(i);
+                break;
+            }
+            case "start": {
+                Intent i = new Intent("android.intent.action.INTERVAL_START").putExtra("maxIntervals", maxIntervals).putExtra("intervalTime", intervalTime);
+                getActivity().sendBroadcast(i);
+                break;
+            }
+        }
     }
 
 }
