@@ -72,8 +72,12 @@ public class Active extends Fragment {
 
         //BroadcastReceiver for ActiveFraagment
         /*
-         * This BroadcastReceiver receive the intervallCounter and a finish-message from the
-         * service "TimerService". They will be shown in this fragment.
+         * This BroadcastReceiver receive the broadcasts from the TimerService
+         * It can receive following broadcasts:
+         * -intervallCount
+         * -restIntervallTime
+         * -finish-message from the Timer
+         * -status, that the Service is ready
          */
         timerServiceReceiver = new BroadcastReceiver() {
 
@@ -99,7 +103,7 @@ public class Active extends Fragment {
                         break;
                     }
                 default:
-                    System.out.println("No Broadcast Receive");
+                    Toast.makeText(getActivity(),"Unkown Broadcast receive", Toast.LENGTH_LONG).show();
                }
 
 
@@ -124,6 +128,8 @@ public class Active extends Fragment {
 
     /**
      * This method will send a broadcast to the service TimerService
+     * case reset => TimerService will reset and restart
+     * case start => TierService got the numberOfIntervals and the intervalTime. Then it will start.
      */
     public void sendBroadcastToTimerService(String broadcast) {
 
