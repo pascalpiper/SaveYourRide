@@ -6,14 +6,13 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 
-public class IntervallTimer extends IntentService {
+public class IntervallTimer extends IntentService implements Runnable {
 
     int intervallCounter = 0;
     int intervallTime = 10000;
     int maxIntervalls = 6;
 
     Handler customHandler = new Handler();
-    public static final String SERVICE_REQUEST = "com.example.app.service.SERVICE_REQUEST";
 
 
     /**
@@ -34,7 +33,7 @@ public class IntervallTimer extends IntentService {
         // Normally we would do some work here, like download a file.
         // For our sample, we just sleep for 5 seconds.
         try {
-            customHandler.post(intervallThread);
+            customHandler.post(this);
 
         } catch (Exception e) {
             // Restore interrupt status.
@@ -42,33 +41,31 @@ public class IntervallTimer extends IntentService {
         }
     }
 
-    private Runnable intervallThread = new Runnable() {
+    @Override
+    public void run() {
+        if (intervallCounter < maxIntervalls) {
+            //intervallBenachrichtigung(intervallCounter);
 
-        public void run() {
+            sendBroadcastToMainScreen(intervallCounter);
+            System.out.println("Service: " + intervallCounter);
+            intervallCounter++;
+            customHandler.postDelayed(this, intervallTime);
 
-            if (intervallCounter < maxIntervalls) {
-                //intervallBenachrichtigung(intervallCounter);
-
-                sendBroadcastToMainScreen(intervallCounter);
-                System.out.println("Service: " + intervallCounter);
-                intervallCounter++;
-                customHandler.postDelayed(this, intervallTime);
-
-// ...
-
-
-
-            } else {
-                System.out.println("Notruf");
-               // button.setText("Notruf");
-            }
-
+        } else {
+            System.out.println("Notruf");
+            // button.setText("Notruf");
         }
-    };
+    }
+
 
     public void sendBroadcastToMainScreen(int intervallCounter){
         Intent i = new Intent("android.intent.action.FINISHED").putExtra("some_msg", Integer.toString(intervallCounter));
         this.sendBroadcast(i);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        System.out.println("ich wurde zerstört");
+    }
 }
