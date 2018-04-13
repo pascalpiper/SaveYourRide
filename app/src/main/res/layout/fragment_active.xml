@@ -6,6 +6,17 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/textViewIntervalCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/textViewTimer"
+        android:layout_centerHorizontal="true"
+        android:text="Interval Count"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="55sp"
+        android:textStyle="bold" />
+
+    <TextView
         android:id="@+id/textViewTimer"
         android:layout_centerVertical="true"
         android:layout_width="wrap_content"
@@ -48,16 +59,15 @@
 
     <Button
         android:id="@+id/buttonStopTimer"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_below="@+id/textViewTimer"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="38.5dp"
+        android:layout_toEndOf="@+id/buttonStartTimer"
         android:background="@drawable/round_button"
-        android:elevation="16dp"
+        android:elevation="3dp"
         android:text="STOP"
-        android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/colorWhite"
         android:textStyle="bold|italic" />
 
