@@ -27,9 +27,9 @@
         android:textStyle="bold|italic" />
 
     <View
-        android:id="@+id/view"
+        android:id="@+id/passiveFragmentGradientView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/passive_fragment_gradient" />
+        android:background="@drawable/fragments_gradient" />
 
 </FrameLayout>
