@@ -1,20 +1,28 @@
 <resources>
 
+    <!-- GOOGLE MAPS KEY -->
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyB6LKT60C_EPzIXzTo13PFcZKFFABt9q3E</string>
 
-    <string name="app_name">SaveYourRide</string>
+
     <string name="edit_message">Enter a message</string>
     <string name="settings">Settings</string>
     <string name="title_activity__active">Activity_Active</string>
 
-    <string name="passive">Passive</string>
-    <string name="active">Active</string>
-    <string name="title_activity_passive_mode">PassiveMode</string>
-
+    <!-- BUTTONS-->
     <string name="start">START</string>
     <string name="stop">STOP</string>
+    <string name="reset">RESET</string>
+
+    <!-- TEXT VIEWS -->
     <string name="intervalCount">Interval Count</string>
+    <string name="timer">TIMER</string>
+
+    <!-- TITLES -->
+    <string name="app_name">SaveYourRide</string>
+    <string name="title_activity_passive_mode">PassiveMode</string>
     <string name="title_activity_active_mode">activeMode</string>
+    <string name="title_passive_tab">Passive</string>
+    <string name="title_active_tab">Active</string>
 
     <!-- DESCRIPTIONS -->
     <string name="colored_background">colored background</string>

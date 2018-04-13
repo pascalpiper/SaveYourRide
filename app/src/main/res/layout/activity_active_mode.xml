@@ -1,21 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".activities.ActiveMode">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    tools:context=".activities.ActiveMode">
 
-        <TextView
-            android:id="@+id/textViewIntervalCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="Interval Count"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="55sp"
-            android:textStyle="bold"
-            android:layout_marginTop="119dp" />
+    <View
+        android:id="@+id/activeFragmentGradientView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/white_gradient"
+        android:elevation="1dp" />
+
+    <TextView
+        android:id="@+id/textViewIntervalCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="119dp"
+        android:text="@string/intervalCount"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/colorWhite"
+        android:textSize="55sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/textViewTimer"
@@ -24,7 +32,8 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="203dp"
-        android:text="TIMER"
+        android:text="@string/timer"
+        android:textColor="@color/colorWhite"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="50sp"
         android:textStyle="bold|italic" />
@@ -35,31 +44,33 @@
         android:layout_height="150dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="132dp"
+        android:layout_marginBottom="150dp"
         android:background="@drawable/round_button"
         android:clickable="true"
         android:elevation="10dp"
         android:focusable="true"
-        android:text="RESET"
+        android:text="@string/reset"
+        android:textSize="35sp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/colorWhite"
         android:textStyle="bold|italic" />
 
     <Button
         android:id="@+id/buttonStopTimer"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="43dp"
+        android:layout_marginBottom="50dp"
         android:background="@drawable/round_button"
         android:elevation="3dp"
-        android:text="STOP"
+        android:text="@string/stop"
+        android:textSize="20sp"
         android:textColor="@color/colorWhite"
         android:textStyle="bold|italic" />
 
 
-    </RelativeLayout>
+</RelativeLayout>
 
 
 

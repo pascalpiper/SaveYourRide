@@ -9,7 +9,7 @@
         android:id="@+id/activeFragmentGradientView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/fragments_gradient"
+        android:background="@drawable/white_gradient"
         android:elevation="1dp" />
 
     <ImageView
