@@ -9,5 +9,6 @@
 
     <string name="passive">Passiv</string>
     <string name="active">Aktiv</string>
+    <string name="title_activity_active_mode">activeMode</string>
 
 </resources>

@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
+import com.example.saveyourride.activities.MainScreen;
 import com.example.saveyourride.utils.Interval;
 
 public class TimerService extends Service {
@@ -17,6 +18,9 @@ public class TimerService extends Service {
 
     // IntentFilter filters messages received by BroadcastReceiver
     private IntentFilter filter;
+
+    private Intent intentMainScreen;
+
 
     private int minutes, seconds, intervalCount;
 
@@ -31,6 +35,7 @@ public class TimerService extends Service {
         super.onCreate();
 
         intervalCount = 0;
+        intentMainScreen = new Intent(this.getApplicationContext(), MainScreen.class);
 
         // DEBUG
         System.out.println("Service gestartet");
@@ -166,6 +171,7 @@ public class TimerService extends Service {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(activeFragmentReceiver);
+        startActivity(intentMainScreen);
         System.out.println("SERVICE ON DESTROY");
         // TODO: INTERVAL TIMER STOPEN
     }
