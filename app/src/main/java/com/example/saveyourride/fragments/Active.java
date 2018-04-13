@@ -100,7 +100,7 @@ public class Active extends Fragment {
                     case "android.intent.action.INTERVAL_COUNT": {
                         int intervalCount = intent.getIntExtra("interval_count", -1);
                         System.out.println("Fragment-Receiver received interval count: " + intervalCount);
-                        buttonStartTimer.setText(Integer.toString(intervalCount));
+                        //buttonStartTimer.setText(Integer.toString(intervalCount));
                         break;
                     }
                     case "android.intent.action.REST_INTERVAL_TIME": {
