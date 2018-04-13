@@ -23,17 +23,19 @@ public class TimerService extends Service {
     private int numberOfIntervals;
     private long intervalTime;
 
-    /// TEST
-    private Interval firstInterval;
-    ///
+    private Interval currentInterval;
+
 
     @Override
     public void onCreate() {
         super.onCreate();
 
+        intervalCount = 0;
+
         // DEBUG
         System.out.println("Service gestartet");
         //
+
 
         /// BroadcastReceiver for TimerService
         /*
@@ -53,7 +55,7 @@ public class TimerService extends Service {
                         intervalTime = intent.getLongExtra("intervalTime", 0);
 
                         //run the intervals
-                        runIntervals();
+                        runInterval(intervalCount);
 
                         break;
                     }
@@ -94,48 +96,36 @@ public class TimerService extends Service {
 
     }
 
-    private void runIntervals() {
+    public void runInterval(int intervalCount) {
 
         // DEBUG RUN ONE INTERVAL FIRST
-        firstInterval = new Interval(intervalTime, this);
-        intervalCount = 0;
-        firstInterval.start();
-        sendBroadcastToActiveFragment("intervalCount");
+//        firstInterval = new Interval(intervalTime, this, sperre);
+//        intervalCount = 0;
+//        firstInterval.start();
+//        sendBroadcastToActiveFragment("intervalCount");
         //
 
-//        Interval[] intervals = new Interval[numberOfIntervals];
-//        for (int i = 0; i < 1; i++) {
-//            intervals[i] = new Interval(intervalTime, this);
-//
-//            intervalCount = i;
-//            if(i == 0) {
-//                intervals[i].start();
-//            }
-//            else {
-//                synchronized (this) {
-//                    try {
-//                        this.wait();
-//                        intervals[i].start();
-//                    }
-//                    catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//            sendBroadcastToActiveFragment("intervalCount");
-//
-//        }
+            if(intervalCount < numberOfIntervals) {
+                currentInterval = new Interval(intervalTime, this, intervalCount);
+                currentInterval.start();
+                this.intervalCount = intervalCount;
+                sendBroadcastToActiveFragment("intervalCount");
+            }
+            else {
+                sendBroadcastToActiveFragment("timerFinish");
+        }
     }
 
     private void stopIntervals() {
         // DEBUG STOP ONLY ONE INTERVAL
-        firstInterval.stop();
+        currentInterval.stop();
         //
     }
 
     private void resetIntervals() {
         stopIntervals();
-        runIntervals();
+        intervalCount = 0;
+        runInterval(intervalCount);
     }
 
     public void setValues(int minutes, int seconds) {
@@ -185,4 +175,5 @@ public class TimerService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
 }

@@ -16,12 +16,14 @@ public class Interval {
     private int seconds, minutes;
     private long intervalTime;
     private CountDownTimer timer;
+    private int intervalCount;
 
-    public Interval(long intervalTime, TimerService timerService) {
+    public Interval(long intervalTime, TimerService timerService, int intervalCount) {
         this.timerService = timerService;
         this.intervalTime = intervalTime;
         this.seconds = 0;
         this.minutes = 0;
+        this.intervalCount = intervalCount;
     }
 
     public void start() {
@@ -43,9 +45,9 @@ public class Interval {
             @Override
             public void onFinish() {
                 System.out.println("ON FINISH!");
-//                synchronized (timerService) {
-//                    timerService.notify();
-//                }
+                intervalCount++;
+                timerService.runInterval(intervalCount);
+
             }
         };
         timer.start();
@@ -55,4 +57,5 @@ public class Interval {
         timer.cancel();
 
     }
+
 }

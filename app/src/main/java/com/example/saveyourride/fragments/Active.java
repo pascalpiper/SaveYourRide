@@ -71,7 +71,7 @@ public class Active extends Fragment {
             @Override
             public void onClick(View v) {
                 sendBroadcastToTimerService("stopTimer");
-                getActivity().stopService(intentTimerService);
+                //getActivity().stopService(intentTimerService);
             }
         });
 
@@ -158,5 +158,17 @@ public class Active extends Fragment {
                 Toast.makeText(getActivity(), "Unknown broadcast!", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getActivity().unregisterReceiver(timerServiceReceiver);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().registerReceiver(timerServiceReceiver, filter);
     }
 }
