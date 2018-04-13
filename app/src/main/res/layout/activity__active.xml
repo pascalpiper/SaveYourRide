@@ -4,7 +4,7 @@
     android:id="@+id/activity_active1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.saveyourride.activities.Activity_Active">
+    tools:context=".activities.Activity_Active">
 
     <Button
         android:text="START"
