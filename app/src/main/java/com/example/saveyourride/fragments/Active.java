@@ -32,6 +32,7 @@ public class Active extends Fragment {
 
     private Button buttonStartTimer;
     private Button buttonStopTimer;
+    private TextView textViewIntervalCount;
     private TextView textViewTime;
 
     private boolean isStarted = false; // TODO: check when it must be set.
@@ -51,6 +52,7 @@ public class Active extends Fragment {
         buttonStartTimer = (Button) fragmentView.findViewById(R.id.buttonStartTimer);
         buttonStopTimer = (Button) fragmentView.findViewById(R.id.buttonStopTimer);
         textViewTime = (TextView) fragmentView.findViewById(R.id.textViewTimer);
+        textViewIntervalCount = (TextView) fragmentView.findViewById(R.id.textViewIntervalCount);
 
         buttonStartTimer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,7 +102,7 @@ public class Active extends Fragment {
                     case "android.intent.action.INTERVAL_COUNT": {
                         int intervalCount = intent.getIntExtra("interval_count", -1);
                         System.out.println("Fragment-Receiver received interval count: " + intervalCount);
-                        //buttonStartTimer.setText(Integer.toString(intervalCount));
+                        textViewIntervalCount.setText(Integer.toString(intervalCount));
                         break;
                     }
                     case "android.intent.action.REST_INTERVAL_TIME": {
