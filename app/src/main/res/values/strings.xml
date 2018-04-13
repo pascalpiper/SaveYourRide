@@ -14,5 +14,6 @@
     <string name="start">START</string>
     <string name="stop">STOP</string>
     <string name="intervalCount">Interval Count</string>
+    <string name="title_activity_active_mode">activeMode</string>
 
 </resources>

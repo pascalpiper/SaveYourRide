@@ -27,14 +27,13 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activities.Activity_Active"
-            android:label="@string/title_activity__active"
             android:launchMode="singleTop"
+            android:label="@string/title_activity__active"
             android:parentActivityName=".activities.MainScreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -43,6 +42,17 @@
         <activity
             android:name=".activities.PassiveMode"
             android:label="@string/title_activity_passive_mode"
+            android:parentActivityName=".activities.MainScreen"
+            android:theme="@style/AppTheme.NoActionBar">
+            android:launchMode="singleTop"
+            android:parentActivityName=".activities.MainScreen">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.saveyourride.activities.MainScreen" />
+        </activity>
+        <activity
+            android:name=".activities.ActiveMode"
+            android:label="@string/title_activity_active_mode"
             android:parentActivityName=".activities.MainScreen"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
