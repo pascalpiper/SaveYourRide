@@ -68,8 +68,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
      */
     private boolean mPermissionDenied = false;
 
-    private final int REQUEST = 1;
-    // Because of Fragment we need activity object.
+    // Because of Fragment we need an activity object.
     private FragmentActivity myActivity;
     private SupportMapFragment mapFragment;
     private GoogleMap myGoogleMap;
@@ -129,7 +128,6 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
 
         myGoogleMap = googleMap;
 
-
         if (ContextCompat.checkSelfPermission(myActivity, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // Permission to access the location is missing.
@@ -171,7 +169,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
             } else {
                 // location services are disabled
                 LatLng germanyLatLng = new LatLng(50.980602, 10.314458);
-                myGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(germanyLatLng, 6));
+                myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(germanyLatLng, 6));
                 Toast.makeText(myActivity, "Your Location-Services are probably disabled. You can not use some features.", Toast.LENGTH_LONG).show();
             }
         } else {
@@ -198,7 +196,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
      */
     private boolean getMyLocation() {
 
-        // Permission Chek
+        // Permission Check
         if (ContextCompat.checkSelfPermission(myActivity, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // Permission to access the location is missing.
@@ -262,7 +260,6 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
 
     /**
      * Check if Location Services are enabled. If they are not, start dialog window and settings.
-     *
      * @param lm LocationManager provide information about Location-Services.
      */
     private boolean locationServicesCheck(LocationManager lm) {
@@ -339,10 +336,10 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
                     Manifest.permission.ACCESS_FINE_LOCATION, true);
         }
 
-        LocationListener gpsListener = getGpsLocationListener();
-        myLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsListener);
-        LocationListener networkListener = getNetworkLocationListener();
-        myLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, networkListener);
+        gpsLocationListener = getGpsLocationListener();
+        myLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsLocationListener);
+        networkLocationListener = getNetworkLocationListener();
+        myLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, networkLocationListener);
     }
 
     /**
@@ -427,6 +424,17 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
             // Display the missing permission error dialog when the fragments resume.
             initWithoutPermission();
             mPermissionDenied = true;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mPermissionDenied) {
+            // Permission was not granted, display error dialog.
+            showMissingPermissionError();
+            initWithoutPermission();
+            mPermissionDenied = false;
         }
     }
 

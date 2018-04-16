@@ -1,9 +1,11 @@
 package com.example.saveyourride.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.saveyourride.R;
+import com.example.saveyourride.services.LocationService;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -30,6 +32,12 @@ public class PassiveMode extends AppCompatActivity {
                 googleMap.getUiSettings().setAllGesturesEnabled(false);
             }
         });
+
+        // START LOCATION SERVICE
+        Intent intentLocationService = new Intent(getApplicationContext(), LocationService.class);
+        startService(intentLocationService);
+        System.out.println("START OF LOCATION_SERVICE");
+        //
     }
 
 }
