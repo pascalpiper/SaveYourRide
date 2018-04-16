@@ -20,7 +20,13 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <!-- Services for Active Mode -->
         <service android:name=".services.TimerService" />
+
+        <!-- Services for Passive Mode -->
+        <service android:name=".services.ControlService" />
+        <service android:name=".services.Accelerometer" />
+
 
         <activity
             android:name=".activities.MainScreen"
