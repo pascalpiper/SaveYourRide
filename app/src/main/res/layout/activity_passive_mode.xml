@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".activities.PassiveMode">
 
+    <View
+        android:id="@+id/passiveModeGradientView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/white_long_gradient"
+        android:elevation="1dp" />
+
     <fragment
         android:id="@+id/mapInPassiveMode"
         android:name="com.google.android.gms.maps.SupportMapFragment"
