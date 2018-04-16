@@ -15,7 +15,7 @@ public class LocationService extends Service {
     private static final String TAG = "LOCATION_SERVICE";
     //
     private static final int LOCATION_INTERVAL = 1000;
-    private static final float LOCATION_DISTANCE = 10f;
+    private static final float LOCATION_DISTANCE = 0f;
     private LocationManager mLocationManager;
     LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER),
@@ -90,7 +90,7 @@ public class LocationService extends Service {
 
         @Override
         public void onLocationChanged(Location location) {
-            Log.d(TAG, "onLocationChanged: " + location);
+            Log.d(TAG, "onLocationChanged: " + location + "Speed:" + location.getSpeed());
             mLastLocation.set(location);
         }
 

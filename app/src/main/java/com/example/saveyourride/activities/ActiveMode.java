@@ -21,16 +21,12 @@ public class ActiveMode extends AppCompatActivity {
     private final int numberOfIntervals = 6;
     private final long intervalTime = 10000L;
 
-    private Intent intentTimerService, intentMainScreen;
-
     // BroadcastReceiver for messages from TimerService
     private BroadcastReceiver timerServiceReceiver;
 
     // IntentFilter filters messages received by BroadcastReceiver
     private IntentFilter filter;
 
-    private Button buttonStartTimer;
-    private Button buttonStopTimer;
     private TextView textViewIntervalCount;
     private TextView textViewTime;
 
@@ -40,15 +36,15 @@ public class ActiveMode extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_mode);
 
-        intentTimerService = new Intent(this.getApplicationContext(), TimerService.class);
+        final Intent intentTimerService = new Intent(this.getApplicationContext(), TimerService.class);
         filter = new IntentFilter();
 
         filter.addAction("android.intent.action.TIMER_SERVICE_READY");
         filter.addAction("android.intent.action.INTERVAL_COUNT");
         filter.addAction("android.intent.action.REST_INTERVAL_TIME");
 
-        buttonStartTimer = (Button)findViewById(R.id.buttonResetTimer);
-        buttonStopTimer = (Button)findViewById(R.id.buttonStopTimer);
+        Button buttonStartTimer = (Button) findViewById(R.id.buttonResetTimer);
+        Button buttonStopTimer = (Button) findViewById(R.id.buttonStopTimer);
         textViewTime = (TextView)findViewById(R.id.textViewTimer);
         textViewIntervalCount = (TextView)findViewById(R.id.textViewIntervalCount);
 

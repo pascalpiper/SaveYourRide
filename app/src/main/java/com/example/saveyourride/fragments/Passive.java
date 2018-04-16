@@ -39,20 +39,6 @@ import static android.content.Context.LOCATION_SERVICE;
 
 /**
  * Updated by taraszaika on 20.04.18.
- * <p>
- * Copyright (C) 2012 The Android Open Source Project
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 public class Passive extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -118,8 +104,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
+     * This is where we can add markers or lines, add listeners or move the camera.
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
@@ -127,6 +112,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
     private void myOnMapReady(GoogleMap googleMap) {
 
         myGoogleMap = googleMap;
+        googleMap.getUiSettings().setAllGesturesEnabled(false);
 
         if (ContextCompat.checkSelfPermission(myActivity, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -191,7 +177,6 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
 
     /**
      * Tries to get {@link Location} of Device. First of all it checkes last known {@link Location}. If no one is available it requests for one.
-     *
      * @return true if location found, flase - if not.
      */
     private boolean getMyLocation() {
@@ -242,7 +227,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
                 myLocationManager.removeUpdates(getGpsLocationListener());
                 myLocationManager.removeUpdates(getNetworkLocationListener());
                 LatLng currentLatLng = new LatLng(sharedLatitude, sharedLongitude);
-                myGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 13));
+                myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17));
                 return true;
             }
         } else {
@@ -252,7 +237,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
             double latitude = currentLocation.getLatitude();
             double longitude = currentLocation.getLongitude();
             LatLng currentLatLng = new LatLng(latitude, longitude);
-            myGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 13));
+            myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17));
             return true;
         }
 
@@ -357,7 +342,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
                 editor.putString("Longitude", Double.toString(location.getLongitude()));
                 editor.apply();
                 LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 13));
+                myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17));
 
             }
 
@@ -390,7 +375,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
                 editor.putString("Longitude", Double.toString(location.getLongitude()));
                 editor.apply();
                 LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 13));
+                myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17));
 
             }
 
