@@ -171,6 +171,7 @@ public class TimerService extends Service {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(activeFragmentReceiver);
+        currentInterval.stop();
         startActivity(intentMainScreen);
         System.out.println("SERVICE ON DESTROY");
         // TODO: INTERVAL TIMER STOPEN
