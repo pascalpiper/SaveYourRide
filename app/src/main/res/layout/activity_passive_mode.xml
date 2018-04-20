@@ -20,7 +20,7 @@
         android:textColor="@color/colorWhite"
         android:textStyle="bold|italic" />
 
-    <!-- ONLY FOR THIS BRANCH -->
+    <!-- ONLY FOR TESTS -->
     <Button
         android:id="@+id/buttonReadFromFile"
         android:layout_width="65dp"
@@ -34,6 +34,9 @@
         android:textColor="@color/colorWhite"
         android:textSize="20sp"
         android:textStyle="bold|italic" />
+
+
+    <!--               -->
 
     <View
         android:id="@+id/passiveModeGradientView"

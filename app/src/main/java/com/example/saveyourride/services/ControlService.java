@@ -27,6 +27,7 @@ public class ControlService extends Service {
 
     /// ONLY FOR TESTS
     private File accelerometerDataFile;
+    private String accelerometerData;
     ///
 
     @Override
@@ -62,8 +63,8 @@ public class ControlService extends Service {
                 System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit " + intent.getFloatExtra("acceleration", -1));
 
                 /// ONLY FOR TESTS
-                String data = "BLA BLA BLA BLA " + intent.getFloatExtra("acceleration", -1);
-                writeAccelerometerDataToFile(accelerometerDataFile, data);
+                accelerometerData = accelerometerData + "\n" + "Acceleration is: " + intent.getFloatExtra("acceleration", -1);
+                //writeAccelerometerDataToFile(accelerometerDataFile, accelerometerData);
                 ///
             }
         });
@@ -140,7 +141,6 @@ public class ControlService extends Service {
         int length = (int) file.length();
         byte[] bytes = new byte[length];
 
-
         try {
             FileInputStream in = new FileInputStream(file);
             in.read(bytes);
@@ -162,6 +162,9 @@ public class ControlService extends Service {
         Intent mainScreen = new Intent(this.getApplicationContext(), MainScreen.class);
         startActivity(mainScreen);
 
+        /// ONLY FOR TESTSWrite received broadcast into file
+        writeAccelerometerDataToFile(accelerometerDataFile, accelerometerData);
+        ///
     }
 
 
