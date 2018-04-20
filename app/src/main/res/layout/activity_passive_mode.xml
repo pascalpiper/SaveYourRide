@@ -20,6 +20,21 @@
         android:textColor="@color/colorWhite"
         android:textStyle="bold|italic" />
 
+    <!-- ONLY FOR THIS BRANCH -->
+    <Button
+        android:id="@+id/buttonReadFromFile"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_above="@+id/buttonStopPassiveMode"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="50dp"
+        android:background="@drawable/round_button"
+        android:elevation="3dp"
+        android:text="READ"
+        android:textColor="@color/colorWhite"
+        android:textSize="20sp"
+        android:textStyle="bold|italic" />
+
     <View
         android:id="@+id/passiveModeGradientView"
         android:layout_width="wrap_content"

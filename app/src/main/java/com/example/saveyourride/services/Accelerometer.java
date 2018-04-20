@@ -1,6 +1,5 @@
 package com.example.saveyourride.services;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -75,6 +74,12 @@ public class Accelerometer extends Service implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        senSensorManager.unregisterListener(this, senAccelerometer);
     }
 
     @Nullable

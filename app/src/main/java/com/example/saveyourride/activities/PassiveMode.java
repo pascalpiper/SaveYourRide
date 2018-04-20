@@ -50,9 +50,14 @@ public class PassiveMode extends AppCompatActivity {
             }
         });
 
+        /// ONLY FOR TESTS
 
-
-
+        Button buttonRead = (Button) findViewById(R.id.buttonReadFromFile);
+        buttonRead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // DO SOMETHING
+            }
+        });
     }
-
 }

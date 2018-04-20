@@ -117,6 +117,9 @@ public class ControlService extends Service {
 
     private void stopAllServices(){
         for (Intent service :services){
+            // DEBUG
+            System.out.println("STOP SERVICE: " + service.toString());
+            //
             stopService(service);
         }
     }
