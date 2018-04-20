@@ -15,7 +15,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ControlService extends Service {
 
@@ -63,7 +65,7 @@ public class ControlService extends Service {
                 System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit " + intent.getFloatExtra("acceleration", -1));
 
                 /// ONLY FOR TESTS
-                accelerometerData = accelerometerData + "\n" + "Acceleration is: " + intent.getFloatExtra("acceleration", -1);
+                accelerometerData = accelerometerData + "\n" + "Acceleration is: " + intent.getFloatExtra("acceleration", -1) + " TimeStamp: " + getCurrentReadbleDate();
                 //writeAccelerometerDataToFile(accelerometerDataFile, accelerometerData);
                 ///
             }
@@ -149,6 +151,13 @@ public class ControlService extends Service {
             e.printStackTrace();
         }
         return new String(bytes);
+    }
+
+    private String getCurrentReadbleDate() {
+        long yourmilliseconds = System.currentTimeMillis();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        Date resultdate = new Date(yourmilliseconds);
+        return sdf.format(resultdate);
     }
     ///
 

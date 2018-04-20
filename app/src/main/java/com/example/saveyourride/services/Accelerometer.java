@@ -10,8 +10,6 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import java.util.regex.Matcher;
-
 /*
  * Created by taraszaika on 03.04.18.
  * new Accelerometer
@@ -21,7 +19,7 @@ public class Accelerometer extends Service implements SensorEventListener {
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
 
-    private static final int SHAKE_THRESHOLD = 30;
+    private static final int SHAKE_THRESHOLD = 130;
 
     @Override
     public void onCreate() {
