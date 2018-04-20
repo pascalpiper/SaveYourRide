@@ -47,6 +47,7 @@ public class PassiveMode extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 stopService(controlService);
+                // TODO: not only stop a service also finish an activity
             }
         });
 
