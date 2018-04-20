@@ -92,6 +92,10 @@ public class LocationService extends Service {
         public void onLocationChanged(Location location) {
             Log.d(TAG, "onLocationChanged: " + location + "Speed:" + location.getSpeed());
             mLastLocation.set(location);
+
+            //Send locationSpeed to ControlService
+            Intent locationSpeed = new Intent("android.intent.action.LOCATION").putExtra("location_speed", location.getSpeed());
+            sendBroadcast(locationSpeed);
         }
 
         @Override
