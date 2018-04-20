@@ -30,6 +30,7 @@ public class ControlService extends Service {
     /// ONLY FOR TESTS
     private File accelerometerDataFile;
     private String accelerometerData;
+    private String currentLocationString;
     ///
 
     @Override
@@ -66,7 +67,10 @@ public class ControlService extends Service {
                 System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit " + intent.getFloatExtra("acceleration", -1));
 
                 /// ONLY FOR TESTS
-                accelerometerData = accelerometerData + "\n" + "Acceleration is: " + intent.getFloatExtra("acceleration", -1) + " TimeStamp: " + getCurrentReadbleDate();
+                accelerometerData = accelerometerData + "\n" +
+                        "Acceleration is: " + intent.getFloatExtra("acceleration", -1) +
+                        " :: " + currentLocationString +
+                        " TimeStamp: " + getCurrentReadbleDate();
                 //writeAccelerometerDataToFile(accelerometerDataFile, accelerometerData);
                 ///
             }
@@ -79,6 +83,10 @@ public class ControlService extends Service {
             public void onReceive(Context context, Intent intent) {
                 Log.d(TAG, "Broadcast from LocationService");
                 Log.d(TAG, "Location Speed: " + intent.getFloatExtra("location_speed", -1));
+                currentLocationString = "LOCATION:" +
+                        " Latitude: " + intent.getDoubleExtra("location_latitude", -1d) +
+                        " Longitude: " + intent.getDoubleExtra("location_longitude", -1d) +
+                        " Speed: " + intent.getFloatExtra("location_speed", -1f);
             }
         });
 

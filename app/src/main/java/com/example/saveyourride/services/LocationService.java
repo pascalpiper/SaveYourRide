@@ -15,7 +15,7 @@ public class LocationService extends Service {
     private static final String TAG = "LOCATION_SERVICE";
     //
     private static final int LOCATION_INTERVAL = 1000;
-    private static final float LOCATION_DISTANCE = 0f;
+    private static final float LOCATION_DISTANCE = 10f;
     private LocationManager mLocationManager;
     LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER),
@@ -94,7 +94,10 @@ public class LocationService extends Service {
             mLastLocation.set(location);
 
             //Send locationSpeed to ControlService
-            Intent locationSpeed = new Intent("android.intent.action.LOCATION").putExtra("location_speed", location.getSpeed());
+            Intent locationSpeed = new Intent("android.intent.action.LOCATION")
+                    .putExtra("location_speed", location.getSpeed())
+                    .putExtra("location_latitude", location.getLatitude())
+                    .putExtra("location_longitude", location.getLongitude());
             sendBroadcast(locationSpeed);
         }
 
