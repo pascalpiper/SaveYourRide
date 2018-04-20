@@ -9,7 +9,7 @@ android {
     compileSdkVersion 27
     buildToolsVersion '27.0.3'
     defaultConfig {
-        applicationId "com.example.saveyourride"
+        applicationId "com.saveyourride"
         minSdkVersion 23
         targetSdkVersion 27
         versionCode versionMajor * 100 + versionMinor * 10 + versionBuild
