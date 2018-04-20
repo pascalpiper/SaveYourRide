@@ -10,6 +10,10 @@ import android.support.annotation.Nullable;
 
 import com.example.saveyourride.activities.MainScreen;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class ControlService extends Service {
@@ -29,9 +33,17 @@ public class ControlService extends Service {
 
     private Intent accelerometer;
 
+    /// ONLY FOR TESTS
+    private File accelerometerDataFile;
+    ///
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        /// ONLY FOR TESTS
+        accelerometerDataFile = getFile();
+        ///
 
         broadcastReceivers = new ArrayList<BroadcastReceiver>();
         intentFilters = new ArrayList<IntentFilter>();
@@ -59,6 +71,12 @@ public class ControlService extends Service {
             public void onReceive(Context context, Intent intent) {
                 System.out.println("Broadcast from Accelerometer");
                 System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit " + intent.getFloatExtra("speed", -1));
+
+
+                /// ONLY FOR TESTS
+                String data = "BLA BLA BLA BLA";
+                writeAccelerometerDataToFile(accelerometerDataFile, data);
+                ///
             }
         };
 
@@ -124,6 +142,37 @@ public class ControlService extends Service {
         }
     }
 
+    /// ONLY FOR TESTS
+    private File getFile() {
+        File path = getApplicationContext().getFilesDir();
+        return new File(path, "accelerometer_data.txt");
+    }
+
+    private void writeAccelerometerDataToFile(File file, String data) {
+        try {
+            FileOutputStream stream = new FileOutputStream(file);
+            stream.write(data.getBytes());
+            stream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String readAccelerometerDataFromFile(File file) {
+        int length = (int) file.length();
+        byte[] bytes = new byte[length];
+
+
+        try {
+            FileInputStream in = new FileInputStream(file);
+            in.read(bytes);
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new String(bytes);
+    }
+    ///
 
 
     @Override
