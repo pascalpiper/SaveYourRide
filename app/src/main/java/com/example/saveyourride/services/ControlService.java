@@ -62,7 +62,7 @@ public class ControlService extends Service {
                 System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit " + intent.getFloatExtra("acceleration", -1));
 
                 /// ONLY FOR TESTS
-                String data = "BLA BLA BLA BLA";
+                String data = "BLA BLA BLA BLA " + intent.getFloatExtra("acceleration", -1);
                 writeAccelerometerDataToFile(accelerometerDataFile, data);
                 ///
             }
