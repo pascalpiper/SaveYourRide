@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.saveyourride.utils;
+package com.saveyourride.utils;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -27,7 +27,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
-import com.example.saveyourride.R;
+import com.saveyourride.R;
 
 /**
  * Utility class for access to runtime permissions.

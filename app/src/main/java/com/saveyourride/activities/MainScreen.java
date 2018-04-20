@@ -1,4 +1,4 @@
-package com.example.saveyourride.activities;
+package com.saveyourride.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,8 +9,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.example.saveyourride.R;
-import com.example.saveyourride.utils.PagerAdapter;
+import com.saveyourride.R;
+import com.saveyourride.utils.PagerAdapter;
 
 import java.util.Objects;
 
@@ -24,7 +24,9 @@ public class MainScreen extends AppCompatActivity {
     private Intent activeIntent;
     ///
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 

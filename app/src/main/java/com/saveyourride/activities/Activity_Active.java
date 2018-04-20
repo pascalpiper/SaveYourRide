@@ -1,4 +1,4 @@
-package com.example.saveyourride.activities;
+package com.saveyourride.activities;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.saveyourride.R;
+import com.saveyourride.R;
 
 public class Activity_Active extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package com.example.saveyourride.services;
+package com.saveyourride.services;
 
 import android.app.Service;
 import android.content.Context;

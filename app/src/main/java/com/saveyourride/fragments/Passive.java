@@ -1,4 +1,4 @@
-package com.example.saveyourride.fragments;
+package com.saveyourride.fragments;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -26,14 +26,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.saveyourride.R;
-import com.example.saveyourride.activities.PassiveMode;
-import com.example.saveyourride.utils.PermissionUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.saveyourride.R;
+import com.saveyourride.activities.PassiveMode;
+import com.saveyourride.utils.PermissionUtils;
 
 import static android.content.Context.LOCATION_SERVICE;
 
@@ -44,6 +44,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
 
     /**
      * Request code for location permission request.
+     *
      * @see #onRequestPermissionsResult(int, String[], int[])
      */
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -177,6 +178,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
 
     /**
      * Tries to get {@link Location} of Device. First of all it checkes last known {@link Location}. If no one is available it requests for one.
+     *
      * @return true if location found, flase - if not.
      */
     private boolean getMyLocation() {
@@ -245,6 +247,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
 
     /**
      * Check if Location Services are enabled. If they are not, start dialog window and settings.
+     *
      * @param lm LocationManager provide information about Location-Services.
      */
     private boolean locationServicesCheck(LocationManager lm) {

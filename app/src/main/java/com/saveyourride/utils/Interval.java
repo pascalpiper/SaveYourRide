@@ -1,8 +1,8 @@
-package com.example.saveyourride.utils;
+package com.saveyourride.utils;
 
 import android.os.CountDownTimer;
 
-import com.example.saveyourride.services.TimerService;
+import com.saveyourride.services.TimerService;
 
 /*
  * Created by taraszaika on 12.04.18.

@@ -1,11 +1,11 @@
-package com.example.saveyourride.utils;
+package com.saveyourride.utils;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.example.saveyourride.fragments.Active;
-import com.example.saveyourride.fragments.Passive;
+import com.saveyourride.fragments.Active;
+import com.saveyourride.fragments.Passive;
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
 

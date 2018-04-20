@@ -1,4 +1,4 @@
-package com.example.saveyourride.services;
+package com.saveyourride.services;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -8,8 +8,8 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.example.saveyourride.activities.MainScreen;
-import com.example.saveyourride.utils.Interval;
+import com.saveyourride.activities.MainScreen;
+import com.saveyourride.utils.Interval;
 
 public class TimerService extends Service {
 
@@ -110,14 +110,13 @@ public class TimerService extends Service {
 //        sendBroadcastToActiveFragment("intervalCount");
         //
 
-            if(intervalCount < numberOfIntervals) {
-                currentInterval = new Interval(intervalTime, this, intervalCount);
-                currentInterval.start();
-                this.intervalCount = intervalCount;
-                sendBroadcastToActiveFragment("intervalCount");
-            }
-            else {
-                sendBroadcastToActiveFragment("timerFinish");
+        if (intervalCount < numberOfIntervals) {
+            currentInterval = new Interval(intervalTime, this, intervalCount);
+            currentInterval.start();
+            this.intervalCount = intervalCount;
+            sendBroadcastToActiveFragment("intervalCount");
+        } else {
+            sendBroadcastToActiveFragment("timerFinish");
         }
     }
 
@@ -145,13 +144,13 @@ public class TimerService extends Service {
     }
 
     public void sendBroadcastToActiveFragment(String broadcast) {
-        switch (broadcast){
-            case "serviceReady" : {
+        switch (broadcast) {
+            case "serviceReady": {
                 Intent serviceReadyIntent = new Intent("android.intent.action.TIMER_SERVICE_READY");
                 this.sendBroadcast(serviceReadyIntent);
                 break;
             }
-            case "intervalCount" : {
+            case "intervalCount": {
                 Intent intervalCountIntent = new Intent("android.intent.action.INTERVAL_COUNT").putExtra("interval_count", intervalCount);
                 this.sendBroadcast(intervalCountIntent);
                 break;

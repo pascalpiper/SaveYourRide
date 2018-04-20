@@ -1,4 +1,4 @@
-package com.example.saveyourride.services;
+package com.saveyourride.services;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -9,7 +9,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.example.saveyourride.activities.MainScreen;
+import com.saveyourride.activities.MainScreen;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,12 +21,10 @@ import java.util.Date;
 
 public class ControlService extends Service {
 
+    private static final String TAG = "ControlService";
     private ArrayList<BroadcastReceiver> broadcastReceivers;
     private ArrayList<IntentFilter> intentFilters;
     private ArrayList<Intent> serviceIntents;
-
-    private static final String TAG = "ControlService";
-
     /// ONLY FOR TESTS
     private File dataFile;
     private String dataString;
@@ -51,7 +49,7 @@ public class ControlService extends Service {
         serviceIntents.add(new Intent(this.getApplicationContext(), LocationService.class));
 
         //Passive Fragment
-        broadcastReceivers.add(new BroadcastReceiver(){
+        broadcastReceivers.add(new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -61,7 +59,7 @@ public class ControlService extends Service {
         });
 
         //Accelerometer
-        broadcastReceivers.add(new BroadcastReceiver(){
+        broadcastReceivers.add(new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -79,7 +77,7 @@ public class ControlService extends Service {
         });
 
         //Location
-        broadcastReceivers.add( new BroadcastReceiver(){
+        broadcastReceivers.add(new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -103,8 +101,8 @@ public class ControlService extends Service {
     /**
      * Register all BroadcastReveicers from a ArrayList with its intentFilters in another ArrayList.
      */
-    public void registerAllBroadcastReceivers(){
-        for (int i = 0; i < broadcastReceivers.size(); i++ ){
+    public void registerAllBroadcastReceivers() {
+        for (int i = 0; i < broadcastReceivers.size(); i++) {
             registerReceiver(broadcastReceivers.get(i), intentFilters.get(i));
             System.out.println(broadcastReceivers.get(i));
         }
@@ -113,20 +111,20 @@ public class ControlService extends Service {
     /**
      * unregister all BroadcastReceivers from this Service
      */
-    public void unregisterAllBroadcastReceivers(){
-        for (int i = 0; i < broadcastReceivers.size(); i++ ){
+    public void unregisterAllBroadcastReceivers() {
+        for (int i = 0; i < broadcastReceivers.size(); i++) {
             unregisterReceiver(broadcastReceivers.get(i));
         }
     }
 
-    private void startAllServices(){
-        for (Intent service : serviceIntents){
+    private void startAllServices() {
+        for (Intent service : serviceIntents) {
             startService(service);
         }
     }
 
-    private void stopAllServices(){
-        for (Intent service : serviceIntents){
+    private void stopAllServices() {
+        for (Intent service : serviceIntents) {
             // DEBUG
             System.out.println("STOP SERVICE: " + service.toString());
             //

@@ -1,21 +1,15 @@
-package com.example.saveyourride.fragments;
+package com.saveyourride.fragments;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.saveyourride.R;
-import com.example.saveyourride.activities.ActiveMode;
-import com.example.saveyourride.services.TimerService;
+import com.saveyourride.R;
+import com.saveyourride.activities.ActiveMode;
 
 public class Active extends Fragment {
 
@@ -34,7 +28,7 @@ public class Active extends Fragment {
         buttonStartTimer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            startActivity(activeMode);
+                startActivity(activeMode);
             }
         });
 

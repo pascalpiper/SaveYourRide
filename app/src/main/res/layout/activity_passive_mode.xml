@@ -50,6 +50,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        tools:context="com.example.saveyourride.activities.PassiveMode" />
+        tools:context="com.saveyourride.activities.PassiveMode" />
 
 </RelativeLayout>

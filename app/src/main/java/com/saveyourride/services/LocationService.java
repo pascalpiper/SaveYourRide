@@ -1,4 +1,4 @@
-package com.example.saveyourride.services;
+package com.saveyourride.services;
 
 import android.app.Service;
 import android.content.Context;
@@ -16,11 +16,11 @@ public class LocationService extends Service {
     //
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
-    private LocationManager mLocationManager;
     LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER),
             new LocationListener(LocationManager.NETWORK_PROVIDER)
     };
+    private LocationManager mLocationManager;
 
     @Override
     public void onCreate() {

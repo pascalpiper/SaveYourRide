@@ -1,4 +1,4 @@
-package com.example.saveyourride.activities;
+package com.saveyourride.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,8 +11,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.saveyourride.R;
-import com.example.saveyourride.services.TimerService;
+import com.saveyourride.R;
+import com.saveyourride.services.TimerService;
 
 public class ActiveMode extends AppCompatActivity {
 
@@ -45,13 +45,13 @@ public class ActiveMode extends AppCompatActivity {
 
         Button buttonStartTimer = (Button) findViewById(R.id.buttonResetTimer);
         Button buttonStopTimer = (Button) findViewById(R.id.buttonStopTimer);
-        textViewTime = (TextView)findViewById(R.id.textViewTimer);
-        textViewIntervalCount = (TextView)findViewById(R.id.textViewIntervalCount);
+        textViewTime = (TextView) findViewById(R.id.textViewTimer);
+        textViewIntervalCount = (TextView) findViewById(R.id.textViewIntervalCount);
 
         buttonStartTimer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    resetTimer();
+                resetTimer();
             }
         });
 
@@ -89,7 +89,7 @@ public class ActiveMode extends AppCompatActivity {
                     case "android.intent.action.INTERVAL_COUNT": {
                         int intervalCount = intent.getIntExtra("interval_count", -1);
                         System.out.println("Fragment-Receiver received interval count: " + intervalCount);
-                        textViewIntervalCount.setText(Integer.toString(intervalCount+1) + " / " + numberOfIntervals);
+                        textViewIntervalCount.setText(Integer.toString(intervalCount + 1) + " / " + numberOfIntervals);
                         break;
                     }
                     case "android.intent.action.REST_INTERVAL_TIME": {
