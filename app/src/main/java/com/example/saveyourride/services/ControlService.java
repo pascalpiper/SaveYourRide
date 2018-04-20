@@ -49,7 +49,7 @@ public class ControlService extends Service {
 
             @Override
             public void onReceive(Context context, Intent intent) {
-
+                System.out.println("ACCELEROMETER DATA FILE: \n" + readAccelerometerDataFromFile(accelerometerDataFile));
             }
         });
 
