@@ -15,12 +15,12 @@ public class LocationService extends Service {
     private static final String TAG = "LOCATION_SERVICE";
     //
     private static final int LOCATION_INTERVAL = 1000;
-    private static final float LOCATION_DISTANCE = 10f;
+    private static final float LOCATION_DISTANCE = 0f;
+    private LocationManager mLocationManager;
     LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER),
             new LocationListener(LocationManager.NETWORK_PROVIDER)
     };
-    private LocationManager mLocationManager;
 
     @Override
     public void onCreate() {

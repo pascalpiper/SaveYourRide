@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,8 +27,10 @@ public class ControlService extends Service {
     private ArrayList<IntentFilter> intentFilters;
     private ArrayList<Intent> serviceIntents;
     /// ONLY FOR TESTS
-    private File dataFile;
-    private String dataString;
+    private File dataFileFirst;
+    private File dataFileSecond;
+    private String dataStringFirst;
+    private String dataStringSecond;
     private String currentLocationString;
     ///
 
@@ -36,8 +39,11 @@ public class ControlService extends Service {
         super.onCreate();
 
         /// ONLY FOR TESTS
-        dataFile = getFile();
-        dataString = "LAUNCH: " + getCurrentReadbleDate();
+        dataFileFirst = getFile(1);
+        dataFileSecond = getFile(2);
+
+        dataStringFirst = "LAUNCH: " + getCurrentReadbleDate() + "First Part";
+        dataStringSecond = "LAUNCH: " + getCurrentReadbleDate() + " Second Part";
         currentLocationString = "NO_LOCATION";
         ///
 
@@ -54,7 +60,14 @@ public class ControlService extends Service {
             @Override
             public void onReceive(Context context, Intent intent) {
                 // READ BUTTON PRESSED
-                System.out.println("ACCELEROMETER DATA FILE: \n" + readAccelerometerDataFromFile(dataFile));
+                System.out.println("Accelerometer Shake-Threshold under 100");
+                System.out.println("ACCELEROMETER DATA FILE: \n" + readAccelerometerDataFromFile(dataFileFirst));
+                System.out.println("");
+                System.out.println("-------------------------------------");
+                System.out.println("");
+                System.out.println("Accelerometer Shake-Threshold over 100");
+                System.out.println("ACCELEROMETER DATA FILE: \n" + readAccelerometerDataFromFile(dataFileSecond));
+
             }
         });
 
@@ -67,12 +80,19 @@ public class ControlService extends Service {
                 System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit " + intent.getFloatExtra("acceleration", -1f));
 
                 /// ONLY FOR TESTS
-                dataString = dataString + "\n" +
-                        "Acceleration " + intent.getFloatExtra("acceleration", -1) +
-                        " " + currentLocationString +
-                        " TimeStamp " + getCurrentReadbleDate();
-                //writeAccelerometerDataToFile(dataFile, dataString);
-                ///
+                if (intent.getFloatExtra("acceleration", -1) < 100) {
+                    dataStringFirst = dataStringFirst + "\n" +
+                            "Acceleration " + intent.getFloatExtra("acceleration", -1) +
+                            " " + currentLocationString +
+                            " TimeStamp " + getCurrentReadbleDate();
+                } else {
+                    dataStringSecond = dataStringSecond + "\n" +
+                            "Acceleration " + intent.getFloatExtra("acceleration", -1) +
+                            " " + currentLocationString +
+                            " TimeStamp " + getCurrentReadbleDate();
+                    //writeAccelerometerDataToFile(dataFileFirst, dataStringFirst);
+                    ///
+                }
             }
         });
 
@@ -133,9 +153,14 @@ public class ControlService extends Service {
     }
 
     /// ONLY FOR TESTS
-    private File getFile() {
+    private File getFile(int part) {
         File path = getApplicationContext().getFilesDir();
-        return new File(path, "accelerometer_data.txt");
+        if(part == 1) {
+            return new File(path, "accelerometer_data.txt");
+        }
+        else{
+                return new File(path, "accelerometer_data_2.txt");
+            }
     }
 
     private void writeAccelerometerDataToFile(File file, String data) {
@@ -181,7 +206,8 @@ public class ControlService extends Service {
         startActivity(mainScreen);
 
         /// ONLY FOR TESTSWrite received broadcast into file
-        writeAccelerometerDataToFile(dataFile, dataString);
+        writeAccelerometerDataToFile(dataFileFirst, dataStringFirst);
+        writeAccelerometerDataToFile(dataFileSecond, dataStringSecond);
         ///
     }
 
