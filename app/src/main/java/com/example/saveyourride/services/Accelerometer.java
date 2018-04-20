@@ -19,8 +19,6 @@ public class Accelerometer extends Service implements SensorEventListener {
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
 
-    private long lastUpdate = 0;
-    private float last_x, last_y, last_z;
     private static final int SHAKE_THRESHOLD = 2000;
 
     @Override
@@ -40,34 +38,17 @@ public class Accelerometer extends Service implements SensorEventListener {
             float y = sensorEvent.values[1];
             float z = sensorEvent.values[2];
 
-            long curTime = System.currentTimeMillis();
-
             /// TEST
             System.out.println("X:   " + x + "    Y:   " + y + "    Z:   " + z);
             ///
 
-            if ((curTime - lastUpdate) > 100) {
-                long diffTime = (curTime - lastUpdate);
-                lastUpdate = curTime;
+                float acceleration = Math.abs(x + y + z);
 
-                float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
-
-                if (speed > SHAKE_THRESHOLD) {
-                    /// TEST
-                    Intent i = new Intent("android.intent.action.ACCELEROMETER_DETECTED_SHAKE").putExtra("speed", speed);
-                    sendBroadcast(i);
-                    //System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit " + speed);
-                    ///
+                if (acceleration > SHAKE_THRESHOLD) {
+                    Intent shake = new Intent("android.intent.action.ACCELEROMETER_DETECTED_STRONG_SHAKE").putExtra("acceleration", acceleration);
+                    sendBroadcast(shake);
                 }
 
-                last_x = x;
-                last_y = y;
-                last_z = z;
-
-                /// TEST
-                //System.out.println("EINE SEKUNDE");
-                ///
-            }
         }
     }
 

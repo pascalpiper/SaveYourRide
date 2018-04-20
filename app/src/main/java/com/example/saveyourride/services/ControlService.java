@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.saveyourride.activities.MainScreen;
 
@@ -16,18 +17,9 @@ public class ControlService extends Service {
 
     private ArrayList<BroadcastReceiver> broadcastReceivers;
     private ArrayList<IntentFilter> intentFilters;
-    private ArrayList<Intent> services;
+    private ArrayList<Intent> serviceIntents;
 
-    private BroadcastReceiver passiveFragmentReceiver;
-    private IntentFilter passiveFragmentFilter;
-
-    private BroadcastReceiver accelerometerReceiver;
-    private IntentFilter accerometerFilter;
-
-    private BroadcastReceiver locationReceiver;
-    private IntentFilter locationReceiverFilter;
-
-    private Intent accelerometer;
+    private static final String TAG = "ControlService";
 
     @Override
     public void onCreate() {
@@ -35,59 +27,46 @@ public class ControlService extends Service {
 
         broadcastReceivers = new ArrayList<BroadcastReceiver>();
         intentFilters = new ArrayList<IntentFilter>();
-        services = new ArrayList<Intent>();
+        serviceIntents = new ArrayList<Intent>();
 
+        serviceIntents.add(new Intent(this.getApplicationContext(), Accelerometer.class));
+        serviceIntents.add(new Intent(this.getApplicationContext(), LocationService.class));
 
-        accelerometer = new Intent(this.getApplicationContext(), Accelerometer.class);
-        //location = new Intent(this.getApplicationContext(), location.class);
-
-        services.add(accelerometer);
-        //services.add(location);
-
-
-        passiveFragmentReceiver = new BroadcastReceiver(){
+        //Passive Fragment
+        broadcastReceivers.add(new BroadcastReceiver(){
 
             @Override
             public void onReceive(Context context, Intent intent) {
 
             }
-        };
+        });
 
-        accelerometerReceiver = new BroadcastReceiver(){
+        //Accelerometer
+        broadcastReceivers.add(new BroadcastReceiver(){
 
             @Override
             public void onReceive(Context context, Intent intent) {
                 System.out.println("Broadcast from Accelerometer");
-                System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit " + intent.getFloatExtra("speed", -1));
+                System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit " + intent.getFloatExtra("acceleration", -1));
             }
-        };
+        });
 
-        locationReceiver = new BroadcastReceiver(){
+        //Location
+        broadcastReceivers.add( new BroadcastReceiver(){
 
             @Override
             public void onReceive(Context context, Intent intent) {
-
+                Log.d(TAG, "Broadcast from LocationService");
+                Log.d(TAG, "Location Speed: " + intent.getFloatExtra("location_speed", -1));
             }
-        };
+        });
 
-        broadcastReceivers.add(passiveFragmentReceiver);
-        broadcastReceivers.add(accelerometerReceiver);
-        broadcastReceivers.add(locationReceiver);
-
-        passiveFragmentFilter = new IntentFilter("android.intent.action.PASSIV_FRAGMENT");
-        accerometerFilter = new IntentFilter("android.intent.action.ACCELEROMETER_DETECTED_SHAKE");
-        locationReceiverFilter = new IntentFilter("android.intent.action.LOCATION");
-
-        intentFilters.add(passiveFragmentFilter);
-        intentFilters.add(accerometerFilter);
-        intentFilters.add(locationReceiverFilter);
-
-
+        intentFilters.add(new IntentFilter("android.intent.action.PASSIV_FRAGMENT"));
+        intentFilters.add(new IntentFilter("android.intent.action.ACCELEROMETER_DETECTED_STRONG_SHAKE"));
+        intentFilters.add(new IntentFilter("android.intent.action.LOCATION"));
 
         registerAllBroadcastReceivers();//
         startAllServices();
-
-
     }
 
     /**
@@ -110,13 +89,13 @@ public class ControlService extends Service {
     }
 
     private void startAllServices(){
-        for (Intent service :services){
+        for (Intent service : serviceIntents){
             startService(service);
         }
     }
 
     private void stopAllServices(){
-        for (Intent service :services){
+        for (Intent service : serviceIntents){
             // DEBUG
             System.out.println("STOP SERVICE: " + service.toString());
             //
