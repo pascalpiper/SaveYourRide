@@ -16,7 +16,7 @@ import android.support.annotation.Nullable;
  */
 public class Accelerometer extends Service implements SensorEventListener {
 
-    private static final int SHAKE_THRESHOLD = 130;
+    private static final int SHAKE_THRESHOLD = 200;
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
 
@@ -36,10 +36,6 @@ public class Accelerometer extends Service implements SensorEventListener {
             float x = sensorEvent.values[0];
             float y = sensorEvent.values[1];
             float z = sensorEvent.values[2];
-
-            /// TEST
-//            System.out.println("X:   " + x + "    Y:   " + y + "    Z:   " + z);
-            ///
 
             float acceleration = Math.abs(x) + Math.abs(y) + Math.abs(z);
 

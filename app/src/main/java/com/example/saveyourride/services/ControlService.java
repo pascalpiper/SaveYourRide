@@ -28,8 +28,8 @@ public class ControlService extends Service {
     private static final String TAG = "ControlService";
 
     /// ONLY FOR TESTS
-    private File accelerometerDataFile;
-    private String accelerometerData;
+    private File dataFile;
+    private String dataString;
     private String currentLocationString;
     ///
 
@@ -38,8 +38,9 @@ public class ControlService extends Service {
         super.onCreate();
 
         /// ONLY FOR TESTS
-        accelerometerDataFile = getFile();
-        accelerometerData = "LAUNCH: " + getCurrentReadbleDate();
+        dataFile = getFile();
+        dataString = "LAUNCH: " + getCurrentReadbleDate();
+        currentLocationString = "NO_LOCATION";
         ///
 
         broadcastReceivers = new ArrayList<BroadcastReceiver>();
@@ -54,7 +55,8 @@ public class ControlService extends Service {
 
             @Override
             public void onReceive(Context context, Intent intent) {
-                System.out.println("ACCELEROMETER DATA FILE: \n" + readAccelerometerDataFromFile(accelerometerDataFile));
+                // READ BUTTON PRESSED
+                System.out.println("ACCELEROMETER DATA FILE: \n" + readAccelerometerDataFromFile(dataFile));
             }
         });
 
@@ -67,11 +69,11 @@ public class ControlService extends Service {
                 System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit " + intent.getFloatExtra("acceleration", -1));
 
                 /// ONLY FOR TESTS
-                accelerometerData = accelerometerData + "\n" +
-                        "Acceleration is: " + intent.getFloatExtra("acceleration", -1) +
-                        " :: " + currentLocationString +
-                        " TimeStamp: " + getCurrentReadbleDate();
-                //writeAccelerometerDataToFile(accelerometerDataFile, accelerometerData);
+                dataString = dataString + "\n" +
+                        "Acceleration " + intent.getFloatExtra("acceleration", -1) +
+                        " " + currentLocationString +
+                        " TimeStamp " + getCurrentReadbleDate();
+                //writeAccelerometerDataToFile(dataFile, dataString);
                 ///
             }
         });
@@ -83,10 +85,10 @@ public class ControlService extends Service {
             public void onReceive(Context context, Intent intent) {
                 Log.d(TAG, "Broadcast from LocationService");
                 Log.d(TAG, "Location Speed: " + intent.getFloatExtra("location_speed", -1));
-                currentLocationString = "LOCATION:" +
-                        " Latitude: " + intent.getDoubleExtra("location_latitude", -1d) +
-                        " Longitude: " + intent.getDoubleExtra("location_longitude", -1d) +
-                        " Speed: " + intent.getFloatExtra("location_speed", -1f);
+                currentLocationString = "Location" +
+                        " Latitude " + intent.getDoubleExtra("location_latitude", -1d) +
+                        " Longitude " + intent.getDoubleExtra("location_longitude", -1d) +
+                        " Speed " + intent.getFloatExtra("location_speed", -1f);
             }
         });
 
@@ -163,10 +165,10 @@ public class ControlService extends Service {
     }
 
     private String getCurrentReadbleDate() {
-        long yourmilliseconds = System.currentTimeMillis();
+        long currentTimeMillis = System.currentTimeMillis();
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        Date resultdate = new Date(yourmilliseconds);
-        return sdf.format(resultdate);
+        Date resultDate = new Date(currentTimeMillis);
+        return sdf.format(resultDate);
     }
     ///
 
@@ -181,7 +183,7 @@ public class ControlService extends Service {
         startActivity(mainScreen);
 
         /// ONLY FOR TESTSWrite received broadcast into file
-        writeAccelerometerDataToFile(accelerometerDataFile, accelerometerData);
+        writeAccelerometerDataToFile(dataFile, dataString);
         ///
     }
 

@@ -33,4 +33,7 @@
     <string name="permission_required_toast">Location permission is required for this featue.</string>
     <string name="permission_rationale_location">Access to the location service is required for this feature.</string>
     <string name="please_activate_location_services">Please activate location services</string>
+
+    <!-- ONLY FOR TESTS -->
+    <string name="read">READ</string>
 </resources>
