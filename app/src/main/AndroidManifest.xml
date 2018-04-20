@@ -26,14 +26,6 @@
             android:value="@integer/google_play_services_version" />
 
         <!-- Activities -->
-        <!-- Services for Active Mode -->
-        <service android:name=".services.TimerService" />
-
-        <!-- Services for Passive Mode -->
-        <service android:name=".services.ControlService" />
-        <service android:name=".services.Accelerometer" />
-
-
         <activity
             android:name=".activities.MainScreen"
             android:screenOrientation="portrait">
@@ -75,7 +67,13 @@
         </activity>
 
         <!-- Services -->
+
+        <!-- Services for Active Mode -->
         <service android:name=".services.TimerService" />
+
+        <!-- Services for Passive Mode -->
+        <service android:name=".services.ControlService" />
+        <service android:name=".services.Accelerometer" />
         <service android:name=".services.LocationService" />
 
     </application>
