@@ -10,6 +10,8 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
+import java.util.regex.Matcher;
+
 /*
  * Created by taraszaika on 03.04.18.
  * new Accelerometer
@@ -19,7 +21,7 @@ public class Accelerometer extends Service implements SensorEventListener {
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
 
-    private static final int SHAKE_THRESHOLD = 2000;
+    private static final int SHAKE_THRESHOLD = 30;
 
     @Override
     public void onCreate() {
@@ -39,10 +41,10 @@ public class Accelerometer extends Service implements SensorEventListener {
             float z = sensorEvent.values[2];
 
             /// TEST
-            System.out.println("X:   " + x + "    Y:   " + y + "    Z:   " + z);
+//            System.out.println("X:   " + x + "    Y:   " + y + "    Z:   " + z);
             ///
 
-                float acceleration = Math.abs(x + y + z);
+                float acceleration = Math.abs(x) + Math.abs(y) + Math.abs(z);
 
                 if (acceleration > SHAKE_THRESHOLD) {
                     Intent shake = new Intent("android.intent.action.ACCELEROMETER_DETECTED_STRONG_SHAKE").putExtra("acceleration", acceleration);
