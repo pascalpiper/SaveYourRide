@@ -6,6 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".activities.PassiveMode">
 
+    <Button
+        android:id="@+id/buttonStopPassiveMode"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="50dp"
+        android:background="@drawable/round_button"
+        android:elevation="3dp"
+        android:text="@string/stop"
+        android:textSize="20sp"
+        android:textColor="@color/colorWhite"
+        android:textStyle="bold|italic" />
+
     <View
         android:id="@+id/passiveModeGradientView"
         android:layout_width="wrap_content"

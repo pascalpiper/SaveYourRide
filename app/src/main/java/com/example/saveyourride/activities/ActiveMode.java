@@ -60,6 +60,7 @@ public class ActiveMode extends AppCompatActivity {
             public void onClick(View v) {
                 sendBroadcastToTimerService("stopTimer");
                 stopService(intentTimerService);
+                ActiveMode.this.finish();
             }
         });
 
