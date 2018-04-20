@@ -16,7 +16,6 @@ import com.saveyourride.services.TimerService;
 
 public class ActiveMode extends AppCompatActivity {
 
-
     // TODO: Pick Up values for number of intervals and interval time
     private final int numberOfIntervals = 6;
     private final long intervalTime = 10000L;
@@ -29,7 +28,6 @@ public class ActiveMode extends AppCompatActivity {
 
     private TextView textViewIntervalCount;
     private TextView textViewTime;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +109,6 @@ public class ActiveMode extends AppCompatActivity {
 
         startService(intentTimerService);
     }
-
 
     private void setTextViewTime(int intervalTimeMin, int intervalTimeSec) {
         String time = String.format("%02d", intervalTimeMin) + ":" + String.format("%02d", intervalTimeSec);
