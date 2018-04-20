@@ -17,7 +17,7 @@ import com.saveyourride.services.ControlService;
 
 public class PassiveMode extends AppCompatActivity {
 
-    private Intent controlService;
+    private Intent controlServiceIntent;
     private Button buttonStopPassiveMode;
 
     @Override
@@ -40,13 +40,13 @@ public class PassiveMode extends AppCompatActivity {
             }
         });
 
-        controlService = new Intent(this.getApplicationContext(), ControlService.class);
-        startService(controlService);
+        controlServiceIntent = new Intent(this.getApplicationContext(), ControlService.class);
+        startService(controlServiceIntent);
 
         buttonStopPassiveMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopService(controlService);
+                stopService(controlServiceIntent);
                 // TODO: not only stop a service also finish an activity
             }
         });
