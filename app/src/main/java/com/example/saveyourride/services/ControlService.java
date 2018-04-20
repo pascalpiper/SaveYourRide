@@ -66,7 +66,7 @@ public class ControlService extends Service {
             @Override
             public void onReceive(Context context, Intent intent) {
                 System.out.println("Broadcast from Accelerometer");
-                System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit " + intent.getFloatExtra("acceleration", -1));
+                System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit " + intent.getFloatExtra("acceleration", -1f));
 
                 /// ONLY FOR TESTS
                 dataString = dataString + "\n" +
@@ -84,7 +84,7 @@ public class ControlService extends Service {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.d(TAG, "Broadcast from LocationService");
-                Log.d(TAG, "Location Speed: " + intent.getFloatExtra("location_speed", -1));
+                Log.d(TAG, "Location Speed: " + intent.getFloatExtra("location_speed", -1f));
                 currentLocationString = "Location" +
                         " Latitude " + intent.getDoubleExtra("location_latitude", -1d) +
                         " Longitude " + intent.getDoubleExtra("location_longitude", -1d) +
