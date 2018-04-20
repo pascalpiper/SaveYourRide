@@ -16,17 +16,16 @@ import android.support.annotation.Nullable;
  */
 public class Accelerometer extends Service implements SensorEventListener {
 
+    private static final int SHAKE_THRESHOLD = 130;
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
-
-    private static final int SHAKE_THRESHOLD = 130;
 
     @Override
     public void onCreate() {
         super.onCreate();
         senSensorManager = (SensorManager) this.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        senSensorManager.registerListener(this, senAccelerometer , SensorManager.SENSOR_DELAY_NORMAL);
+        senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -42,12 +41,12 @@ public class Accelerometer extends Service implements SensorEventListener {
 //            System.out.println("X:   " + x + "    Y:   " + y + "    Z:   " + z);
             ///
 
-                float acceleration = Math.abs(x) + Math.abs(y) + Math.abs(z);
+            float acceleration = Math.abs(x) + Math.abs(y) + Math.abs(z);
 
-                if (acceleration > SHAKE_THRESHOLD) {
-                    Intent shake = new Intent("android.intent.action.ACCELEROMETER_DETECTED_STRONG_SHAKE").putExtra("acceleration", acceleration);
-                    sendBroadcast(shake);
-                }
+            if (acceleration > SHAKE_THRESHOLD) {
+                Intent shake = new Intent("android.intent.action.ACCELEROMETER_DETECTED_STRONG_SHAKE").putExtra("acceleration", acceleration);
+                sendBroadcast(shake);
+            }
 
         }
     }

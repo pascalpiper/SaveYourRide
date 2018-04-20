@@ -38,6 +38,7 @@ public class ControlService extends Service {
 
         /// ONLY FOR TESTS
         accelerometerDataFile = getFile();
+        accelerometerData = "LAUNCH: " + getCurrentReadbleDate();
         ///
 
         broadcastReceivers = new ArrayList<BroadcastReceiver>();
