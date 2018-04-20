@@ -16,7 +16,7 @@ import android.support.annotation.Nullable;
  */
 public class Accelerometer extends Service implements SensorEventListener {
 
-    private static final int SHAKE_THRESHOLD = 200;
+    private static final int SHAKE_THRESHOLD = 50;
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
 

@@ -15,11 +15,11 @@ public class LocationService extends Service {
     private static final String TAG = "LOCATION_SERVICE";
     //
     private static final int LOCATION_INTERVAL = 1000;
-    private static final float LOCATION_DISTANCE = 10f;
+    private static final float LOCATION_DISTANCE = 0f;
     private LocationManager mLocationManager;
     LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER),
-            new LocationListener(LocationManager.NETWORK_PROVIDER)
+//            new LocationListener(LocationManager.NETWORK_PROVIDER)
     };
 
     @Override
@@ -40,15 +40,15 @@ public class LocationService extends Service {
         } catch (IllegalArgumentException ex) {
             Log.e(TAG, "gps provider does not exist " + ex.getMessage());
         }
-        try {
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
-                    mLocationListeners[1]);
-        } catch (java.lang.SecurityException ex) {
-            Log.e(TAG, "fail to request location update, ignore", ex);
-        } catch (IllegalArgumentException ex) {
-            Log.e(TAG, "network provider does not exist, " + ex.getMessage());
-        }
+//        try {
+//            mLocationManager.requestLocationUpdates(
+//                    LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
+//                    mLocationListeners[1]);
+//        } catch (java.lang.SecurityException ex) {
+//            Log.e(TAG, "fail to request location update, ignore", ex);
+//        } catch (IllegalArgumentException ex) {
+//            Log.e(TAG, "network provider does not exist, " + ex.getMessage());
+//        }
     }
 
     private void initializeLocationManager() {
