@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -77,7 +76,7 @@ public class ControlService extends Service {
             @Override
             public void onReceive(Context context, Intent intent) {
                 System.out.println("Broadcast from Accelerometer");
-                System.out.println("Wir haben das Handy geschüttelt mit der Geschwindigkeit " + intent.getFloatExtra("acceleration", -1f));
+                System.out.println("Das Handy wurde geschüttelt. Beschleunigung betrug: " + intent.getFloatExtra("acceleration", -1f));
 
                 /// ONLY FOR TESTS
                 if (intent.getFloatExtra("acceleration", -1) < 100) {
@@ -90,7 +89,6 @@ public class ControlService extends Service {
                             "Acceleration " + intent.getFloatExtra("acceleration", -1) +
                             " " + currentLocationString +
                             " TimeStamp " + getCurrentReadbleDate();
-                    //writeAccelerometerDataToFile(dataFileFirst, dataStringFirst);
                     ///
                 }
             }
@@ -110,7 +108,7 @@ public class ControlService extends Service {
             }
         });
 
-        intentFilters.add(new IntentFilter("android.intent.action.PASSIV_FRAGMENT"));
+        intentFilters.add(new IntentFilter("android.intent.action.PASSIVE_FRAGMENT"));
         intentFilters.add(new IntentFilter("android.intent.action.ACCELEROMETER_DETECTED_STRONG_SHAKE"));
         intentFilters.add(new IntentFilter("android.intent.action.LOCATION"));
 
