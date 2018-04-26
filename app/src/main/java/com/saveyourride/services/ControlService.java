@@ -116,6 +116,10 @@ public class ControlService extends Service {
         startAllServices();
     }
 
+    public void checkIfCrash(){
+
+    }
+
     /**
      * Register all BroadcastReveicers from a ArrayList with its intentFilters in another ArrayList.
      */

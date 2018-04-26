@@ -16,7 +16,11 @@ import android.support.annotation.Nullable;
  */
 public class Accelerometer extends Service implements SensorEventListener {
 
-    private static final int SHAKE_THRESHOLD = 50;
+    private final int ACCIDENT_THRESHOLD = 130;
+    private final int NO_MOVE_THERSHOLD = 2;
+
+    private boolean noMovementBroadcastWasSent = false;
+
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
 
@@ -39,10 +43,15 @@ public class Accelerometer extends Service implements SensorEventListener {
 
             float acceleration = Math.abs(x) + Math.abs(y) + Math.abs(z);
 
-            if (acceleration > SHAKE_THRESHOLD) {
+            if(noMovementBroadcastWasSent && acceleration < NO_MOVE_THERSHOLD){
+
+            }
+
+            if (acceleration > ACCIDENT_THRESHOLD) {
                 Intent shake = new Intent("android.intent.action.ACCELEROMETER_DETECTED_STRONG_SHAKE").putExtra("acceleration", acceleration);
                 sendBroadcast(shake);
             }
+
 
         }
     }
