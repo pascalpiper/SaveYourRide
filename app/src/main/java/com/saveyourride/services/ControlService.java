@@ -77,22 +77,46 @@ public class ControlService extends Service {
 
             @Override
             public void onReceive(Context context, Intent intent) {
-                System.out.println("Broadcast from Accelerometer");
-                System.out.println("Das Handy wurde geschüttelt. Beschleunigung betrug: " + intent.getFloatExtra("acceleration", -1f));
-
-                /// ONLY FOR TESTS
-                if (intent.getFloatExtra("acceleration", -1) < 100) {
-                    dataStringFirst = dataStringFirst + "\n" +
-                            "Acceleration " + intent.getFloatExtra("acceleration", -1) +
-                            " " + currentLocationString +
-                            " TimeStamp " + getCurrentReadbleDate();
-                } else {
-                    dataStringSecond = dataStringSecond + "\n" +
-                            "Acceleration " + intent.getFloatExtra("acceleration", -1) +
-                            " " + currentLocationString +
-                            " TimeStamp " + getCurrentReadbleDate();
-                }
+                /// DEBUG
+                Log.d(TAG, "Broadcast from Accelerometer");
                 ///
+                switch (intent.getAction()) {
+                    case "android.intent.action.ACCELEROMETER_POSSIBLE_ACCIDENT": {
+                        /// DEBUG
+                        Log.d(TAG, "Possible accident. acceleration was: " + intent.getFloatExtra("acceleration", -1f));
+                        ///
+                        /// ONLY FOR TESTS
+                        if (intent.getFloatExtra("acceleration", -1) < 100) {
+                            dataStringFirst = dataStringFirst + "\n" +
+                                    "Acceleration " + intent.getFloatExtra("acceleration", -1) +
+                                    " " + currentLocationString +
+                                    " TimeStamp " + getCurrentReadbleDate();
+                        } else {
+                            dataStringSecond = dataStringSecond + "\n" +
+                                    "Acceleration " + intent.getFloatExtra("acceleration", -1) +
+                                    " " + currentLocationString +
+                                    " TimeStamp " + getCurrentReadbleDate();
+                        }
+                        ///
+                        break;
+                    }
+                    case "android.intent.action.ACCELEROMETER_NO_MOVEMENT": {
+                        /// DEBUG
+                        Log.d(TAG, "NO_MOVEMENT Broadcast received!");
+                        ///
+                        break;
+                    }
+                    case "android.intent.action.ACCELEROMETER_MOVEMENT_AGAIN": {
+                        /// DEBUG
+                        Log.d(TAG, "MOVEMENT_AGAIN Broadcast received!");
+                        ///
+                        break;
+                    }
+                    default: {
+                        Log.d(TAG, "NO SUCH ACTION IN BROADCAST!");
+                        break;
+                    }
+                }
             }
         });
 
