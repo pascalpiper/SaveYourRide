@@ -45,7 +45,7 @@ public class Accelerometer extends Service implements SensorEventListener {
 
             float acceleration = Math.abs(x) + Math.abs(y) + Math.abs(z);
 
-            System.out.println("----  " + acceleration + "  ------ C: " + noMovementCounter);
+//            System.out.println("----  " + acceleration + "  ------ C: " + noMovementCounter);
 
             if (!noMovementBroadcastWasSent && acceleration < NO_MOVE_THRESHOLD) {
 
@@ -56,10 +56,8 @@ public class Accelerometer extends Service implements SensorEventListener {
 
                     noMovementBroadcastWasSent = true;
 
-                    System.out.println("No Movement");
                 } else {
                     noMovementCounter++;
-                    System.out.println("Counter erhöht");
                 }
             }
             if (noMovementBroadcastWasSent && acceleration > NO_MOVE_THRESHOLD) {
@@ -68,15 +66,12 @@ public class Accelerometer extends Service implements SensorEventListener {
 
                 noMovementBroadcastWasSent = false;
                 noMovementCounter = 0;
-                System.out.println("Movement Again");
             }
 
             if (!noMovementBroadcastWasSent && acceleration > ACCIDENT_THRESHOLD) {
                 Intent shake = new Intent("android.intent.action.ACCELEROMETER_POSSIBLE_ACCIDENT").putExtra("acceleration", acceleration);
                 sendBroadcast(shake);
-                System.out.println("Accident");
             }
-            System.out.println(" ");
         }
 
     }
