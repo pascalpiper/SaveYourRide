@@ -16,10 +16,12 @@ import android.support.annotation.Nullable;
  */
 public class Accelerometer extends Service implements SensorEventListener {
 
-    private final int ACCIDENT_THRESHOLD = 130;
-    private final int NO_MOVE_THERSHOLD = 2;
+    private final float ACCIDENT_THRESHOLD = 130;
+    private final float NO_MOVE_THRESHOLD = 2;
 
     private boolean noMovementBroadcastWasSent = false;
+    private int noMovementCounter = 0;
+    private final int MAX_NO_MOVEMENT_COUNTER = 20;
 
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
@@ -43,17 +45,35 @@ public class Accelerometer extends Service implements SensorEventListener {
 
             float acceleration = Math.abs(x) + Math.abs(y) + Math.abs(z);
 
-            if(noMovementBroadcastWasSent && acceleration < NO_MOVE_THERSHOLD){
+//            System.out.println("----  " + acceleration + "  ------ C: " + noMovementCounter);
 
+            if (!noMovementBroadcastWasSent && acceleration < NO_MOVE_THRESHOLD) {
+
+
+                if (noMovementCounter >= MAX_NO_MOVEMENT_COUNTER) {
+                    Intent noMovement = new Intent("android.intent.action.ACCELEROMETER_NO_MOVEMENT");
+                    sendBroadcast(noMovement);
+
+                    noMovementBroadcastWasSent = true;
+
+                } else {
+                    noMovementCounter++;
+                }
+            }
+            if (noMovementBroadcastWasSent && acceleration > NO_MOVE_THRESHOLD) {
+                Intent movementAgain = new Intent("android.intent.action.ACCELEROMETER_MOVEMENT_AGAIN");
+                sendBroadcast(movementAgain);
+
+                noMovementBroadcastWasSent = false;
+                noMovementCounter = 0;
             }
 
-            if (acceleration > ACCIDENT_THRESHOLD) {
-                Intent shake = new Intent("android.intent.action.ACCELEROMETER_DETECTED_STRONG_SHAKE").putExtra("acceleration", acceleration);
+            if (!noMovementBroadcastWasSent && acceleration > ACCIDENT_THRESHOLD) {
+                Intent shake = new Intent("android.intent.action.ACCELEROMETER_POSSIBLE_ACCIDENT").putExtra("acceleration", acceleration);
                 sendBroadcast(shake);
             }
-
-
         }
+
     }
 
     @Override
