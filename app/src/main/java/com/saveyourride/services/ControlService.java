@@ -25,6 +25,7 @@ public class ControlService extends Service {
     private ArrayList<BroadcastReceiver> broadcastReceivers;
     private ArrayList<IntentFilter> intentFilters;
     private ArrayList<Intent> serviceIntents;
+
     /// ONLY FOR TESTS
     private File dataFileFirst;
     private File dataFileSecond;
