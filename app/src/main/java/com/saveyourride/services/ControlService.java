@@ -54,7 +54,8 @@ public class ControlService extends Service {
         serviceIntents.add(new Intent(this.getApplicationContext(), Accelerometer.class));
         serviceIntents.add(new Intent(this.getApplicationContext(), LocationService.class));
 
-        //Passive Fragment
+        /// Add broadcast receivers
+        // Passive Mode Activity BroadcastReceiver
         broadcastReceivers.add(new BroadcastReceiver() {
 
             @Override
@@ -71,7 +72,7 @@ public class ControlService extends Service {
             }
         });
 
-        //Accelerometer
+        // Accelerometer BroadcastReceiver
         broadcastReceivers.add(new BroadcastReceiver() {
 
             @Override
@@ -90,12 +91,12 @@ public class ControlService extends Service {
                             "Acceleration " + intent.getFloatExtra("acceleration", -1) +
                             " " + currentLocationString +
                             " TimeStamp " + getCurrentReadbleDate();
-                    ///
                 }
+                ///
             }
         });
 
-        //Location
+        // Location BroadcastReceiver
         broadcastReceivers.add(new BroadcastReceiver() {
 
             @Override
@@ -109,30 +110,39 @@ public class ControlService extends Service {
             }
         });
 
-        intentFilters.add(new IntentFilter("android.intent.action.PASSIVE_FRAGMENT"));
-        intentFilters.add(new IntentFilter("android.intent.action.ACCELEROMETER_DETECTED_STRONG_SHAKE"));
-        intentFilters.add(new IntentFilter("android.intent.action.LOCATION"));
+        /// Add intent filters
+        // Passive Mode Activity IntentFilter
+        IntentFilter pmaFilter = new IntentFilter();
+        pmaFilter.addAction("android.intent.action.PASSIVE_MODE_ACTIVITY");
+        intentFilters.add(pmaFilter); // index = 0
+
+        // Accelerometer IntentFilter
+        IntentFilter accelerometerFilter = new IntentFilter();
+        accelerometerFilter.addAction("android.intent.action.ACCELEROMETER_POSSIBLE_ACCIDENT");
+        accelerometerFilter.addAction("android.intent.action.ACCELEROMETER_NO_MOVEMENT");
+        accelerometerFilter.addAction("android.intent.action.ACCELEROMETER_MOVEMENT_AGAIN");
+        intentFilters.add(accelerometerFilter); // index = 1
+
+        // Location IntentFilter
+        IntentFilter locationFilter = new IntentFilter();
+        locationFilter.addAction("android.intent.action.LOCATION");
+        intentFilters.add(locationFilter); // index = 2
 
         registerAllBroadcastReceivers();//
         startAllServices();
     }
 
-    public void checkIfCrash(){
-
-    }
-
     /**
-     * Register all BroadcastReveicers from a ArrayList with its intentFilters in another ArrayList.
+     * Register all BroadcastReceivers from a ArrayList with its intentFilters in another ArrayList.
      */
     public void registerAllBroadcastReceivers() {
         for (int i = 0; i < broadcastReceivers.size(); i++) {
             registerReceiver(broadcastReceivers.get(i), intentFilters.get(i));
-            System.out.println(broadcastReceivers.get(i));
         }
     }
 
     /**
-     * unregister all BroadcastReceivers from this Service
+     * Unregister all BroadcastReceivers from this Service
      */
     public void unregisterAllBroadcastReceivers() {
         for (int i = 0; i < broadcastReceivers.size(); i++) {
@@ -208,7 +218,7 @@ public class ControlService extends Service {
         Intent mainScreen = new Intent(this.getApplicationContext(), MainScreen.class);
         startActivity(mainScreen);
 
-        /// ONLY FOR TESTSWrite received broadcast into file
+        /// ONLY FOR TESTS Write received broadcast into file
         writeAccelerometerDataToFile(dataFileFirst, dataStringFirst);
         writeAccelerometerDataToFile(dataFileSecond, dataStringSecond);
         ///
