@@ -6,12 +6,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.saveyourride.R;
+import com.saveyourride.services.Notification;
 import com.saveyourride.services.TimerService;
 
 public class ActiveMode extends AppCompatActivity {
@@ -29,12 +32,17 @@ public class ActiveMode extends AppCompatActivity {
     private TextView textViewIntervalCount;
     private TextView textViewTime;
 
+    private Intent notificationService, intentTimerService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_mode);
 
-        final Intent intentTimerService = new Intent(this.getApplicationContext(), TimerService.class);
+        intentTimerService = new Intent(this.getApplicationContext(), TimerService.class);
+        notificationService = new Intent(this.getApplicationContext(), Notification.class);
+
+
         filter = new IntentFilter();
 
         filter.addAction("android.intent.action.TIMER_SERVICE_READY");
@@ -56,8 +64,6 @@ public class ActiveMode extends AppCompatActivity {
         buttonStopTimer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendBroadcastToTimerService("stopTimer");
-                stopService(intentTimerService);
                 ActiveMode.this.finish();
             }
         });
@@ -108,6 +114,13 @@ public class ActiveMode extends AppCompatActivity {
         ///End - BroadcastReceiver for ActiveFragment
 
         startService(intentTimerService);
+        startService(notificationService);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     private void setTextViewTime(int intervalTimeMin, int intervalTimeSec) {
@@ -149,9 +162,23 @@ public class ActiveMode extends AppCompatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                System.out.println("Home");
+                break;
+        }
+        return true;
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(timerServiceReceiver);
+        stopService(notificationService);
+        sendBroadcastToTimerService("stopTimer");
+        stopService(intentTimerService);
     }
 
     @Override

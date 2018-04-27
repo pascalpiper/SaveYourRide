@@ -95,6 +95,7 @@ public class ControlService extends Service {
             }
         });
 
+
         //Location
         broadcastReceivers.add(new BroadcastReceiver() {
 
