@@ -54,7 +54,8 @@ public class ControlService extends Service {
         serviceIntents.add(new Intent(this.getApplicationContext(), Accelerometer.class));
         serviceIntents.add(new Intent(this.getApplicationContext(), LocationService.class));
 
-        //Passive Fragment
+        /// Add broadcast receivers
+        // Passive Mode Activity BroadcastReceiver
         broadcastReceivers.add(new BroadcastReceiver() {
 
             @Override
@@ -71,32 +72,55 @@ public class ControlService extends Service {
             }
         });
 
-        //Accelerometer
+        // Accelerometer BroadcastReceiver
         broadcastReceivers.add(new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
-                System.out.println("Broadcast from Accelerometer");
-                System.out.println("Das Handy wurde geschüttelt. Beschleunigung betrug: " + intent.getFloatExtra("acceleration", -1f));
-
-                /// ONLY FOR TESTS
-                if (intent.getFloatExtra("acceleration", -1) < 100) {
-                    dataStringFirst = dataStringFirst + "\n" +
-                            "Acceleration " + intent.getFloatExtra("acceleration", -1) +
-                            " " + currentLocationString +
-                            " TimeStamp " + getCurrentReadbleDate();
-                } else {
-                    dataStringSecond = dataStringSecond + "\n" +
-                            "Acceleration " + intent.getFloatExtra("acceleration", -1) +
-                            " " + currentLocationString +
-                            " TimeStamp " + getCurrentReadbleDate();
-                    ///
+                /// DEBUG
+                Log.d(TAG, "Broadcast from Accelerometer");
+                ///
+                switch (intent.getAction()) {
+                    case "android.intent.action.ACCELEROMETER_POSSIBLE_ACCIDENT": {
+                        /// DEBUG
+                        Log.d(TAG, "Possible accident. acceleration was: " + intent.getFloatExtra("acceleration", -1f));
+                        ///
+                        /// ONLY FOR TESTS
+                        if (intent.getFloatExtra("acceleration", -1) < 100) {
+                            dataStringFirst = dataStringFirst + "\n" +
+                                    "Acceleration " + intent.getFloatExtra("acceleration", -1) +
+                                    " " + currentLocationString +
+                                    " TimeStamp " + getCurrentReadbleDate();
+                        } else {
+                            dataStringSecond = dataStringSecond + "\n" +
+                                    "Acceleration " + intent.getFloatExtra("acceleration", -1) +
+                                    " " + currentLocationString +
+                                    " TimeStamp " + getCurrentReadbleDate();
+                        }
+                        ///
+                        break;
+                    }
+                    case "android.intent.action.ACCELEROMETER_NO_MOVEMENT": {
+                        /// DEBUG
+                        Log.d(TAG, "NO_MOVEMENT Broadcast received!");
+                        ///
+                        break;
+                    }
+                    case "android.intent.action.ACCELEROMETER_MOVEMENT_AGAIN": {
+                        /// DEBUG
+                        Log.d(TAG, "MOVEMENT_AGAIN Broadcast received!");
+                        ///
+                        break;
+                    }
+                    default: {
+                        Log.d(TAG, "NO SUCH ACTION IN BROADCAST!");
+                        break;
+                    }
                 }
             }
         });
 
-
-        //Location
+        // Location BroadcastReceiver
         broadcastReceivers.add(new BroadcastReceiver() {
 
             @Override
@@ -110,30 +134,39 @@ public class ControlService extends Service {
             }
         });
 
-        intentFilters.add(new IntentFilter("android.intent.action.PASSIVE_FRAGMENT"));
-        intentFilters.add(new IntentFilter("android.intent.action.ACCELEROMETER_DETECTED_STRONG_SHAKE"));
-        intentFilters.add(new IntentFilter("android.intent.action.LOCATION"));
+        /// Add intent filters
+        // Passive Mode Activity IntentFilter
+        IntentFilter pmaFilter = new IntentFilter();
+        pmaFilter.addAction("android.intent.action.PASSIVE_MODE_ACTIVITY");
+        intentFilters.add(pmaFilter); // index = 0
+
+        // Accelerometer IntentFilter
+        IntentFilter accelerometerFilter = new IntentFilter();
+        accelerometerFilter.addAction("android.intent.action.ACCELEROMETER_POSSIBLE_ACCIDENT");
+        accelerometerFilter.addAction("android.intent.action.ACCELEROMETER_NO_MOVEMENT");
+        accelerometerFilter.addAction("android.intent.action.ACCELEROMETER_MOVEMENT_AGAIN");
+        intentFilters.add(accelerometerFilter); // index = 1
+
+        // Location IntentFilter
+        IntentFilter locationFilter = new IntentFilter();
+        locationFilter.addAction("android.intent.action.LOCATION");
+        intentFilters.add(locationFilter); // index = 2
 
         registerAllBroadcastReceivers();//
         startAllServices();
     }
 
-    public void checkIfCrash(){
-
-    }
-
     /**
-     * Register all BroadcastReveicers from a ArrayList with its intentFilters in another ArrayList.
+     * Register all BroadcastReceivers from a ArrayList with its intentFilters in another ArrayList.
      */
     public void registerAllBroadcastReceivers() {
         for (int i = 0; i < broadcastReceivers.size(); i++) {
             registerReceiver(broadcastReceivers.get(i), intentFilters.get(i));
-            System.out.println(broadcastReceivers.get(i));
         }
     }
 
     /**
-     * unregister all BroadcastReceivers from this Service
+     * Unregister all BroadcastReceivers from this Service
      */
     public void unregisterAllBroadcastReceivers() {
         for (int i = 0; i < broadcastReceivers.size(); i++) {
@@ -209,7 +242,7 @@ public class ControlService extends Service {
         Intent mainScreen = new Intent(this.getApplicationContext(), MainScreen.class);
         startActivity(mainScreen);
 
-        /// ONLY FOR TESTSWrite received broadcast into file
+        /// ONLY FOR TESTS Write received broadcast into file
         writeAccelerometerDataToFile(dataFileFirst, dataStringFirst);
         writeAccelerometerDataToFile(dataFileSecond, dataStringSecond);
         ///
