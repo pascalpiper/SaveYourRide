@@ -115,6 +115,7 @@ public class TimerService extends Service {
             currentInterval.start();
             this.intervalCount = intervalCount;
             sendBroadcastToActiveFragment("intervalCount");
+            sendBroadcastToActiveFragment("interval");
         } else {
             sendBroadcastToActiveFragment("timerFinish");
         }
@@ -153,6 +154,11 @@ public class TimerService extends Service {
             case "intervalCount": {
                 Intent intervalCountIntent = new Intent("android.intent.action.INTERVAL_COUNT").putExtra("interval_count", intervalCount);
                 this.sendBroadcast(intervalCountIntent);
+                break;
+            }
+            case "interval": {
+                Intent interval = new Intent("android.intent.action.ACTIVE_MODE_INTERVAL");
+                sendBroadcast(interval);
                 break;
             }
             case "intervalTime": {
