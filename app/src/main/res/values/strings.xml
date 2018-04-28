@@ -12,6 +12,7 @@
     <string name="start">START</string>
     <string name="stop">STOP</string>
     <string name="reset">RESET</string>
+    <string name="sos">SOS</string>
 
     <!-- DIALOG-BUTTONS-->
     <string name="yes">Yes</string>
