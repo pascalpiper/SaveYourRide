@@ -12,6 +12,11 @@
     <string name="start">START</string>
     <string name="stop">STOP</string>
     <string name="reset">RESET</string>
+    <string name="sos">SOS</string>
+
+    <!-- DIALOG-BUTTONS-->
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <!-- TEXT VIEWS -->
     <string name="intervalCount">Interval Count</string>
@@ -23,6 +28,7 @@
     <string name="title_activity_active_mode">activeMode</string>
     <string name="title_passive_tab">Passive</string>
     <string name="title_active_tab">Active</string>
+    <string name="title_dialog_stop_active_mode">Do you want to stop the Active-Mode?</string>
 
     <!-- DESCRIPTIONS -->
     <string name="colored_background">colored background</string>
