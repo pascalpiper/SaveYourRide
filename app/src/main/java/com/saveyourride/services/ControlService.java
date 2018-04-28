@@ -25,23 +25,35 @@ public class ControlService extends Service {
     /// ONLY FOR DEBUG
     private static final String TAG = "ControlService";
     ///
+
+    // Acceleration threshold, when the probability of an accident begins to grow
+    private final float MIN_ACCIDENT_ACCELERATION = Accelerometer.ACCIDENT_THRESHOLD;
+    // Acceleration, when the probability of an accident is 100%
+    private final float MAX_ACCIDENT_ACCELERATION = 230f;
+    // Time for which the probability of the accident is stored
+    private final long POSSIBLE_ACCIDENT_MILLIS = 30000L; // 30 seconds
+    // Minimal time for which the probability of the accident is stored
+    private final long MIN_WAIT_TIME = 10000L; // 10 seconds
+    // Maximal time for which the probability of the accident is stored
+    private final long MAX_WAIT_TIME = 120000L; // 120 seconds or 2 minutes
+
     // Indices in ArrayLists
     private final int PASSIVE_MODE_ACTIVITY = 0;
     private final int ACCELEROMETER = 1;
     private final int LOCATION = 2;
     private final int POSSIBLE_ACCIDENT = 0;
     private final int NO_MOVEMENT = 1;
-    // Acceleration where the probability of accident is 100%
-    private final float MAX_ACCIDENT_ACCELERATION = 230f;
-    // time for which the probability of the accident at is stored
-    private final long POSSIBLE_ACCIDENT_MILLIS = 3000L; // 30 seconds
+    private final int NUMBER_TIMERS = 2;
+
     // ArrayLists
     private ArrayList<BroadcastReceiver> broadcastReceivers;
     private ArrayList<IntentFilter> intentFilters;
     private ArrayList<Intent> serviceIntents;
     private ArrayList<CountDownTimer> countDownTimers;
+
     // probability of accident. Value in the range of 0.0 to 1.0 where 0.9 is 90%
     private float accidentProbability = 0f;
+
     /// ONLY FOR TESTS
     private File dataFileFirst;
     private File dataFileSecond;
@@ -63,14 +75,15 @@ public class ControlService extends Service {
         currentLocationString = "NO_LOCATION";
         ///
 
+        serviceIntents = new ArrayList<Intent>();
         broadcastReceivers = new ArrayList<BroadcastReceiver>();
         intentFilters = new ArrayList<IntentFilter>();
-        serviceIntents = new ArrayList<Intent>();
         countDownTimers = new ArrayList<CountDownTimer>();
 
         addAllServiceIntents();
         addAllBroadcastReceivers();
         addAllIntentFilters();
+        addAllCountDownTimers();
 
         registerAllBroadcastReceivers();
         startAllServices();
@@ -131,13 +144,14 @@ public class ControlService extends Service {
                                     " TimeStamp " + getCurrentReadableDate();
                         }
                         ///
-                        if (!countDownTimers.isEmpty()) {
-                            if (countDownTimers.get(POSSIBLE_ACCIDENT) != null) {
-                                countDownTimers.get(POSSIBLE_ACCIDENT).cancel();
-                            }
+
+                        if (countDownTimers.get(POSSIBLE_ACCIDENT) != null) {
+                            countDownTimers.get(POSSIBLE_ACCIDENT).cancel();
+                            // TODO Not only cancel the countDownTimers also remove old ones from the ArrayList
                         }
+
                         float acceleration = intent.getFloatExtra("acceleration", -1f);
-                        float newAccidentProbability = calculateAccidentProbability(acceleration, MAX_ACCIDENT_ACCELERATION);
+                        float newAccidentProbability = calculateAccidentProbability(MIN_ACCIDENT_ACCELERATION, MAX_ACCIDENT_ACCELERATION, acceleration);
                         accidentProbability = newAccidentProbability > accidentProbability ? newAccidentProbability : accidentProbability;
                         startCountDownTimer(POSSIBLE_ACCIDENT, POSSIBLE_ACCIDENT_MILLIS);
                         break;
@@ -146,12 +160,22 @@ public class ControlService extends Service {
                         /// DEBUG
                         Log.d(TAG, "NO_MOVEMENT Broadcast received!");
                         ///
+                        long waitTime = calculateWaitTime(MIN_WAIT_TIME, MAX_WAIT_TIME, accidentProbability);
+                        startCountDownTimer(NO_MOVEMENT, waitTime);
                         break;
                     }
                     case "android.intent.action.ACCELEROMETER_MOVEMENT_AGAIN": {
                         /// DEBUG
                         Log.d(TAG, "MOVEMENT_AGAIN Broadcast received!");
                         ///
+
+                        if (countDownTimers.get(NO_MOVEMENT) != null) {
+                            countDownTimers.get(NO_MOVEMENT).cancel();
+                            /// DEBUG
+                            Log.d(TAG, "NO_MOVEMENT_TIMER was canceled!");
+                            ///
+                        }
+
                         break;
                     }
                     default: {
@@ -200,6 +224,16 @@ public class ControlService extends Service {
     }
 
     /**
+     * Add all CountDownTimers to the ArrayList initial as null references.
+     * This function must be called before {@code startCountDownTimer} because of IndexOutOfBoundException.
+     */
+    private void addAllCountDownTimers() {
+        for (int i = 0; i < NUMBER_TIMERS; i++) {
+            countDownTimers.add(null);
+        }
+    }
+
+    /**
      * Register all BroadcastReceivers from the ArrayList with its IntentFilters in another ArrayList.
      */
     private void registerAllBroadcastReceivers() {
@@ -245,7 +279,7 @@ public class ControlService extends Service {
                     @Override
                     public void onTick(long millisUntilFinished) {
                         // DEBUG
-                        Log.d(TAG, "probability of accident is: " + accidentProbability);
+                        Log.d(TAG, "POSSIBLE_ACCIDENT_TIMER_ON_TICK: probability of accident is: " + accidentProbability);
                         //
                     }
 
@@ -253,7 +287,7 @@ public class ControlService extends Service {
                     public void onFinish() {
                         accidentProbability = 0f;
                         // DEBUG
-                        Log.d(TAG, "probability of accident is: " + accidentProbability);
+                        Log.d(TAG, "POSSIBLE_ACCIDENT_TIMER_ON_FINISH: probability of accident is: " + accidentProbability);
                         //
                     }
                 }.start());
@@ -263,14 +297,19 @@ public class ControlService extends Service {
                 countDownTimers.add(NO_MOVEMENT, new CountDownTimer(timerMillis, timerMillis) {
                     @Override
                     public void onTick(long millisUntilFinished) {
-                        // NOTHING TO DO
+                        // DEBUG
+                        Log.d(TAG, "NO_MOVEMENT_TIMER_ON_TICK: wait for: " + millisUntilFinished + " milliseconds (in Seconds: " + ((int) millisUntilFinished / 1000) + ")");
+                        //
                     }
 
                     @Override
                     public void onFinish() {
-
+                        // DEBUG
+                        Log.d(TAG, "NO_MOVEMENT_TIMER_ON_FINISH: call Notification Service");
+                        //
+                        // TODO: call the notification service
                     }
-                });
+                }.start());
                 break;
             }
             default: {
@@ -281,22 +320,74 @@ public class ControlService extends Service {
     }
 
     /**
-     * Calculates the probability of accident under consideration of information about the acceleration
+     * Calculates the probability of accident under consideration of information about the acceleration.
      *
-     * @param acceleration            is the acceleration that was noticed recently
-     * @param maxAccidentAcceleration is Acceleration where the probability of accident is 100%
+     * @param minAccidentAcceleration Acceleration threshold, when the probability of an accident begins to grow.
+     * @param maxAccidentAcceleration Acceleration, when the probability of an accident is 100%
+     * @param acceleration            is the acceleration that was noticed recently.
      * @return probability of accident as float value in the range of 0.0 to 1.0 where 0.9 is 90%
+     * @throws IllegalArgumentException if {@code minAccidentAcceleration} is greater then {@code maxAccidentAcceleration}.
+     * @throws IllegalArgumentException if {@code acceleration} is less then 0 or less then {@code minAccidentAcceleration}.
      */
-    private float calculateAccidentProbability(float acceleration, float maxAccidentAcceleration) {
+    private float calculateAccidentProbability(float minAccidentAcceleration, float maxAccidentAcceleration, float acceleration) {
+        if (minAccidentAcceleration > maxAccidentAcceleration) {
+            throw new IllegalArgumentException("minAccidentAcceleration is greater then maxAccidentAcceleration");
+        }
+        if (acceleration < 0 || acceleration < minAccidentAcceleration) {
+            throw new IllegalArgumentException("acceleration is less then 0 or less then minAccidentAcceleration");
+        }
         if (acceleration >= maxAccidentAcceleration) {
             return 1f;
-        }
-        if (acceleration < 0) {
-            Log.d(TAG, "SOMETHING WENT WRONG. ACCELERATION IS LESS THEN 0.");
-            return 0f;
         } else {
-            float probability = 1f - ((maxAccidentAcceleration - acceleration) / 100f);
+            float differenceAcceleration = maxAccidentAcceleration - minAccidentAcceleration;
+            float probability = 1f - ((maxAccidentAcceleration - acceleration) / differenceAcceleration);
             return probability >= 1f ? 1f : probability;
+        }
+    }
+
+    /**
+     * Calculates the time that the application should wait before sending the notification to the user
+     * based on the minimum and maximum waiting time and probability of an accident.
+     *
+     * @param minWaitTime minimal time to wait before sending the notification.
+     * @param maxWaitTime maximal time to wait before sending the notification.
+     * @param probability probability of an accident.
+     * @return the time that the application should wait before sending the notification to the user.
+     * @throws IllegalArgumentException if {@code minWaitTime} is greater then {@code maxWaitTime}.
+     * @throws IllegalArgumentException if {@code probability} is less then 0.
+     */
+    private long calculateWaitTime(long minWaitTime, long maxWaitTime,
+                                   float probability) {
+        if (minWaitTime > maxWaitTime) {
+            throw new IllegalArgumentException("minWaitTime is greater then maxWaiTime");
+        }
+        if (probability < 0) {
+            throw new IllegalArgumentException("probability is less then 0");
+        }
+        if (probability == 0f) {
+            return maxWaitTime;
+        } else if (probability >= 1f) {
+            return minWaitTime;
+        } else {
+            float differenceTime = maxWaitTime - minWaitTime;
+            return minWaitTime + (long) (differenceTime * (1f - probability));
+            // (1-probability) because the greater the probability, the less you want to wait
+        }
+    }
+
+    /**
+     * Cancels all timers
+     */
+    private void cancelAllTimers() {
+        for (CountDownTimer each : countDownTimers) {
+            if (each == null) {
+                return;
+            } else {
+                each.cancel();
+                // DEBUG
+                Log.d(TAG, each.toString() + " wurde storniert");
+                //
+            }
         }
     }
 
@@ -351,6 +442,7 @@ public class ControlService extends Service {
         // DEBUG
         System.out.println("ON DESTROY " + TAG);
         //
+        cancelAllTimers();
         unregisterAllBroadcastReceivers();
         stopAllServices();
 
