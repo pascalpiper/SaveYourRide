@@ -2,9 +2,11 @@ package com.saveyourride.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
@@ -123,6 +125,7 @@ public class ActiveMode extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
+
     private void setTextViewTime(int intervalTimeMin, int intervalTimeSec) {
         String time = String.format("%02d", intervalTimeMin) + ":" + String.format("%02d", intervalTimeSec);
         textViewTime.setText(time);
@@ -173,6 +176,12 @@ public class ActiveMode extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        showAlertDialog();
+//        super.onBackPressed();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(timerServiceReceiver);
@@ -185,6 +194,31 @@ public class ActiveMode extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         registerReceiver(timerServiceReceiver, filter);
+    }
+
+    private void showAlertDialog() {
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle(R.string.title_dialog_stop_active_mode);
+
+        // Set up the buttons
+        alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // ja button
+                ActiveMode.super.onBackPressed();
+            }
+        });
+
+        alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog dialog = alert.create();
+        dialog.show();
     }
 
 }
