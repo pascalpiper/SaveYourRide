@@ -418,8 +418,12 @@ public class ControlService extends Service {
         System.out.println("ON DESTROY " + TAG);
         //
 
-        possibleAccidentTimer.cancel();
-        noMovementTimer.cancel();
+        if (possibleAccidentTimer != null) {
+            possibleAccidentTimer.cancel();
+        }
+        if (noMovementTimer != null) {
+            noMovementTimer.cancel();
+        }
         unregisterAllBroadcastReceivers();
         stopAllServices();
 
