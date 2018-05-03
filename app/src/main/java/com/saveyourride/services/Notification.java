@@ -24,11 +24,16 @@ public class Notification extends Service {
     private IntentFilter passiveModeFilter;
     private MediaPlayer mMediaPlayer;
 
+    private AudioManager audioManager;
+
+
     @Override
     public void onCreate() {
         super.onCreate();
 
         System.out.println("Start Notification");
+
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         saveIfAccident = new BroadcastReceiver() {
             @Override
@@ -94,7 +99,6 @@ public class Notification extends Service {
         Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setDataSource(this, alert);
-        final AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
@@ -110,6 +114,7 @@ public class Notification extends Service {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(aktiveModeInterval);
+        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, 0, audioManager.FLAG_SHOW_UI);
         mMediaPlayer.stop();
     }
 }
