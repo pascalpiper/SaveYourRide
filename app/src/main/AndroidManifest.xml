@@ -77,7 +77,7 @@
         <service android:name=".services.ControlService" />
         <service android:name=".services.Accelerometer" />
         <service android:name=".services.LocationService" />
-        <service android:name=".services.Notification" />
+        <service android:name=".services.NotificationSound" />
     </application>
 
 </manifest>

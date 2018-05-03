@@ -174,7 +174,7 @@ public class ControlService extends Service {
                             ///
                         }
 
-                        // TODO Cancel Notification service or other services if they are started.
+                        // TODO Cancel NotificationSound service or other services if they are started.
 
                         break;
                     }
@@ -303,7 +303,7 @@ public class ControlService extends Service {
             @Override
             public void onFinish() {
                 // DEBUG
-                Log.d(TAG, "NO_MOVEMENT_TIMER_ON_FINISH: call Notification Service");
+                Log.d(TAG, "NO_MOVEMENT_TIMER_ON_FINISH: call NotificationSound Service");
                 //
                 // TODO: call the notification service
             }

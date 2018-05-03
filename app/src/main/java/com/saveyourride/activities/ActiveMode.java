@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -17,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.saveyourride.R;
-import com.saveyourride.services.Notification;
+import com.saveyourride.services.NotificationSound;
 import com.saveyourride.services.TimerService;
 
 public class ActiveMode extends AppCompatActivity {
@@ -31,7 +32,13 @@ public class ActiveMode extends AppCompatActivity {
     private final int INTERVAL_EXPIRED = 1;
 
     //Dialog
-    AlertDialog dialog;
+    AlertDialog currentDialog;
+    private long notificationTime = 6000L;
+    private CountDownTimer notificationBeShownTimer;
+
+    Intent stopNotificationIntent = new Intent("android.intent.action.STOP_NOTIFICATION");
+
+
 
     // BroadcastReceiver for messages from TimerService
     private BroadcastReceiver timerServiceReceiver;
@@ -49,7 +56,7 @@ public class ActiveMode extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_mode);
         intentTimerService = new Intent(this.getApplicationContext(), TimerService.class);
-        notificationService = new Intent(this.getApplicationContext(), Notification.class);
+        notificationService = new Intent(this.getApplicationContext(), NotificationSound.class);
 
 
         filter = new IntentFilter();
@@ -109,6 +116,11 @@ public class ActiveMode extends AppCompatActivity {
                     case "android.intent.action.INTERVAL_EXPIRED": {
                         // Dialog
                         showAlertDialog(INTERVAL_EXPIRED);
+
+                        long time = 2800L;
+                        Intent startNotificationIntent = new Intent("android.intent.action.START_NOTIFICATION").putExtra("notificationSoundTime", time);
+                        sendBroadcast(startNotificationIntent);
+
                         break;
                     }
                     case "android.intent.action.REST_INTERVAL_TIME": {
@@ -232,8 +244,8 @@ public class ActiveMode extends AppCompatActivity {
                     }
                 });
 
-                dialog = alert.create();
-                dialog.show();
+                currentDialog = alert.create();
+                currentDialog.show();
                 break;
             }
 
@@ -247,10 +259,12 @@ public class ActiveMode extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         sendBroadcastToTimerService("resetTimer");
-                        //TODO: Hier muss Broadcast an NotificationService gesendet werden, um Notification zu stoppen
+                        //TODO: Hier muss Broadcast an NotificationService gesendet werden, um NotificationSound zu stoppen
                         ///
-                        stopService(notificationService);
-                        dialog.cancel();
+                        sendBroadcast(stopNotificationIntent);
+
+                        currentDialog.dismiss();
+                        notificationBeShownTimer.cancel();
 
                     }
                 });
@@ -260,16 +274,31 @@ public class ActiveMode extends AppCompatActivity {
                 // this is set the view from XML inside AlertDialog
                 alert.setView(dialogLayout);
 
-                dialog = alert.create();
-                dialog.show();
+                currentDialog = alert.create();
+                currentDialog.show();
 
-                //cancel dialog methods
-//                dialog.cancel();
-//                dialog.dismiss();
+                startNotificationBeShownTimer(notificationTime);
             }
 
             break;
         }
+    }
+
+    public void startNotificationBeShownTimer(long notificationTime) {
+        notificationBeShownTimer = new CountDownTimer(notificationTime, notificationTime) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                // Nothing happend here
+            }
+
+            @Override
+            public void onFinish() {
+                if (currentDialog.isShowing()) {
+                    currentDialog.dismiss();
+                }
+                sendBroadcast(stopNotificationIntent);
+            }
+        }.start();
     }
 
 
