@@ -16,7 +16,9 @@ import android.support.annotation.Nullable;
  */
 public class Accelerometer extends Service implements SensorEventListener {
 
-    private final float ACCIDENT_THRESHOLD = 130f;
+    // Acceleration threshold, when the probability of an accident begins to grow
+    public static final float ACCIDENT_THRESHOLD = 130f;
+    // Acceleration when it is very likely that there is no movement
     private final float NO_MOVE_THRESHOLD = 2f;
 
     private boolean noMovementBroadcastWasSent = false;

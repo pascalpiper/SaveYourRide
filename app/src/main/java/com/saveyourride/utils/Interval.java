@@ -11,7 +11,7 @@ import com.saveyourride.services.TimerService;
  */
 public class Interval {
 
-    private final long MILLISECONDS_IN_SECOND = 1000;
+    private final long MILLISECONDS_IN_SECOND = 1000L;
     private final int SECONDS_IN_MINUTE = 60;
     private final TimerService timerService;
     private int seconds, minutes;
@@ -31,7 +31,7 @@ public class Interval {
         timer = new CountDownTimer(intervalTime, MILLISECONDS_IN_SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                // TEST
+                // DEBUG
                 System.out.println("millisUntilFinished = " + millisUntilFinished + "(in Seconds: " + ((int) millisUntilFinished / 1000) + ")");
                 //
                 timerService.setValues(minutes, seconds);
@@ -60,7 +60,6 @@ public class Interval {
 
     public void stop() {
         timer.cancel();
-
     }
 
 }

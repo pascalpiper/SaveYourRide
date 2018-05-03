@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -21,10 +22,37 @@ import java.util.Date;
 
 public class ControlService extends Service {
 
+    /// ONLY FOR DEBUG
     private static final String TAG = "ControlService";
+    ///
+
+    // Acceleration threshold, when the probability of an accident begins to grow
+    private final float MIN_ACCIDENT_ACCELERATION = Accelerometer.ACCIDENT_THRESHOLD;
+    // Acceleration, when the probability of an accident is 100%
+    private final float MAX_ACCIDENT_ACCELERATION = 230f;
+    // Time for which the probability of the accident is stored
+    private final long POSSIBLE_ACCIDENT_MILLIS = 30000L; // 30 seconds
+    // Minimal time for which the probability of the accident is stored
+    private final long MIN_WAIT_TIME = 10000L; // 10 seconds
+    // Maximal time for which the probability of the accident is stored
+    private final long MAX_WAIT_TIME = 120000L; // 120 seconds or 2 minutes
+
+    // Indices in ArrayLists
+    private final int PASSIVE_MODE_ACTIVITY = 0;
+    private final int ACCELEROMETER = 1;
+    private final int LOCATION = 2;
+    private final int POSSIBLE_ACCIDENT = 0;
+    private final int NO_MOVEMENT = 1;
+    private final int NUMBER_TIMERS = 2;
+
+    // ArrayLists
     private ArrayList<BroadcastReceiver> broadcastReceivers;
     private ArrayList<IntentFilter> intentFilters;
     private ArrayList<Intent> serviceIntents;
+    private ArrayList<CountDownTimer> countDownTimers;
+
+    // probability of accident. Value in the range of 0.0 to 1.0 where 0.9 is 90%
+    private float accidentProbability = 0f;
 
     /// ONLY FOR TESTS
     private File dataFileFirst;
@@ -42,21 +70,39 @@ public class ControlService extends Service {
         dataFileFirst = getFile(1);
         dataFileSecond = getFile(2);
 
-        dataStringFirst = "LAUNCH: " + getCurrentReadbleDate() + "First Part";
-        dataStringSecond = "LAUNCH: " + getCurrentReadbleDate() + " Second Part";
+        dataStringFirst = "LAUNCH: " + getCurrentReadableDate() + "First Part";
+        dataStringSecond = "LAUNCH: " + getCurrentReadableDate() + " Second Part";
         currentLocationString = "NO_LOCATION";
         ///
 
+        serviceIntents = new ArrayList<Intent>();
         broadcastReceivers = new ArrayList<BroadcastReceiver>();
         intentFilters = new ArrayList<IntentFilter>();
-        serviceIntents = new ArrayList<Intent>();
+        countDownTimers = new ArrayList<CountDownTimer>();
 
+        addAllServiceIntents();
+        addAllBroadcastReceivers();
+        addAllIntentFilters();
+        addAllCountDownTimers();
+
+        registerAllBroadcastReceivers();
+        startAllServices();
+    }
+
+    /**
+     * Add all Intent of services to the ArrayList and specify this services.
+     */
+    private void addAllServiceIntents() {
         serviceIntents.add(new Intent(this.getApplicationContext(), Accelerometer.class));
         serviceIntents.add(new Intent(this.getApplicationContext(), LocationService.class));
+    }
 
-        /// Add broadcast receivers
-        // Passive Mode Activity BroadcastReceiver
-        broadcastReceivers.add(new BroadcastReceiver() {
+    /**
+     * Add all BroadcastReceivers to the ArrayList and assign the functionality to them.
+     */
+    private void addAllBroadcastReceivers() {
+        // Passive Mode Activity BroadcastReceiver // index = 0
+        broadcastReceivers.add(PASSIVE_MODE_ACTIVITY, new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -72,8 +118,8 @@ public class ControlService extends Service {
             }
         });
 
-        // Accelerometer BroadcastReceiver
-        broadcastReceivers.add(new BroadcastReceiver() {
+        // Accelerometer BroadcastReceiver // index = 1
+        broadcastReceivers.add(ACCELEROMETER, new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -86,30 +132,50 @@ public class ControlService extends Service {
                         Log.d(TAG, "Possible accident. acceleration was: " + intent.getFloatExtra("acceleration", -1f));
                         ///
                         /// ONLY FOR TESTS
-                        if (intent.getFloatExtra("acceleration", -1) < 100) {
+                        if (intent.getFloatExtra("acceleration", -1f) < 100f) {
                             dataStringFirst = dataStringFirst + "\n" +
-                                    "Acceleration " + intent.getFloatExtra("acceleration", -1) +
+                                    "Acceleration " + intent.getFloatExtra("acceleration", -1f) +
                                     " " + currentLocationString +
-                                    " TimeStamp " + getCurrentReadbleDate();
+                                    " TimeStamp " + getCurrentReadableDate();
                         } else {
                             dataStringSecond = dataStringSecond + "\n" +
-                                    "Acceleration " + intent.getFloatExtra("acceleration", -1) +
+                                    "Acceleration " + intent.getFloatExtra("acceleration", -1f) +
                                     " " + currentLocationString +
-                                    " TimeStamp " + getCurrentReadbleDate();
+                                    " TimeStamp " + getCurrentReadableDate();
                         }
                         ///
+
+                        if (countDownTimers.get(POSSIBLE_ACCIDENT) != null) {
+                            countDownTimers.get(POSSIBLE_ACCIDENT).cancel();
+                            // TODO Not only cancel the countDownTimers also remove old ones from the ArrayList
+                        }
+
+                        float acceleration = intent.getFloatExtra("acceleration", -1f);
+                        float newAccidentProbability = calculateAccidentProbability(MIN_ACCIDENT_ACCELERATION, MAX_ACCIDENT_ACCELERATION, acceleration);
+                        accidentProbability = newAccidentProbability > accidentProbability ? newAccidentProbability : accidentProbability;
+                        startCountDownTimer(POSSIBLE_ACCIDENT, POSSIBLE_ACCIDENT_MILLIS);
                         break;
                     }
                     case "android.intent.action.ACCELEROMETER_NO_MOVEMENT": {
                         /// DEBUG
                         Log.d(TAG, "NO_MOVEMENT Broadcast received!");
                         ///
+                        long waitTime = calculateWaitTime(MIN_WAIT_TIME, MAX_WAIT_TIME, accidentProbability);
+                        startCountDownTimer(NO_MOVEMENT, waitTime);
                         break;
                     }
                     case "android.intent.action.ACCELEROMETER_MOVEMENT_AGAIN": {
                         /// DEBUG
                         Log.d(TAG, "MOVEMENT_AGAIN Broadcast received!");
                         ///
+
+                        if (countDownTimers.get(NO_MOVEMENT) != null) {
+                            countDownTimers.get(NO_MOVEMENT).cancel();
+                            /// DEBUG
+                            Log.d(TAG, "NO_MOVEMENT_TIMER was canceled!");
+                            ///
+                        }
+
                         break;
                     }
                     default: {
@@ -120,8 +186,8 @@ public class ControlService extends Service {
             }
         });
 
-        // Location BroadcastReceiver
-        broadcastReceivers.add(new BroadcastReceiver() {
+        // Location BroadcastReceiver // index = 2
+        broadcastReceivers.add(LOCATION, new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -133,33 +199,44 @@ public class ControlService extends Service {
                         " Speed " + intent.getFloatExtra("location_speed", -1f);
             }
         });
+    }
 
-        /// Add intent filters
+    /**
+     * Add all IntentFilters for BroadcastReceivers to the ArrayList and assign the actions to them.
+     */
+    private void addAllIntentFilters() {
         // Passive Mode Activity IntentFilter
         IntentFilter pmaFilter = new IntentFilter();
         pmaFilter.addAction("android.intent.action.PASSIVE_MODE_ACTIVITY");
-        intentFilters.add(pmaFilter); // index = 0
+        intentFilters.add(PASSIVE_MODE_ACTIVITY, pmaFilter); // index = 0
 
         // Accelerometer IntentFilter
         IntentFilter accelerometerFilter = new IntentFilter();
         accelerometerFilter.addAction("android.intent.action.ACCELEROMETER_POSSIBLE_ACCIDENT");
         accelerometerFilter.addAction("android.intent.action.ACCELEROMETER_NO_MOVEMENT");
         accelerometerFilter.addAction("android.intent.action.ACCELEROMETER_MOVEMENT_AGAIN");
-        intentFilters.add(accelerometerFilter); // index = 1
+        intentFilters.add(ACCELEROMETER, accelerometerFilter); // index = 1
 
         // Location IntentFilter
         IntentFilter locationFilter = new IntentFilter();
         locationFilter.addAction("android.intent.action.LOCATION");
-        intentFilters.add(locationFilter); // index = 2
-
-        registerAllBroadcastReceivers();//
-        startAllServices();
+        intentFilters.add(LOCATION, locationFilter); // index = 2
     }
 
     /**
-     * Register all BroadcastReceivers from a ArrayList with its intentFilters in another ArrayList.
+     * Add all CountDownTimers to the ArrayList initial as null references.
+     * This function must be called before {@code startCountDownTimer} because of IndexOutOfBoundException.
      */
-    public void registerAllBroadcastReceivers() {
+    private void addAllCountDownTimers() {
+        for (int i = 0; i < NUMBER_TIMERS; i++) {
+            countDownTimers.add(null);
+        }
+    }
+
+    /**
+     * Register all BroadcastReceivers from the ArrayList with its IntentFilters in another ArrayList.
+     */
+    private void registerAllBroadcastReceivers() {
         for (int i = 0; i < broadcastReceivers.size(); i++) {
             registerReceiver(broadcastReceivers.get(i), intentFilters.get(i));
         }
@@ -168,18 +245,24 @@ public class ControlService extends Service {
     /**
      * Unregister all BroadcastReceivers from this Service
      */
-    public void unregisterAllBroadcastReceivers() {
+    private void unregisterAllBroadcastReceivers() {
         for (int i = 0; i < broadcastReceivers.size(); i++) {
             unregisterReceiver(broadcastReceivers.get(i));
         }
     }
 
+    /**
+     * Start all Services from the ArrayList
+     */
     private void startAllServices() {
         for (Intent service : serviceIntents) {
             startService(service);
         }
     }
 
+    /**
+     * Stop all Services from the ArrayList
+     */
     private void stopAllServices() {
         for (Intent service : serviceIntents) {
             // DEBUG
@@ -189,15 +272,133 @@ public class ControlService extends Service {
         }
     }
 
+    private void startCountDownTimer(int index, long timerMillis) {
+        switch (index) {
+            case POSSIBLE_ACCIDENT: {
+                countDownTimers.add(POSSIBLE_ACCIDENT, new CountDownTimer(timerMillis, timerMillis) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        // DEBUG
+                        Log.d(TAG, "POSSIBLE_ACCIDENT_TIMER_ON_TICK: probability of accident is: " + accidentProbability);
+                        //
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        accidentProbability = 0f;
+                        // DEBUG
+                        Log.d(TAG, "POSSIBLE_ACCIDENT_TIMER_ON_FINISH: probability of accident is: " + accidentProbability);
+                        //
+                    }
+                }.start());
+                break;
+            }
+            case NO_MOVEMENT: {
+                countDownTimers.add(NO_MOVEMENT, new CountDownTimer(timerMillis, timerMillis) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        // DEBUG
+                        Log.d(TAG, "NO_MOVEMENT_TIMER_ON_TICK: wait for: " + millisUntilFinished + " milliseconds (in Seconds: " + ((int) millisUntilFinished / 1000) + ")");
+                        //
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        // DEBUG
+                        Log.d(TAG, "NO_MOVEMENT_TIMER_ON_FINISH: call Notification Service");
+                        //
+                        // TODO: call the notification service
+                    }
+                }.start());
+                break;
+            }
+            default: {
+                Log.d(TAG, "NO SUCH INDEX TO Count_Down_Timer");
+                break;
+            }
+        }
+    }
+
+    /**
+     * Calculates the probability of accident under consideration of information about the acceleration.
+     *
+     * @param minAccidentAcceleration Acceleration threshold, when the probability of an accident begins to grow.
+     * @param maxAccidentAcceleration Acceleration, when the probability of an accident is 100%
+     * @param acceleration            is the acceleration that was noticed recently.
+     * @return probability of accident as float value in the range of 0.0 to 1.0 where 0.9 is 90%
+     * @throws IllegalArgumentException if {@code minAccidentAcceleration} is greater then {@code maxAccidentAcceleration}.
+     * @throws IllegalArgumentException if {@code acceleration} is less then 0 or less then {@code minAccidentAcceleration}.
+     */
+    private float calculateAccidentProbability(float minAccidentAcceleration, float maxAccidentAcceleration, float acceleration) {
+        if (minAccidentAcceleration > maxAccidentAcceleration) {
+            throw new IllegalArgumentException("minAccidentAcceleration is greater then maxAccidentAcceleration");
+        }
+        if (acceleration < 0 || acceleration < minAccidentAcceleration) {
+            throw new IllegalArgumentException("acceleration is less then 0 or less then minAccidentAcceleration");
+        }
+        if (acceleration >= maxAccidentAcceleration) {
+            return 1f;
+        } else {
+            float differenceAcceleration = maxAccidentAcceleration - minAccidentAcceleration;
+            float probability = 1f - ((maxAccidentAcceleration - acceleration) / differenceAcceleration);
+            return probability >= 1f ? 1f : probability;
+        }
+    }
+
+    /**
+     * Calculates the time that the application should wait before sending the notification to the user
+     * based on the minimum and maximum waiting time and probability of an accident.
+     *
+     * @param minWaitTime minimal time to wait before sending the notification.
+     * @param maxWaitTime maximal time to wait before sending the notification.
+     * @param probability probability of an accident.
+     * @return the time that the application should wait before sending the notification to the user.
+     * @throws IllegalArgumentException if {@code minWaitTime} is greater then {@code maxWaitTime}.
+     * @throws IllegalArgumentException if {@code probability} is less then 0.
+     */
+    private long calculateWaitTime(long minWaitTime, long maxWaitTime,
+                                   float probability) {
+        if (minWaitTime > maxWaitTime) {
+            throw new IllegalArgumentException("minWaitTime is greater then maxWaiTime");
+        }
+        if (probability < 0) {
+            throw new IllegalArgumentException("probability is less then 0");
+        }
+        if (probability == 0f) {
+            return maxWaitTime;
+        } else if (probability >= 1f) {
+            return minWaitTime;
+        } else {
+            float differenceTime = maxWaitTime - minWaitTime;
+            return minWaitTime + (long) (differenceTime * (1f - probability));
+            // (1-probability) because the greater the probability, the less you want to wait
+        }
+    }
+
+    /**
+     * Cancels all timers
+     */
+    private void cancelAllTimers() {
+        for (CountDownTimer each : countDownTimers) {
+            if (each == null) {
+                return;
+            } else {
+                each.cancel();
+                // DEBUG
+                Log.d(TAG, each.toString() + " wurde storniert");
+                //
+            }
+        }
+    }
+
     /// ONLY FOR TESTS
     private File getFile(int part) {
         File path = getApplicationContext().getFilesDir();
-        if(part == 1) {
+        if (part == 1) {
             return new File(path, "accelerometer_data.txt");
+        } else {
+            return new File(path, "accelerometer_data_2.txt");
         }
-        else{
-                return new File(path, "accelerometer_data_2.txt");
-            }
     }
 
     private void writeAccelerometerDataToFile(File file, String data) {
@@ -224,7 +425,7 @@ public class ControlService extends Service {
         return new String(bytes);
     }
 
-    private String getCurrentReadbleDate() {
+    private String getCurrentReadableDate() {
         long currentTimeMillis = System.currentTimeMillis();
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         Date resultDate = new Date(currentTimeMillis);
@@ -232,10 +433,16 @@ public class ControlService extends Service {
     }
     ///
 
-
+    /**
+     * Will be called after stopService(controlServiceIntent).
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();
+        // DEBUG
+        System.out.println("ON DESTROY " + TAG);
+        //
+        cancelAllTimers();
         unregisterAllBroadcastReceivers();
         stopAllServices();
 
@@ -247,7 +454,6 @@ public class ControlService extends Service {
         writeAccelerometerDataToFile(dataFileSecond, dataStringSecond);
         ///
     }
-
 
     @Nullable
     @Override
