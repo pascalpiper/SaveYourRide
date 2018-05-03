@@ -16,10 +16,14 @@ import android.support.annotation.Nullable;
  */
 public class Accelerometer extends Service implements SensorEventListener {
 
-    private final int ACCIDENT_THRESHOLD = 130;
-    private final int NO_MOVE_THERSHOLD = 2;
+    // Acceleration threshold, when the probability of an accident begins to grow
+    public static final float ACCIDENT_THRESHOLD = 130f;
+    // Acceleration when it is very likely that there is no movement
+    private final float NO_MOVE_THRESHOLD = 2f;
 
     private boolean noMovementBroadcastWasSent = false;
+    private int noMovementCounter = 0;
+    private final int MAX_NO_MOVEMENT_COUNTER = 50;
 
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
@@ -43,17 +47,37 @@ public class Accelerometer extends Service implements SensorEventListener {
 
             float acceleration = Math.abs(x) + Math.abs(y) + Math.abs(z);
 
-            if(noMovementBroadcastWasSent && acceleration < NO_MOVE_THERSHOLD){
+            //System.out.println("----  " + acceleration + "  ------ C: " + noMovementCounter);
 
+            if (!noMovementBroadcastWasSent && acceleration <= NO_MOVE_THRESHOLD) {
+
+                if (noMovementCounter >= MAX_NO_MOVEMENT_COUNTER) {
+                    Intent noMovement = new Intent("android.intent.action.ACCELEROMETER_NO_MOVEMENT");
+                    sendBroadcast(noMovement);
+
+                    noMovementBroadcastWasSent = true;
+                    noMovementCounter = 0;
+
+                } else {
+                    noMovementCounter++;
+                }
+            } else if (acceleration > NO_MOVE_THRESHOLD) {
+                noMovementCounter = 0;
+                if (noMovementBroadcastWasSent) {
+                    Intent movementAgain = new Intent("android.intent.action.ACCELEROMETER_MOVEMENT_AGAIN");
+                    sendBroadcast(movementAgain);
+
+                    noMovementBroadcastWasSent = false;
+                }
             }
 
             if (acceleration > ACCIDENT_THRESHOLD) {
-                Intent shake = new Intent("android.intent.action.ACCELEROMETER_DETECTED_STRONG_SHAKE").putExtra("acceleration", acceleration);
+                Intent shake = new Intent("android.intent.action.ACCELEROMETER_POSSIBLE_ACCIDENT").putExtra("acceleration", acceleration);
                 sendBroadcast(shake);
+                noMovementCounter = 0;
             }
-
-
         }
+
     }
 
     @Override

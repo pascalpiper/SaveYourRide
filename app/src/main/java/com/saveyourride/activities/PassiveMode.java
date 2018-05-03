@@ -57,7 +57,7 @@ public class PassiveMode extends AppCompatActivity {
         buttonRead.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent readIntent = new Intent("android.intent.action.PASSIVE_FRAGMENT");
+                Intent readIntent = new Intent("android.intent.action.PASSIVE_MODE_ACTIVITY");
                 sendBroadcast(readIntent);
             }
         });

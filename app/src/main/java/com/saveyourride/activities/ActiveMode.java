@@ -2,16 +2,22 @@ package com.saveyourride.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.saveyourride.R;
+import com.saveyourride.services.Notification;
 import com.saveyourride.services.TimerService;
 
 public class ActiveMode extends AppCompatActivity {
@@ -19,6 +25,13 @@ public class ActiveMode extends AppCompatActivity {
     // TODO: Pick Up values for number of intervals and interval time
     private final int numberOfIntervals = 6;
     private final long intervalTime = 10000L;
+
+    //Dialog IDs
+    private final int BACK_PRESSED = 0;
+    private final int INTERVAL_EXPIRED = 1;
+
+    //Dialog
+    AlertDialog dialog;
 
     // BroadcastReceiver for messages from TimerService
     private BroadcastReceiver timerServiceReceiver;
@@ -29,17 +42,22 @@ public class ActiveMode extends AppCompatActivity {
     private TextView textViewIntervalCount;
     private TextView textViewTime;
 
+    private Intent notificationService, intentTimerService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_mode);
+        intentTimerService = new Intent(this.getApplicationContext(), TimerService.class);
+        notificationService = new Intent(this.getApplicationContext(), Notification.class);
 
-        final Intent intentTimerService = new Intent(this.getApplicationContext(), TimerService.class);
+
         filter = new IntentFilter();
 
         filter.addAction("android.intent.action.TIMER_SERVICE_READY");
         filter.addAction("android.intent.action.INTERVAL_COUNT");
         filter.addAction("android.intent.action.REST_INTERVAL_TIME");
+        filter.addAction("android.intent.action.INTERVAL_EXPIRED");
 
         Button buttonStartTimer = (Button) findViewById(R.id.buttonResetTimer);
         Button buttonStopTimer = (Button) findViewById(R.id.buttonStopTimer);
@@ -56,8 +74,6 @@ public class ActiveMode extends AppCompatActivity {
         buttonStopTimer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendBroadcastToTimerService("stopTimer");
-                stopService(intentTimerService);
                 ActiveMode.this.finish();
             }
         });
@@ -90,6 +106,11 @@ public class ActiveMode extends AppCompatActivity {
                         textViewIntervalCount.setText(Integer.toString(intervalCount + 1) + " / " + numberOfIntervals);
                         break;
                     }
+                    case "android.intent.action.INTERVAL_EXPIRED": {
+                        // Dialog
+                        showAlertDialog(INTERVAL_EXPIRED);
+                        break;
+                    }
                     case "android.intent.action.REST_INTERVAL_TIME": {
                         int intervalTimeMin = intent.getIntExtra("rest_interval_time_min", -1);
                         int intervalTimeSec = intent.getIntExtra("rest_interval_time_sec", -1);
@@ -108,7 +129,15 @@ public class ActiveMode extends AppCompatActivity {
         ///End - BroadcastReceiver for ActiveFragment
 
         startService(intentTimerService);
+        startService(notificationService);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
+
 
     private void setTextViewTime(int intervalTimeMin, int intervalTimeSec) {
         String time = String.format("%02d", intervalTimeMin) + ":" + String.format("%02d", intervalTimeSec);
@@ -149,9 +178,29 @@ public class ActiveMode extends AppCompatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                System.out.println("Home");
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        showAlertDialog(BACK_PRESSED);
+//        super.onBackPressed();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(timerServiceReceiver);
+        stopService(notificationService);
+        sendBroadcastToTimerService("stopTimer");
+        stopService(intentTimerService);
     }
 
     @Override
@@ -160,4 +209,72 @@ public class ActiveMode extends AppCompatActivity {
         registerReceiver(timerServiceReceiver, filter);
     }
 
+    private void showAlertDialog(int dialogID) {
+
+        switch (dialogID) {
+            case BACK_PRESSED: {
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                alert.setTitle(R.string.title_dialog_stop_active_mode);
+
+                // Set up the buttons
+                alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // ja button
+                        ActiveMode.super.onBackPressed();
+                    }
+                });
+
+                alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                dialog = alert.create();
+                dialog.show();
+                break;
+            }
+
+            case INTERVAL_EXPIRED: {
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogLayout = inflater.inflate(R.layout.dialog_active_mode_notification, null);
+
+                Button dialogResetButton = dialogLayout.findViewById(R.id.dialogButtonResetTimer);
+
+                dialogResetButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        sendBroadcastToTimerService("resetTimer");
+                        //TODO: Hier muss Broadcast an NotificationService gesendet werden, um Notification zu stoppen
+                        ///
+                        stopService(notificationService);
+                        dialog.cancel();
+
+                    }
+                });
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+//                    alert.setTitle(R.string.join_event);
+                // this is set the view from XML inside AlertDialog
+                alert.setView(dialogLayout);
+
+                dialog = alert.create();
+                dialog.show();
+
+                //cancel dialog methods
+//                dialog.cancel();
+//                dialog.dismiss();
+            }
+
+            break;
+        }
+    }
+
+
 }
+
+
+
+
