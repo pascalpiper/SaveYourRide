@@ -1,5 +1,6 @@
 package com.saveyourride.utils;
 
+import android.content.Intent;
 import android.os.CountDownTimer;
 
 import com.saveyourride.services.TimerService;
@@ -47,6 +48,10 @@ public class Interval {
                 System.out.println("ON FINISH!");
                 intervalCount++;
                 timerService.runInterval(intervalCount);
+
+                Intent intervalExpiredIntent = new Intent("android.intent.action.INTERVAL_EXPIRED");
+                timerService.sendBroadcast(intervalExpiredIntent);
+
 
             }
         };

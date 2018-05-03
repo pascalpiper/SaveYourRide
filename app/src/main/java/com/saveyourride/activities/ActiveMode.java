@@ -28,7 +28,7 @@ public class ActiveMode extends AppCompatActivity {
 
     //Dialog IDs
     private final int BACK_PRESSED = 0;
-    private final int INTERVAL_FINISHED = 1;
+    private final int INTERVAL_EXPIRED = 1;
 
     //Dialog
     AlertDialog dialog;
@@ -48,7 +48,6 @@ public class ActiveMode extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_mode);
-
         intentTimerService = new Intent(this.getApplicationContext(), TimerService.class);
         notificationService = new Intent(this.getApplicationContext(), Notification.class);
 
@@ -58,6 +57,7 @@ public class ActiveMode extends AppCompatActivity {
         filter.addAction("android.intent.action.TIMER_SERVICE_READY");
         filter.addAction("android.intent.action.INTERVAL_COUNT");
         filter.addAction("android.intent.action.REST_INTERVAL_TIME");
+        filter.addAction("android.intent.action.INTERVAL_EXPIRED");
 
         Button buttonStartTimer = (Button) findViewById(R.id.buttonResetTimer);
         Button buttonStopTimer = (Button) findViewById(R.id.buttonStopTimer);
@@ -104,18 +104,11 @@ public class ActiveMode extends AppCompatActivity {
                         int intervalCount = intent.getIntExtra("interval_count", -1);
                         System.out.println("Fragment-Receiver received interval count: " + intervalCount);
                         textViewIntervalCount.setText(Integer.toString(intervalCount + 1) + " / " + numberOfIntervals);
-                        // Dialog
-                        showAlertDialog(INTERVAL_FINISHED);
-                        ///
                         break;
                     }
-                    case "android.intent.action.ACTIVE_MODE_INTERVAL": {
+                    case "android.intent.action.INTERVAL_EXPIRED": {
                         // Dialog
-                        showAlertDialog(INTERVAL_FINISHED);
-
-                        //TODO: Hier muss Broadcast an NotificationService gesendet werden, um Notification zu stoppen
-                        stopService(notificationService);
-                        ///
+                        showAlertDialog(INTERVAL_EXPIRED);
                         break;
                     }
                     case "android.intent.action.REST_INTERVAL_TIME": {
@@ -244,7 +237,7 @@ public class ActiveMode extends AppCompatActivity {
                 break;
             }
 
-            case INTERVAL_FINISHED: {
+            case INTERVAL_EXPIRED: {
                 LayoutInflater inflater = getLayoutInflater();
                 View dialogLayout = inflater.inflate(R.layout.dialog_active_mode_notification, null);
 
@@ -254,6 +247,9 @@ public class ActiveMode extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         sendBroadcastToTimerService("resetTimer");
+                        //TODO: Hier muss Broadcast an NotificationService gesendet werden, um Notification zu stoppen
+                        ///
+                        stopService(notificationService);
                         dialog.cancel();
 
                     }
