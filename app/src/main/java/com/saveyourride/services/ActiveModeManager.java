@@ -68,7 +68,6 @@ public class ActiveModeManager extends Service {
                         // DEBUG
                         Log.d(TAG, "'RESET-TIMER' - broadcast received");
                         //
-                        // reset|restart the intervals
                         resetIntervals();
                         break;
                     }
@@ -88,14 +87,13 @@ public class ActiveModeManager extends Service {
             }
         };
 
-        // IntentFilter filters messages received by BroadcastReceiver
+        // IntentFilter filters broadcasts received by BroadcastReceiver
         IntentFilter filter = new IntentFilter();
 
         filter.addAction("android.intent.action.RESET_TIMER");
         filter.addAction("android.intent.action.START_TIMER");
         filter.addAction("android.intent.action.STOP_TIMER");
 
-        // register our receiver
         registerReceiver(activityReceiver, filter);
     }
 
@@ -123,7 +121,6 @@ public class ActiveModeManager extends Service {
                 //
                 // If it was last interval (intervalNumber == numberOfIntervals) call // TODO name of "SicherStellungsverfahren"
                 if (intervalNumber < numberOfIntervals) {
-                    // send broadcast that the time of the interval has expired
                     sendBroadcast(new Intent("android.intent.action.INTERVAL_TIME_EXPIRED"));
 
                     // run the next interval | intervalNumber must be incremented
@@ -140,7 +137,6 @@ public class ActiveModeManager extends Service {
                 }
             }
         }.start();
-        // send broadcast to activity with current interval number
         sendBroadcast(new Intent("android.intent.action.INTERVAL_NUMBER").putExtra("interval_number", intervalNumber));
     }
 
