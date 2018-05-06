@@ -64,7 +64,7 @@ public class NotificationSound extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    public void startNotification(long notifcationSoundTime) {
+    public void startNotification(long notificationSoundTime) {
 
         try {
             startSound();
@@ -72,7 +72,7 @@ public class NotificationSound extends Service {
             e.printStackTrace();
         }
 
-        CountDownTimer timer = new CountDownTimer(notifcationSoundTime, notifcationSoundTime) {
+        currentTimer = new CountDownTimer(notificationSoundTime, notificationSoundTime) {
             @Override
             public void onTick(long millisUntilFinished) {
                 System.out.println("OnTick" + millisUntilFinished);
@@ -83,7 +83,7 @@ public class NotificationSound extends Service {
             public void onFinish() {
                 System.out.println("ON FINISH FROM NOTIFICATION PLAYER");
                 mMediaPlayer.stop();
-                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, audioManager.FLAG_SHOW_UI);
+                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_SHOW_UI);
 
 //                mMediaPlayer.release();
 
@@ -117,14 +117,14 @@ public class NotificationSound extends Service {
 //    }
 
 //        Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        Uri alert = Uri.parse("android.resource://" + this.getPackageName() + "/raw/firepager");
+        Uri alert = Uri.parse("android.resource://" + this.getPackageName() + "/raw/notification_sound_service_alarm_signal");
         mMediaPlayer = new MediaPlayer();
-        mMediaPlayer.setDataSource(this, alert);
+        mMediaPlayer.setDataSource(getApplicationContext(), alert);
 
         currentAudioVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
 
-        if (currentAudioVolume < audioManager.getStreamMaxVolume(audioManager.STREAM_ALARM)) {
-            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, audioManager.getStreamMaxVolume(audioManager.STREAM_ALARM), audioManager.FLAG_SHOW_UI);
+        if (currentAudioVolume < audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)) {
+            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM), AudioManager.FLAG_SHOW_UI);
         }
 
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
