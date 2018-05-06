@@ -5,181 +5,161 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.saveyourride.activities.MainScreen;
-import com.saveyourride.utils.Interval;
 
 public class ActiveModeManager extends Service {
 
-    // BroadcastReceiver for messages from ActiveFragment
-    private BroadcastReceiver activeFragmentReceiver;
+    // DEBUG
+    private final String TAG = "ActiveModeManager";
+    //
 
-    // IntentFilter filters messages received by BroadcastReceiver
-    private IntentFilter filter;
+    // BroadcastReceiver for messages from ActiveMode Activity
+    private BroadcastReceiver activityReceiver;
 
-    private Intent intentMainScreen;
+    // Value for TextView
+    private int intervalCount;
 
-
-    private int minutes, seconds, intervalCount;
-
+    // Values received from Activity
     private int numberOfIntervals;
     private long intervalTime;
 
-    private Interval currentInterval;
-
+    // CountDownTimer to run interval
+    private CountDownTimer currentTimer;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         intervalCount = 0;
-        intentMainScreen = new Intent(this.getApplicationContext(), MainScreen.class);
 
-        // DEBUG
-        System.out.println("Service gestartet");
-        //
+        initActivityReceiver();
 
+        sendBroadcast(new Intent("android.intent.action.AMM_SERVICE_READY"));
+    }
 
-        /// BroadcastReceiver for ActiveModeManager
-        /*
-         * This BroadcastReceiver receives the broadcast from the Active Fragment.
-         * It will start or reset the CountDownTimer
-         */
-        activeFragmentReceiver = new BroadcastReceiver() {
+    /**
+     * Creates new {@code BroadcastReceiver} and {@code IntentFilter} for messages from {@code ActiveMode} and registers them.
+     * {@code activityReceiver} receives the broadcasts from the {@code ActiveMode} activity.
+     */
+    private void initActivityReceiver() {
+        activityReceiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
                 switch (intent.getAction()) {
                     case "android.intent.action.START_TIMER": {
                         // DEBUG
-                        System.out.println("Service-Receiver received 'start'-broadcast");
+                        Log.d(TAG, "'START-TIMER' - broadcast received");
                         //
                         numberOfIntervals = intent.getIntExtra("numberOfIntervals", 0);
                         intervalTime = intent.getLongExtra("intervalTime", 0);
 
-                        //run the intervals
+                        //run first interval
                         runInterval(intervalCount);
 
                         break;
                     }
                     case "android.intent.action.RESET_TIMER": {
                         // DEBUG
-                        System.out.println("Service-Receiver received 'reset'-broadcast");
+                        Log.d(TAG, "'RESET-TIMER' - broadcast received");
                         //
-                        // reset|restart the intervals
-                        resetIntervals();
-
+                        resetIntervals(); // reset|restart the intervals
                         break;
                     }
                     case "android.intent.action.STOP_TIMER": {
                         // DEBUG
-                        System.out.println("Service-Receiver received 'stop'-broadcast");
+                        Log.d(TAG, "'STOP-TIMER' - broadcast received");
                         //
-                        stopIntervals();
+                        currentTimer.cancel();
+                        break;
                     }
                     default: {
-                        System.out.println("NO SUCH ACTION IN BROADCAST!");
+                        Log.d(TAG, "NO SUCH ACTION IN BROADCAST!");
                         break;
                     }
                 }
             }
         };
 
-        filter = new IntentFilter();
+        // IntentFilter filters messages received by BroadcastReceiver
+        IntentFilter filter = new IntentFilter();
+
         filter.addAction("android.intent.action.RESET_TIMER");
         filter.addAction("android.intent.action.START_TIMER");
         filter.addAction("android.intent.action.STOP_TIMER");
 
         // register our receiver
-        registerReceiver(activeFragmentReceiver, filter);
-        ///End - BroadcastReceiver for ActiveModeManager
-
-        // TODO Check if it is not async...
-        sendBroadcastToActiveFragment("serviceReady");
-
+        registerReceiver(activityReceiver, filter);
     }
 
-    public void runInterval(int intervalCount) {
-
-        // DEBUG RUN ONE INTERVAL FIRST
-//        firstInterval = new Interval(intervalTime, this, sperre);
-//        intervalCount = 0;
-//        firstInterval.start();
-//        sendBroadcastToActiveFragment("intervalCount");
-        //
-
+    /**
+     * Run interval as CountDownTimer.
+     *
+     * @param intervalCount number of current interval. If it equal to {@code numberOfIntervals} call // TODO name of "SicherStellungsverfahren"
+     */
+    private void runInterval(int intervalCount) {
         if (intervalCount < numberOfIntervals) {
-            currentInterval = new Interval(intervalTime, this, intervalCount);
-            currentInterval.start();
-            this.intervalCount = intervalCount;
-            sendBroadcastToActiveFragment("intervalCount");
-            sendBroadcastToActiveFragment("interval");
-        } else {
-            sendBroadcastToActiveFragment("timerFinish");
-        }
-    }
 
-    private void stopIntervals() {
-        // DEBUG STOP ONLY ONE INTERVAL
-        currentInterval.stop();
-        //
+            // One Second contains 1000 millis | onTick() will be called every second
+            final long MILLISECONDS_IN_SECOND = 1000L;
+
+            currentTimer = new CountDownTimer(intervalTime, MILLISECONDS_IN_SECOND) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    // DEBUG
+                    Log.d(TAG, "millisUntilFinished = " + millisUntilFinished + "(in Seconds: " + ((int) millisUntilFinished / 1000) + ")");
+                    //
+                    sendBroadcast(new Intent("android.intent.action.REST_INTERVAL_TIME").putExtra("rest_interval_millis", millisUntilFinished));
+                }
+
+                @Override
+                public void onFinish() {
+                    // DEBUG
+                    Log.d(TAG, "OnFinish() von Interval: " + ActiveModeManager.this.intervalCount);
+                    //
+
+                    runInterval(++ActiveModeManager.this.intervalCount);
+
+                    if (ActiveModeManager.this.intervalCount < numberOfIntervals) {
+                        sendBroadcast(new Intent("android.intent.action.INTERVAL_EXPIRED"));
+                    } else {
+                        // DEBUG
+                        Log.d(TAG, "intervalCount is : " + ActiveModeManager.this.intervalCount + ". Probable it was the last one.");
+                        //
+                    }
+
+                }
+            }.start();
+
+            sendBroadcast(new Intent("android.intent.action.INTERVAL_COUNT").putExtra("interval_count", intervalCount));
+
+        } else {
+            // TODO Call "Sicherstellungsverfahren"
+            Log.d(TAG, "Call 'Sicherstellungsverfahren'");
+        }
     }
 
     private void resetIntervals() {
-        stopIntervals();
+        currentTimer.cancel();
         intervalCount = 0;
         runInterval(intervalCount);
-    }
-
-    public void setValues(int minutes, int seconds) {
-        this.minutes = minutes;
-        this.seconds = seconds;
-
-        // DEBUG
-        System.out.println("SetValues: Min: " + minutes + ", Sec: " + seconds);
-        //
-
-        sendBroadcastToActiveFragment("intervalTime");
-    }
-
-    public void sendBroadcastToActiveFragment(String broadcast) {
-        switch (broadcast) {
-            case "serviceReady": {
-                Intent serviceReadyIntent = new Intent("android.intent.action.SERVICE_READY");
-                this.sendBroadcast(serviceReadyIntent);
-                break;
-            }
-            case "intervalCount": {
-                Intent intervalCountIntent = new Intent("android.intent.action.INTERVAL_COUNT").putExtra("interval_count", intervalCount);
-                this.sendBroadcast(intervalCountIntent);
-                break;
-            }
-            case "interval": {
-                Intent interval = new Intent("android.intent.action.ACTIVE_MODE_INTERVAL");
-                sendBroadcast(interval);
-                break;
-            }
-            case "intervalTime": {
-                Intent intervalTimeIntent = new Intent("android.intent.action.REST_INTERVAL_TIME").putExtra("rest_interval_time_min", minutes).putExtra("rest_interval_time_sec", seconds);
-                this.sendBroadcast(intervalTimeIntent);
-                break;
-            }
-            default:
-                System.out.println("ActiveModeManager: No Such Broadcast");
-        }
-
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(activeFragmentReceiver);
-        currentInterval.stop();
-        startActivity(intentMainScreen);
-        System.out.println("SERVICE ON DESTROY");
-        // TODO: INTERVAL TIMER STOPEN
+        // DEBUG
+        Log.d(TAG, "AMM-SERVICE ON DESTROY");
+        //
+        // unregister BroadcastReceiver
+        unregisterReceiver(activityReceiver);
+
+        startActivity(new Intent(this.getApplicationContext(), MainScreen.class));
     }
 
     @Nullable
@@ -187,5 +167,4 @@ public class ActiveModeManager extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
-
 }
