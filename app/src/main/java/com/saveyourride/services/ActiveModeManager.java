@@ -11,7 +11,7 @@ import android.support.annotation.Nullable;
 import com.saveyourride.activities.MainScreen;
 import com.saveyourride.utils.Interval;
 
-public class TimerService extends Service {
+public class ActiveModeManager extends Service {
 
     // BroadcastReceiver for messages from ActiveFragment
     private BroadcastReceiver activeFragmentReceiver;
@@ -42,7 +42,7 @@ public class TimerService extends Service {
         //
 
 
-        /// BroadcastReceiver for TimerService
+        /// BroadcastReceiver for ActiveModeManager
         /*
          * This BroadcastReceiver receives the broadcast from the Active Fragment.
          * It will start or reset the CountDownTimer
@@ -94,7 +94,7 @@ public class TimerService extends Service {
 
         // register our receiver
         registerReceiver(activeFragmentReceiver, filter);
-        ///End - BroadcastReceiver for TimerService
+        ///End - BroadcastReceiver for ActiveModeManager
 
         // TODO Check if it is not async...
         sendBroadcastToActiveFragment("serviceReady");
@@ -167,7 +167,7 @@ public class TimerService extends Service {
                 break;
             }
             default:
-                System.out.println("TimerService: No Such Broadcast");
+                System.out.println("ActiveModeManager: No Such Broadcast");
         }
 
     }

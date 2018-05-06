@@ -13,7 +13,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.saveyourride.R;
-import com.saveyourride.services.ControlService;
+import com.saveyourride.services.PassiveModeManager;
 
 public class PassiveMode extends AppCompatActivity {
 
@@ -40,7 +40,7 @@ public class PassiveMode extends AppCompatActivity {
             }
         });
 
-        controlServiceIntent = new Intent(this.getApplicationContext(), ControlService.class);
+        controlServiceIntent = new Intent(this.getApplicationContext(), PassiveModeManager.class);
         startService(controlServiceIntent);
 
         buttonStopPassiveMode.setOnClickListener(new View.OnClickListener() {

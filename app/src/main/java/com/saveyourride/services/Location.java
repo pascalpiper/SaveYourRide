@@ -3,13 +3,12 @@ package com.saveyourride.services;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-public class LocationService extends Service {
+public class Location extends Service {
 
     // DEBUG
     private static final String TAG = "LOCATION_SERVICE";
@@ -81,19 +80,19 @@ public class LocationService extends Service {
     }
 
     private class LocationListener implements android.location.LocationListener {
-        Location mLastLocation;
+        android.location.Location mLastLocation;
 
         public LocationListener(String provider) {
             Log.d(TAG, "LocationListener: " + provider);
-            mLastLocation = new Location(provider);
+            mLastLocation = new android.location.Location(provider);
         }
 
         @Override
-        public void onLocationChanged(Location location) {
+        public void onLocationChanged(android.location.Location location) {
             Log.d(TAG, "onLocationChanged: " + location + "Speed:" + location.getSpeed());
             mLastLocation.set(location);
 
-            //Send locationSpeed to ControlService
+            //Send locationSpeed to PassiveModeManager
             Intent locationSpeed = new Intent("android.intent.action.LOCATION")
                     .putExtra("location_speed", location.getSpeed())
                     .putExtra("location_latitude", location.getLatitude())

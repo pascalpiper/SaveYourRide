@@ -20,10 +20,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class ControlService extends Service {
+public class PassiveModeManager extends Service {
 
     /// ONLY FOR DEBUG
-    private static final String TAG = "ControlService";
+    private static final String TAG = "PassiveModeManager";
     ///
 
     // Acceleration threshold, when the probability of an accident begins to grow
@@ -92,7 +92,7 @@ public class ControlService extends Service {
      */
     private void addAllServiceIntents() {
         serviceIntents.add(new Intent(this.getApplicationContext(), Accelerometer.class));
-        serviceIntents.add(new Intent(this.getApplicationContext(), LocationService.class));
+        serviceIntents.add(new Intent(this.getApplicationContext(), Location.class));
     }
 
     /**
@@ -191,7 +191,7 @@ public class ControlService extends Service {
 
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "Broadcast from LocationService");
+                Log.d(TAG, "Broadcast from Location");
                 Log.d(TAG, "Location Speed: " + intent.getFloatExtra("location_speed", -1f));
                 currentLocationString = "Location" +
                         " Latitude " + intent.getDoubleExtra("location_latitude", -1d) +

@@ -18,8 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.saveyourride.R;
+import com.saveyourride.services.ActiveModeManager;
 import com.saveyourride.services.NotificationSound;
-import com.saveyourride.services.TimerService;
 
 public class ActiveMode extends AppCompatActivity {
 
@@ -39,8 +39,7 @@ public class ActiveMode extends AppCompatActivity {
     Intent stopNotificationIntent = new Intent("android.intent.action.STOP_NOTIFICATION");
 
 
-
-    // BroadcastReceiver for messages from TimerService
+    // BroadcastReceiver for messages from ActiveModeManager
     private BroadcastReceiver timerServiceReceiver;
 
     // IntentFilter filters messages received by BroadcastReceiver
@@ -55,7 +54,7 @@ public class ActiveMode extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_mode);
-        intentTimerService = new Intent(this.getApplicationContext(), TimerService.class);
+        intentTimerService = new Intent(this.getApplicationContext(), ActiveModeManager.class);
         notificationService = new Intent(this.getApplicationContext(), NotificationSound.class);
 
 
@@ -87,7 +86,7 @@ public class ActiveMode extends AppCompatActivity {
 
         /// BroadcastReceiver for ActiveFragment
         /*
-         * This BroadcastReceiver receives the broadcasts from the TimerService
+         * This BroadcastReceiver receives the broadcasts from the ActiveModeManager
          * It can receive following broadcasts:
          * - intervalCount
          * - restIntervalTime
@@ -161,10 +160,10 @@ public class ActiveMode extends AppCompatActivity {
     }
 
     /**
-     * This method will send a broadcast to the service TimerService.
+     * This method will send a broadcast to the service ActiveModeManager.
      * case start => TierService becomes the numberOfIntervals and the intervalTime and start the timer.
-     * case reset => TimerService will reset the timer and start the new one.
-     * case stop => TimerService will stop the timer
+     * case reset => ActiveModeManager will reset the timer and start the new one.
+     * case stop => ActiveModeManager will stop the timer
      */
     private void sendBroadcastToTimerService(String broadcast) {
         switch (broadcast) {

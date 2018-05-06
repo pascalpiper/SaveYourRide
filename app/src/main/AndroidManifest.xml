@@ -9,8 +9,8 @@
     <!-- DEBUG -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <!--  -->
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -42,7 +42,6 @@
             android:parentActivityName=".activities.MainScreen"
             android:screenOrientation="portrait"
             android:showOnLockScreen="true">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.saveyourride.activities.MainScreen" />
@@ -69,15 +68,17 @@
         </activity>
 
         <!-- Services -->
+        <service android:name=".services.NotificationSound" />
+        <service android:name=".services.NotificationManager" />
 
         <!-- Services for Active Mode -->
-        <service android:name=".services.TimerService" />
+        <service android:name=".services.ActiveModeManager" />
 
         <!-- Services for Passive Mode -->
-        <service android:name=".services.ControlService" />
+        <service android:name=".services.PassiveModeManager" />
         <service android:name=".services.Accelerometer" />
-        <service android:name=".services.LocationService" />
-        <service android:name=".services.NotificationSound" />
+        <service android:name=".services.Location" />
+
     </application>
 
 </manifest>

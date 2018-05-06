@@ -3,7 +3,7 @@ package com.saveyourride.utils;
 import android.content.Intent;
 import android.os.CountDownTimer;
 
-import com.saveyourride.services.TimerService;
+import com.saveyourride.services.ActiveModeManager;
 
 /*
  * Created by taraszaika on 12.04.18.
@@ -13,14 +13,14 @@ public class Interval {
 
     private final long MILLISECONDS_IN_SECOND = 1000L;
     private final int SECONDS_IN_MINUTE = 60;
-    private final TimerService timerService;
+    private final ActiveModeManager activeModeManager;
     private int seconds, minutes;
     private long intervalTime;
     private CountDownTimer timer;
     private int intervalCount;
 
-    public Interval(long intervalTime, TimerService timerService, int intervalCount) {
-        this.timerService = timerService;
+    public Interval(long intervalTime, ActiveModeManager activeModeManager, int intervalCount) {
+        this.activeModeManager = activeModeManager;
         this.intervalTime = intervalTime;
         this.seconds = 0;
         this.minutes = 0;
@@ -34,7 +34,7 @@ public class Interval {
                 // DEBUG
                 System.out.println("millisUntilFinished = " + millisUntilFinished + "(in Seconds: " + ((int) millisUntilFinished / 1000) + ")");
                 //
-                timerService.setValues(minutes, seconds);
+                activeModeManager.setValues(minutes, seconds);
                 if (seconds < SECONDS_IN_MINUTE) {
                     seconds = seconds + 1;
                 } else {
@@ -47,10 +47,10 @@ public class Interval {
             public void onFinish() {
                 System.out.println("ON FINISH!");
                 intervalCount++;
-                timerService.runInterval(intervalCount);
+                activeModeManager.runInterval(intervalCount);
 
                 Intent intervalExpiredIntent = new Intent("android.intent.action.INTERVAL_EXPIRED");
-                timerService.sendBroadcast(intervalExpiredIntent);
+                activeModeManager.sendBroadcast(intervalExpiredIntent);
 
 
             }
