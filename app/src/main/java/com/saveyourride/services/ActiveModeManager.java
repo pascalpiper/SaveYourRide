@@ -10,8 +10,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.saveyourride.activities.MainScreen;
-
 public class ActiveModeManager extends Service {
 
     // DEBUG
@@ -21,8 +19,8 @@ public class ActiveModeManager extends Service {
     // BroadcastReceiver for messages from ActiveMode Activity
     private BroadcastReceiver activityReceiver;
 
-    // Value for TextView
-    private int intervalCount;
+    // Current interval number
+    private int intervalNumber;
 
     // Values received from Activity
     private int numberOfIntervals;
@@ -35,10 +33,13 @@ public class ActiveModeManager extends Service {
     public void onCreate() {
         super.onCreate();
 
-        intervalCount = 0;
+        // Init-value of intervalNumber is 1 | first interval
+        intervalNumber = 1;
 
+        // initialize BroadcastReceiver
         initActivityReceiver();
 
+        // send broadcast that AMM-Service is ready
         sendBroadcast(new Intent("android.intent.action.AMM_SERVICE_READY"));
     }
 
@@ -59,22 +60,23 @@ public class ActiveModeManager extends Service {
                         numberOfIntervals = intent.getIntExtra("numberOfIntervals", 0);
                         intervalTime = intent.getLongExtra("intervalTime", 0);
 
-                        //run first interval
-                        runInterval(intervalCount);
-
+                        //run first interval | intervalNumber must be 1 at this moment
+                        runInterval();
                         break;
                     }
                     case "android.intent.action.RESET_TIMER": {
                         // DEBUG
                         Log.d(TAG, "'RESET-TIMER' - broadcast received");
                         //
-                        resetIntervals(); // reset|restart the intervals
+                        // reset|restart the intervals
+                        resetIntervals();
                         break;
                     }
                     case "android.intent.action.STOP_TIMER": {
                         // DEBUG
                         Log.d(TAG, "'STOP-TIMER' - broadcast received");
                         //
+                        // stop current interval
                         currentTimer.cancel();
                         break;
                     }
@@ -99,55 +101,59 @@ public class ActiveModeManager extends Service {
 
     /**
      * Run interval as CountDownTimer.
-     *
-     * @param intervalCount number of current interval. If it equal to {@code numberOfIntervals} call // TODO name of "SicherStellungsverfahren"
      */
-    private void runInterval(int intervalCount) {
-        if (intervalCount < numberOfIntervals) {
+    private void runInterval() {
 
-            // One Second contains 1000 millis | onTick() will be called every second
-            final long MILLISECONDS_IN_SECOND = 1000L;
+        // One Second contains 1000 millis | onTick() will be called every second
+        final long MILLISECONDS_IN_SECOND = 1000L;
 
-            currentTimer = new CountDownTimer(intervalTime, MILLISECONDS_IN_SECOND) {
-                @Override
-                public void onTick(long millisUntilFinished) {
+        currentTimer = new CountDownTimer(intervalTime, MILLISECONDS_IN_SECOND) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                // DEBUG
+                Log.d(TAG, "millisUntilFinished = " + millisUntilFinished + "(in Seconds: " + ((int) millisUntilFinished / 1000) + ")");
+                //
+                sendBroadcast(new Intent("android.intent.action.REST_INTERVAL_TIME").putExtra("rest_interval_millis", millisUntilFinished));
+            }
+
+            @Override
+            public void onFinish() {
+                // DEBUG
+                Log.d(TAG, "OnFinish() von Interval: " + intervalNumber);
+                //
+                // If it was last interval (intervalNumber == numberOfIntervals) call // TODO name of "SicherStellungsverfahren"
+                if (intervalNumber < numberOfIntervals) {
+                    // send broadcast that the time of the interval has expired
+                    sendBroadcast(new Intent("android.intent.action.INTERVAL_TIME_EXPIRED"));
+
+                    // run the next interval | intervalNumber must be incremented
+                    intervalNumber++;
+                    runInterval();
+                } else {
                     // DEBUG
-                    Log.d(TAG, "millisUntilFinished = " + millisUntilFinished + "(in Seconds: " + ((int) millisUntilFinished / 1000) + ")");
+                    Log.d(TAG, "Probable it was the last interval.");
                     //
-                    sendBroadcast(new Intent("android.intent.action.REST_INTERVAL_TIME").putExtra("rest_interval_millis", millisUntilFinished));
-                }
-
-                @Override
-                public void onFinish() {
-                    // DEBUG
-                    Log.d(TAG, "OnFinish() von Interval: " + ActiveModeManager.this.intervalCount);
+                    // TODO Call "Sicherstellungsverfahren"
+                    //DEBUG
+                    Log.d(TAG, "Call 'Sicherstellungsverfahren'");
                     //
-
-                    runInterval(++ActiveModeManager.this.intervalCount);
-
-                    if (ActiveModeManager.this.intervalCount < numberOfIntervals) {
-                        sendBroadcast(new Intent("android.intent.action.INTERVAL_EXPIRED"));
-                    } else {
-                        // DEBUG
-                        Log.d(TAG, "intervalCount is : " + ActiveModeManager.this.intervalCount + ". Probable it was the last one.");
-                        //
-                    }
-
                 }
-            }.start();
-
-            sendBroadcast(new Intent("android.intent.action.INTERVAL_COUNT").putExtra("interval_count", intervalCount));
-
-        } else {
-            // TODO Call "Sicherstellungsverfahren"
-            Log.d(TAG, "Call 'Sicherstellungsverfahren'");
-        }
+            }
+        }.start();
+        // send broadcast to activity with current interval number
+        sendBroadcast(new Intent("android.intent.action.INTERVAL_NUMBER").putExtra("interval_number", intervalNumber));
     }
 
+    /**
+     * Reset all Intervals.
+     * Stop current timer.
+     * Set {@code intervalNumber} to 1 (first interval)
+     * Run first interval
+     */
     private void resetIntervals() {
         currentTimer.cancel();
-        intervalCount = 0;
-        runInterval(intervalCount);
+        intervalNumber = 1;
+        runInterval();
     }
 
     @Override
@@ -156,10 +162,7 @@ public class ActiveModeManager extends Service {
         // DEBUG
         Log.d(TAG, "AMM-SERVICE ON DESTROY");
         //
-        // unregister BroadcastReceiver
         unregisterReceiver(activityReceiver);
-
-        startActivity(new Intent(this.getApplicationContext(), MainScreen.class));
     }
 
     @Nullable
