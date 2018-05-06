@@ -147,7 +147,7 @@ public class ActiveModeManager extends Service {
     public void sendBroadcastToActiveFragment(String broadcast) {
         switch (broadcast) {
             case "serviceReady": {
-                Intent serviceReadyIntent = new Intent("android.intent.action.TIMER_SERVICE_READY");
+                Intent serviceReadyIntent = new Intent("android.intent.action.SERVICE_READY");
                 this.sendBroadcast(serviceReadyIntent);
                 break;
             }

@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 import com.saveyourride.R;
 import com.saveyourride.services.ActiveModeManager;
-import com.saveyourride.services.NotificationSound;
+import com.saveyourride.services.NotificationManager;
 
 public class ActiveMode extends AppCompatActivity {
 
@@ -36,41 +36,33 @@ public class ActiveMode extends AppCompatActivity {
     private long notificationTime = 6000L;
     private CountDownTimer notificationBeShownTimer;
 
-    Intent stopNotificationIntent = new Intent("android.intent.action.STOP_NOTIFICATION");
-
-
-    // BroadcastReceiver for messages from ActiveModeManager
-    private BroadcastReceiver timerServiceReceiver;
-
-    // IntentFilter filters messages received by BroadcastReceiver
-    private IntentFilter filter;
+    // BroadcastReceiver for messages from ActiveModeManager (AMM)
+    private BroadcastReceiver ammReceiver;
 
     private TextView textViewIntervalCount;
     private TextView textViewTime;
 
-    private Intent notificationService, intentTimerService;
+    private Intent notificationService, modeManagerService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_active_mode);
-        intentTimerService = new Intent(this.getApplicationContext(), ActiveModeManager.class);
-        notificationService = new Intent(this.getApplicationContext(), NotificationSound.class);
 
-
-        filter = new IntentFilter();
-
-        filter.addAction("android.intent.action.TIMER_SERVICE_READY");
-        filter.addAction("android.intent.action.INTERVAL_COUNT");
-        filter.addAction("android.intent.action.REST_INTERVAL_TIME");
-        filter.addAction("android.intent.action.INTERVAL_EXPIRED");
-
-        Button buttonStartTimer = (Button) findViewById(R.id.buttonResetTimer);
+        Button buttonResetTimer = (Button) findViewById(R.id.buttonResetTimer);
         Button buttonStopTimer = (Button) findViewById(R.id.buttonStopTimer);
         textViewTime = (TextView) findViewById(R.id.textViewTimer);
         textViewIntervalCount = (TextView) findViewById(R.id.textViewIntervalCount);
 
-        buttonStartTimer.setOnClickListener(new View.OnClickListener() {
+        // Create intents for Services
+        modeManagerService = new Intent(this.getApplicationContext(), ActiveModeManager.class);
+        notificationService = new Intent(this.getApplicationContext(), NotificationManager.class);
+
+        // Create BroadcastReceiver
+
+
+        buttonResetTimer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 resetTimer();
@@ -93,13 +85,13 @@ public class ActiveMode extends AppCompatActivity {
          * - finish-message from the Timer
          * - status, that the Service is ready
          */
-        timerServiceReceiver = new BroadcastReceiver() {
+        ammReceiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
                 //extract our message from intent
                 switch (intent.getAction()) {
-                    case "android.intent.action.TIMER_SERVICE_READY": {
+                    case "android.intent.action.SERVICE_READY": {
                         // DEBUG
                         System.out.println("Fragment-Receiver received 'service-ready'-broadcast");
                         //
@@ -135,11 +127,19 @@ public class ActiveMode extends AppCompatActivity {
             }
         };
 
+        // IntentFilter filters messages received by BroadcastReceiver
+        IntentFilter filter = new IntentFilter();
+
+        filter.addAction("android.intent.action.SERVICE_READY");
+        filter.addAction("android.intent.action.INTERVAL_COUNT");
+        filter.addAction("android.intent.action.REST_INTERVAL_TIME");
+        filter.addAction("android.intent.action.INTERVAL_EXPIRED");
+
         // register our receiver
-        registerReceiver(timerServiceReceiver, filter);
+        registerReceiver(ammReceiver, filter);
         ///End - BroadcastReceiver for ActiveFragment
 
-        startService(intentTimerService);
+        startService(modeManagerService);
         startService(notificationService);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
@@ -208,16 +208,10 @@ public class ActiveMode extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(timerServiceReceiver);
+        unregisterReceiver(ammReceiver);
         stopService(notificationService);
         sendBroadcastToTimerService("stopTimer");
-        stopService(intentTimerService);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        registerReceiver(timerServiceReceiver, filter);
+        stopService(modeManagerService);
     }
 
     private void showAlertDialog(int dialogID) {
@@ -260,7 +254,7 @@ public class ActiveMode extends AppCompatActivity {
                         sendBroadcastToTimerService("resetTimer");
                         //TODO: Hier muss Broadcast an NotificationService gesendet werden, um NotificationSound zu stoppen
                         ///
-                        sendBroadcast(stopNotificationIntent);
+                        sendBroadcast(new Intent("android.intent.action.STOP_NOTIFICATION"));
 
                         currentDialog.dismiss();
                         notificationBeShownTimer.cancel();
@@ -295,7 +289,7 @@ public class ActiveMode extends AppCompatActivity {
                 if (currentDialog.isShowing()) {
                     currentDialog.dismiss();
                 }
-                sendBroadcast(stopNotificationIntent);
+                sendBroadcast(new Intent("android.intent.action.STOP_NOTIFICATION"));
             }
         }.start();
     }
