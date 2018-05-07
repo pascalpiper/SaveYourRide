@@ -34,6 +34,7 @@ public class ActiveMode extends AppCompatActivity {
     //Dialog IDs
     private final int BACK_PRESSED = 0;
     private final int INTERVAL_TIME_EXPIRED = 1;
+    private final int ACCIDENT_GUARANTEE_PROCEDURE = 2;
 
     //Dialog
     AlertDialog currentDialog;
@@ -127,11 +128,13 @@ public class ActiveMode extends AppCompatActivity {
                         showAlertDialog(INTERVAL_TIME_EXPIRED);
                         break;
                     }
+                    case "android.intent.action.AGP_SHOW_DIALOG": {
+                        showAlertDialog(ACCIDENT_GUARANTEE_PROCEDURE);
+                        break;
+                    }
                     case "android.intent.action.DISMISS_DIALOG": {
-                        // DEBUG
-                        Log.d(TAG, "'DISMISS_DIALOG' - broadcast was received!");
-                        //
                         currentDialog.dismiss();
+                        break;
                     }
                     default:
                         Log.d(TAG, "Unknown Broadcast received");
@@ -147,6 +150,7 @@ public class ActiveMode extends AppCompatActivity {
         filter.addAction("android.intent.action.REST_INTERVAL_TIME");
         filter.addAction("android.intent.action.INTERVAL_NUMBER");
         filter.addAction("android.intent.action.ITM_SHOW_DIALOG");
+        filter.addAction("android.intent.action.AGP_SHOW_DIALOG");
         filter.addAction("android.intent.action.DISMISS_DIALOG");
 
         // register our receiver
@@ -171,7 +175,6 @@ public class ActiveMode extends AppCompatActivity {
                         ActiveMode.super.onBackPressed();
                     }
                 });
-
                 alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -200,14 +203,46 @@ public class ActiveMode extends AppCompatActivity {
                 });
 
                 AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
                 // set the view from XML inside AlertDialog
                 alert.setView(dialogLayout);
+                alert.setCancelable(false);
 
                 currentDialog = alert.create();
                 currentDialog.show();
+                break;
             }
-            break;
+            case ACCIDENT_GUARANTEE_PROCEDURE: {
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                alert.setTitle(R.string.title_dialog_accident_guarantee_procedure);
+                alert.setCancelable(false);
+
+                // Set up the buttons
+                alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        sendBroadcast(new Intent("android.intent.action.STOP_NOTIFICATION"));
+                        sendBroadcast(new Intent("android.intent.action.RESET_TIMER"));
+                        dialog.cancel();
+                    }
+                });
+                alert.setNegativeButton(R.string.sos, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // DEBUG
+                        Log.d(TAG, "AGP-DIALOG: SOS-Button was clicked!");
+                        //
+                        // TODO: Call SOS-MODE
+                    }
+                });
+
+                currentDialog = alert.create();
+                currentDialog.show();
+                break;
+            }
+            default: {
+                Log.d(TAG, "Unknown dialog!");
+                break;
+            }
         }
     }
 

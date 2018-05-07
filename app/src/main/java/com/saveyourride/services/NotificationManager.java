@@ -60,7 +60,6 @@ public class NotificationManager extends Service {
                             currentTimer.cancel();
                         }
                         mMediaPlayer.stop();
-
                         break;
                     }
 
@@ -70,7 +69,6 @@ public class NotificationManager extends Service {
                     }
 
                     case "android.intent.action.ACCIDENT_GUARANTEE_PROCEDURE": {
-
                         notificationAGP();
                         break;
                     }
@@ -117,13 +115,10 @@ public class NotificationManager extends Service {
                     mMediaPlayer.stop();
                     audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_SHOW_UI);
                 }
-
             }
-
             @Override
             public void onFinish() {
                 sendBroadcast(new Intent("android.intent.action.DISMISS_DIALOG"));
-
             }
         }.start();
     }
@@ -150,7 +145,6 @@ public class NotificationManager extends Service {
         currentTimer = new CountDownTimer(AGP_NOTIFICATION_TIME, AGP_NOTIFICATION_TIME) {
             @Override
             public void onTick(long millisUntilFinished) {
-
             }
 
             @Override
@@ -159,7 +153,6 @@ public class NotificationManager extends Service {
                 audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_SHOW_UI);
 
                 sendBroadcast(new Intent("android.intent.action.DISMISS_DIALOG"));
-
             }
         }.start();
     }
