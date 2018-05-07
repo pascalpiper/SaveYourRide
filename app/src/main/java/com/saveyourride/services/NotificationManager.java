@@ -40,10 +40,17 @@ public class NotificationManager extends Service {
     public void onCreate() {
         super.onCreate();
 
-        System.out.println("Start NotificationSound");
-
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        initReceiver();
+    }
 
+
+    /**
+     * Creates new {@code BroadcastReceiver} and {@code IntentFilter} for messages from {@code ActiveModeManager} and {@code ActiveMode}
+     * and registers them.
+     * {@code receiver} receives the broadcasts from the ActiveModeManager and ActiveMode activity.
+     */
+    private void initReceiver() {
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
