@@ -19,22 +19,26 @@ public class NotificationManager extends Service {
     // DEBUG
     private final String TAG = "NotificationManager";
     //
+    /// Time of Notifications
+    // ITM
+    private final long ITM_NOTIFICATION_SOUND_TIME = 5500L;
+    private final long ITM_NOTIFICATION_DIALOG_TIME = 20000L;
+    // AGP
+    private final long AGP_NOTIFICATION_TIME = 45000L; // 20000L;
+    // NMD
+    private final long NMD_NOTIFICATION_SOUND_TIME = 5000L;  // 5500L;
+    private final long NMD_NOTIFICATION_DIALOG_TIME = 45000L; // 20000L;
+
+    private boolean isWaiting;
+    private boolean isPlaying;
+    private int waitCounter;
 
     private BroadcastReceiver receiver;
-
     private MediaPlayer mMediaPlayer;
     private AudioManager audioManager;
     private CountDownTimer currentTimer;
-
     private int currentAudioVolume;
 
-    /// Time of Notifications
-    // ITM
-    private final long ITM_NOTIFICATION_SOUND_TIME = 2700L;  // 5500L;
-    private final long ITM_NOTIFICATION_DIALOG_TIME = 5000L; // 20000L;
-
-    // AGP
-    private final long AGP_NOTIFICATION_TIME = 45000L; // 20000L;
 
     @Override
     public void onCreate() {
@@ -64,19 +68,27 @@ public class NotificationManager extends Service {
                         break;
                     }
 
+
+                    case "android.intent.action.ACCIDENT_GUARANTEE_PROCEDURE": {
+// TODO Change
+                        //notificationAGP();
+                        notificationNMD();
+                        break;
+                    }
+
                     case "android.intent.action.INTERVAL_TIME_EXPIRED": {
                         notificationITM();
                         break;
                     }
 
-                    case "android.intent.action.ACCIDENT_GUARANTEE_PROCEDURE": {
-
-                        notificationAGP();
+                    case "android.intent.action.NO_MOVEMENT_DETECTED": {
+                        notificationNMD();
                         break;
                     }
-
                     default:
                         Log.d(TAG, "NO ACTION IN BROADCAST!");
+                        break;
+
                 }
 
             }
@@ -85,8 +97,10 @@ public class NotificationManager extends Service {
         IntentFilter notificationFilter = new IntentFilter();
 
         notificationFilter.addAction("android.intent.action.STOP_NOTIFICATION");
-        notificationFilter.addAction("android.intent.action.INTERVAL_TIME_EXPIRED");
         notificationFilter.addAction("android.intent.action.ACCIDENT_GUARANTEE_PROCEDURE");
+
+        notificationFilter.addAction("android.intent.action.INTERVAL_TIME_EXPIRED");
+        notificationFilter.addAction("android.intent.action.NO_MOVEMENT_DETECTED");
 
 
         registerReceiver(receiver, notificationFilter);
@@ -128,6 +142,58 @@ public class NotificationManager extends Service {
         }.start();
     }
 
+    /**
+     * Control notification when the {@code PassiveModeManager} detects no movement.
+     * NMD = NO_MOVEMENT_DETECTED
+     */
+    public void notificationNMD() {
+
+        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound");
+
+        isWaiting = false;
+        isPlaying = false;
+        waitCounter = 0;
+
+
+        sendBroadcast(new Intent("android.intent.action.NMD_SHOW_DIALOG"));
+
+        currentTimer = new CountDownTimer(NMD_NOTIFICATION_DIALOG_TIME, NMD_NOTIFICATION_SOUND_TIME) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+                if (!isWaiting && !isPlaying) {
+                    try {
+                        // TODO find better solution for Sound URI
+                        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound");
+                        startSound(sound);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    isPlaying = true;
+                } else if (!isWaiting && isPlaying) {
+                    mMediaPlayer.stop();
+                    audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_SHOW_UI);
+                    isWaiting = true;
+                    isPlaying = false;
+                } else if (isWaiting && waitCounter == 3) {
+                    isWaiting = false;
+                    waitCounter = 0;
+                } else {
+                    waitCounter++;
+                }
+            }
+
+
+            @Override
+            public void onFinish() {
+                sendBroadcast(new Intent("android.intent.action.DISMISS_DIALOG"));
+
+                notificationAGP();
+
+            }
+        }.start();
+    }
+
 
     /**
      * Control notification for the accident guarantee procedure from {@code NotificationManager}
@@ -160,6 +226,10 @@ public class NotificationManager extends Service {
 
                 sendBroadcast(new Intent("android.intent.action.DISMISS_DIALOG"));
 
+                // TODO CALL SOS_MODE
+                // DEBUG
+                Log.d(TAG, "Call SOS MODE");
+
             }
         }.start();
     }
@@ -175,8 +245,9 @@ public class NotificationManager extends Service {
         if (currentAudioVolume < audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)) {
             audioManager.setStreamVolume(AudioManager.STREAM_ALARM, audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM), AudioManager.FLAG_SHOW_UI);
         }
-
-        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+        // TODO change streamType
+        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC); // For Testing
+//        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
         mMediaPlayer.setLooping(true);
         mMediaPlayer.prepare();
         mMediaPlayer.start();

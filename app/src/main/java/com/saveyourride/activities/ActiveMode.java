@@ -29,7 +29,7 @@ public class ActiveMode extends AppCompatActivity {
 
     // TODO: Pick Up values for number of intervals and interval time
     private final int numberOfIntervals = 6;
-    private final long intervalTime = 10000L;
+    private final long intervalTime = 60000L;
 
     //Dialog IDs
     private final int BACK_PRESSED = 0;
@@ -206,8 +206,9 @@ public class ActiveMode extends AppCompatActivity {
 
                 currentDialog = alert.create();
                 currentDialog.show();
+                break;
             }
-            break;
+
         }
     }
 

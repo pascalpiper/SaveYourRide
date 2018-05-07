@@ -131,6 +131,8 @@ public class ActiveModeManager extends Service {
                     Log.d(TAG, "Probable it was the last interval.");
                     //
                     // TODO Call "Sicherstellungsverfahren"
+
+                    sendBroadcast(new Intent("android.intent.action.ACCIDENT_GUARANTEE_PROCEDURE"));
                     //DEBUG
                     Log.d(TAG, "Call 'Sicherstellungsverfahren'");
                     //
