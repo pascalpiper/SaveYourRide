@@ -63,7 +63,9 @@ public class NotificationManager extends Service {
                         if (currentTimer != null) {
                             currentTimer.cancel();
                         }
-                        mMediaPlayer.stop();
+                        if (mMediaPlayer != null) {
+                            mMediaPlayer.stop();
+                        }
                         break;
                     }
 
@@ -167,11 +169,8 @@ public class NotificationManager extends Service {
                     audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_SHOW_UI);
                     isWaiting = true;
                     isPlaying = false;
-                } else if (isWaiting && waitCounter == 2) {
+                } else if (isWaiting) {
                     isWaiting = false;
-                    waitCounter = 0;
-                } else {
-                    waitCounter++;
                 }
             }
 

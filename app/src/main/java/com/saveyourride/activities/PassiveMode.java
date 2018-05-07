@@ -13,11 +13,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.saveyourride.R;
+import com.saveyourride.services.NotificationManager;
 import com.saveyourride.services.PassiveModeManager;
 
 public class PassiveMode extends AppCompatActivity {
 
-    private Intent controlServiceIntent;
+    private Intent pmmService, notificationService;
+
     private Button buttonStopPassiveMode;
 
     @Override
@@ -40,19 +42,22 @@ public class PassiveMode extends AppCompatActivity {
             }
         });
 
-        controlServiceIntent = new Intent(this.getApplicationContext(), PassiveModeManager.class);
-        startService(controlServiceIntent);
+        pmmService = new Intent(this.getApplicationContext(), PassiveModeManager.class);
+        notificationService = new Intent(this.getApplicationContext(), NotificationManager.class);
+
+        startService(pmmService);
+        startService(notificationService);
 
         buttonStopPassiveMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopService(controlServiceIntent);
+                stopService(pmmService);
+                stopService(notificationService);
                 PassiveMode.this.finish();
             }
         });
 
         /// ONLY FOR TESTS
-
         Button buttonRead = (Button) findViewById(R.id.buttonReadFromFile);
         buttonRead.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,5 +66,6 @@ public class PassiveMode extends AppCompatActivity {
                 sendBroadcast(readIntent);
             }
         });
+        //
     }
 }

@@ -157,7 +157,6 @@ public class PassiveModeManager extends Service {
                         if (noMovementTimer != null) {
                             noMovementTimer.cancel();
                         }
-
                         sendBroadcast(new Intent("android.intent.action.STOP_NOTIFICATION"));
                         break;
                     }
