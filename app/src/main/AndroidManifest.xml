@@ -68,7 +68,6 @@
         </activity>
 
         <!-- Services -->
-        <service android:name=".services.NotificationSound" />
         <service android:name=".services.NotificationManager" />
 
         <!-- Services for Active Mode -->
