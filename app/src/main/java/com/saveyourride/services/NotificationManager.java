@@ -79,11 +79,6 @@ public class NotificationManager extends Service {
                         notificationITM();
                         break;
                     }
-
-                    case "android.intent.action.ACCIDENT_GUARANTEE_PROCEDURE": {
-                        notificationAGP();
-                        break;
-                    }
                     case "android.intent.action.NO_MOVEMENT_DETECTED": {
                         notificationNMD();
                         break;
