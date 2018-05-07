@@ -69,8 +69,6 @@ public class NotificationManager extends Service {
 
 
                     case "android.intent.action.ACCIDENT_GUARANTEE_PROCEDURE": {
-// TODO Change
-                        //notificationAGP();
                         notificationNMD();
                         break;
                     }
@@ -181,7 +179,7 @@ public class NotificationManager extends Service {
             @Override
             public void onFinish() {
                 sendBroadcast(new Intent("android.intent.action.DISMISS_DIALOG"));
-
+                mMediaPlayer.stop();
                 notificationAGP();
 
             }
@@ -250,6 +248,8 @@ public class NotificationManager extends Service {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receiver);
+        currentTimer.cancel();
+        mMediaPlayer.stop();
     }
 
     @Override
