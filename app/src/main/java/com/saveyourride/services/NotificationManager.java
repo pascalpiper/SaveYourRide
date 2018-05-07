@@ -167,7 +167,7 @@ public class NotificationManager extends Service {
                     audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_SHOW_UI);
                     isWaiting = true;
                     isPlaying = false;
-                } else if (isWaiting && waitCounter == 3) {
+                } else if (isWaiting && waitCounter == 2) {
                     isWaiting = false;
                     waitCounter = 0;
                 } else {

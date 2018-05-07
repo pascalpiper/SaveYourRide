@@ -121,14 +121,8 @@ public class PassiveModeManager extends Service {
 
             @Override
             public void onReceive(Context context, Intent intent) {
-                /// DEBUG
-                Log.d(TAG, "Broadcast from Accelerometer");
-                ///
                 switch (intent.getAction()) {
                     case "android.intent.action.ACCELEROMETER_POSSIBLE_ACCIDENT": {
-                        /// DEBUG
-                        Log.d(TAG, "Possible accident. acceleration was: " + intent.getFloatExtra("acceleration", -1f));
-                        ///
                         /// ONLY FOR TESTS
                         if (intent.getFloatExtra("acceleration", -1f) < 100f) {
                             dataStringFirst = dataStringFirst + "\n" +
@@ -155,27 +149,16 @@ public class PassiveModeManager extends Service {
                         break;
                     }
                     case "android.intent.action.ACCELEROMETER_NO_MOVEMENT": {
-                        /// DEBUG
-                        Log.d(TAG, "NO_MOVEMENT Broadcast received!");
-                        ///
                         long waitTime = calculateWaitTime(MIN_WAIT_TIME, MAX_WAIT_TIME, accidentProbability);
                         startNoMovementTimer(waitTime);
                         break;
                     }
                     case "android.intent.action.ACCELEROMETER_MOVEMENT_AGAIN": {
-                        /// DEBUG
-                        Log.d(TAG, "MOVEMENT_AGAIN Broadcast received!");
-                        ///
-
                         if (noMovementTimer != null) {
                             noMovementTimer.cancel();
-                            /// DEBUG
-                            Log.d(TAG, "NO_MOVEMENT_TIMER was canceled!");
-                            ///
                         }
 
-                        // TODO Cancel NotificationSound service or other services if they are started.
-
+                        sendBroadcast(new Intent("android.intent.action.STOP_NOTIFICATION"));
                         break;
                     }
                     default: {
@@ -305,7 +288,7 @@ public class PassiveModeManager extends Service {
                 // DEBUG
                 Log.d(TAG, "NO_MOVEMENT_TIMER_ON_FINISH: call NotificationSound Service");
                 //
-                // TODO: call the notification service
+                sendBroadcast(new Intent("android.intent.action.NO_MOVEMENT_DETECTED"));
             }
         }.start();
     }
