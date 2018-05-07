@@ -28,9 +28,13 @@ public class NotificationManager extends Service {
 
     private int currentAudioVolume;
 
+    /// Time of Notifications
+    // ITM
     private final long ITM_NOTIFICATION_SOUND_TIME = 2700L;  // 5500L;
     private final long ITM_NOTIFICATION_DIALOG_TIME = 5000L; // 20000L;
 
+    // AGP
+    private final long AGP_NOTIFICATION_TIME = 45000L; // 20000L;
 
     @Override
     public void onCreate() {
@@ -47,21 +51,23 @@ public class NotificationManager extends Service {
                 String action = intent.getAction();
 
                 switch (action) {
+                    case "android.intent.action.STOP_NOTIFICATION": {
+                        if (currentTimer != null) {
+                            currentTimer.cancel();
+                        }
+                        mMediaPlayer.stop();
+
+                        break;
+                    }
+
                     case "android.intent.action.INTERVAL_TIME_EXPIRED": {
-
                         notificationITM();
-
                         break;
                     }
 
                     case "android.intent.action.ACCIDENT_GUARANTEE_PROCEDURE": {
 
-                        long notificationTime = intent.getLongExtra("notificationSoundTime", -1);
-                        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound_service_alarm_signal");
-
-
-                        notificationITM();
-
+                        notificationAGP();
                         break;
                     }
 
@@ -74,6 +80,7 @@ public class NotificationManager extends Service {
 
         IntentFilter notificationFilter = new IntentFilter();
 
+        notificationFilter.addAction("android.intent.action.STOP_NOTIFICATION");
         notificationFilter.addAction("android.intent.action.INTERVAL_TIME_EXPIRED");
         notificationFilter.addAction("android.intent.action.ACCIDENT_GUARANTEE_PROCEDURE");
 
@@ -89,7 +96,8 @@ public class NotificationManager extends Service {
      */
     public void notificationITM() {
 
-        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound_service_alarm_signal");
+        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound");
+
         try {
             startSound(sound);
         } catch (IOException e) {
@@ -110,6 +118,41 @@ public class NotificationManager extends Service {
 
             @Override
             public void onFinish() {
+                sendBroadcast(new Intent("android.intent.action.DISMISS_DIALOG"));
+
+            }
+        }.start();
+    }
+
+
+    /**
+     * Control notification for the accident guarantee procedure from {@code NotificationManager}
+     * is expired.
+     * Start the timer which start/stop the sound and the dialog of the notification
+     * AGP = ACCIDENT_GUARANTEE_PROCEDURE
+     */
+    public void notificationAGP() {
+
+        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/alarm_sound");
+
+        try {
+            startSound(sound);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        sendBroadcast(new Intent("android.intent.action.AGP_SHOW_DIALOG"));
+
+        currentTimer = new CountDownTimer(AGP_NOTIFICATION_TIME, AGP_NOTIFICATION_TIME) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                mMediaPlayer.stop();
+                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_SHOW_UI);
 
                 sendBroadcast(new Intent("android.intent.action.DISMISS_DIALOG"));
 
@@ -135,21 +178,10 @@ public class NotificationManager extends Service {
         mMediaPlayer.start();
     }
 
-    private void stopSound() {
-        mMediaPlayer.stop();
-        if (currentTimer != null) {
-//            currentTimer.onFinish();
-            currentTimer.cancel();
-        }
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receiver);
-
-        stopSound();
-
     }
 
     @Override
