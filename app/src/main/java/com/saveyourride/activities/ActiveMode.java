@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -15,7 +14,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.saveyourride.R;
 import com.saveyourride.services.ActiveModeManager;
@@ -39,11 +37,9 @@ public class ActiveMode extends AppCompatActivity {
 
     //Dialog
     AlertDialog currentDialog;
-    private long notificationTime = 6000L;
-    private CountDownTimer dialogTimer;
 
     // BroadcastReceiver for messages from ActiveModeManager (AMM)
-    private BroadcastReceiver ammReceiver;
+    private BroadcastReceiver receiver;
 
     // TextViews
     private TextView textViewIntervalNumber;
@@ -73,7 +69,7 @@ public class ActiveMode extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Initialize BroadcastReceiver
-        initAmmReceiver();
+        initReceiver();
 
         // Create intents for Services
         ammService = new Intent(this.getApplicationContext(), ActiveModeManager.class);
@@ -100,15 +96,15 @@ public class ActiveMode extends AppCompatActivity {
 
     /**
      * Creates new {@code BroadcastReceiver} and {@code IntentFilter} for messages from {@code ActiveModeManager} and registers them.
-     * {@code ammReceiver} receives the broadcasts from the ActiveModeManager
+     * {@code receiver} receives the broadcasts from the ActiveModeManager and Notification Manager
      * It can receive following broadcasts:
      * - status, that the AMM-Service is ready
      * - intervalNumber
      * - restIntervalTime
      * - the time of the interval has expired
      */
-    private void initAmmReceiver() {
-        ammReceiver = new BroadcastReceiver() {
+    private void initReceiver() {
+        receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 //extract our message from intent
@@ -117,32 +113,29 @@ public class ActiveMode extends AppCompatActivity {
                         sendBroadcast(new Intent("android.intent.action.START_TIMER").putExtra("numberOfIntervals", numberOfIntervals).putExtra("intervalTime", intervalTime));
                         break;
                     }
+                    case "android.intent.action.REST_INTERVAL_TIME": {
+                        long restIntervalMillis = intent.getLongExtra("rest_interval_millis", -1);
+                        setTextViewTime(restIntervalMillis);
+                        break;
+                    }
                     case "android.intent.action.INTERVAL_NUMBER": {
                         int intervalNumber = intent.getIntExtra("interval_number", -1);
                         textViewIntervalNumber.setText(Integer.toString(intervalNumber) + " / " + numberOfIntervals);
                         break;
                     }
-                    case "android.intent.action.INTERVAL_TIME_EXPIRED": {
-                        // Dialog
+                    case "android.intent.action.ITM_SHOW_DIALOG": {
                         showAlertDialog(INTERVAL_TIME_EXPIRED);
-
-                        // TODO make time as final in NotificationManager
-                        long time = 2800L;
-                        Intent startNotificationIntent = new Intent("android.intent.action.START_NOTIFICATION").putExtra("notificationSoundTime", time);
-                        sendBroadcast(startNotificationIntent);
-
                         break;
                     }
-                    case "android.intent.action.REST_INTERVAL_TIME": {
-                        long restIntervalMillis = intent.getLongExtra("rest_interval_millis", -1);
+                    case "android.intent.action.DISMISS_DIALOG": {
                         // DEBUG
-                        Log.d(TAG, "BroadcastReceiver received rest interval millis : " + restIntervalMillis);
+                        Log.d(TAG, "'DISMISS_DIALOG' - broadcast was received!");
                         //
-                        setTextViewTime(restIntervalMillis);
-                        break;
+                        currentDialog.dismiss();
                     }
                     default:
-                        Toast.makeText(getApplicationContext(), "Unknown Broadcast received", Toast.LENGTH_LONG).show();
+                        Log.d(TAG, "Unknown Broadcast received");
+                        break;
                 }
             }
         };
@@ -151,16 +144,21 @@ public class ActiveMode extends AppCompatActivity {
         IntentFilter filter = new IntentFilter();
 
         filter.addAction("android.intent.action.AMM_SERVICE_READY");
-        filter.addAction("android.intent.action.INTERVAL_NUMBER");
         filter.addAction("android.intent.action.REST_INTERVAL_TIME");
-        filter.addAction("android.intent.action.INTERVAL_TIME_EXPIRED");
+        filter.addAction("android.intent.action.INTERVAL_NUMBER");
+        filter.addAction("android.intent.action.ITM_SHOW_DIALOG");
+        filter.addAction("android.intent.action.DISMISS_DIALOG");
 
         // register our receiver
-        registerReceiver(ammReceiver, filter);
+        registerReceiver(receiver, filter);
     }
 
+    /**
+     * Show a dialog with the information for a specific notification.
+     *
+     * @param dialogID determines the information to be shown.
+     */
     private void showAlertDialog(int dialogID) {
-
         switch (dialogID) {
             case BACK_PRESSED: {
                 AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -196,13 +194,8 @@ public class ActiveMode extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         sendBroadcast(new Intent("android.intent.action.RESET_TIMER"));
-                        //TODO: Hier muss Broadcast an NotificationService gesendet werden, um NotificationSound zu stoppen
-                        ///
                         sendBroadcast(new Intent("android.intent.action.STOP_NOTIFICATION"));
-
                         currentDialog.dismiss();
-                        dialogTimer.cancel();
-
                     }
                 });
 
@@ -213,29 +206,9 @@ public class ActiveMode extends AppCompatActivity {
 
                 currentDialog = alert.create();
                 currentDialog.show();
-
-                startNotificationBeShownTimer(notificationTime);
             }
-
             break;
         }
-    }
-
-    public void startNotificationBeShownTimer(long notificationTime) {
-        dialogTimer = new CountDownTimer(notificationTime, notificationTime) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                // Nothing happend here
-            }
-
-            @Override
-            public void onFinish() {
-                if (currentDialog.isShowing()) {
-                    currentDialog.dismiss();
-                }
-                sendBroadcast(new Intent("android.intent.action.STOP_NOTIFICATION"));
-            }
-        }.start();
     }
 
     /**
@@ -263,7 +236,7 @@ public class ActiveMode extends AppCompatActivity {
 
         sendBroadcast(new Intent("android.intent.action.STOP_TIMER"));
 
-        unregisterReceiver(ammReceiver);
+        unregisterReceiver(receiver);
 
         stopService(notificationService);
         stopService(ammService);
