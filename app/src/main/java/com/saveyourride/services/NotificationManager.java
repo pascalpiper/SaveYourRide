@@ -133,7 +133,6 @@ public class NotificationManager extends Service {
      */
     public void notificationAGP() {
 
-        // TODO change sound, download the sound and save it in "raw"
         Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/alarm_sound");
 
         try {
