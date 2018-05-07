@@ -47,10 +47,7 @@ public class NotificationManager extends Service {
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-
-                String action = intent.getAction();
-
-                switch (action) {
+                switch (intent.getAction()) {
                     case "android.intent.action.STOP_NOTIFICATION": {
                         if (currentTimer != null) {
                             currentTimer.cancel();
