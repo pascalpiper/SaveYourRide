@@ -64,7 +64,6 @@ public class NotificationManager extends Service {
                             currentTimer.cancel();
                         }
                         mMediaPlayer.stop();
-
                         break;
                     }
 
@@ -81,6 +80,10 @@ public class NotificationManager extends Service {
                         break;
                     }
 
+                    case "android.intent.action.ACCIDENT_GUARANTEE_PROCEDURE": {
+                        notificationAGP();
+                        break;
+                    }
                     case "android.intent.action.NO_MOVEMENT_DETECTED": {
                         notificationNMD();
                         break;
@@ -88,7 +91,6 @@ public class NotificationManager extends Service {
                     default:
                         Log.d(TAG, "NO ACTION IN BROADCAST!");
                         break;
-
                 }
 
             }
@@ -131,13 +133,10 @@ public class NotificationManager extends Service {
                     mMediaPlayer.stop();
                     audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_SHOW_UI);
                 }
-
             }
-
             @Override
             public void onFinish() {
                 sendBroadcast(new Intent("android.intent.action.DISMISS_DIALOG"));
-
             }
         }.start();
     }
@@ -216,7 +215,6 @@ public class NotificationManager extends Service {
         currentTimer = new CountDownTimer(AGP_NOTIFICATION_TIME, AGP_NOTIFICATION_TIME) {
             @Override
             public void onTick(long millisUntilFinished) {
-
             }
 
             @Override

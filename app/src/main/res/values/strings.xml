@@ -29,6 +29,7 @@
     <string name="title_passive_tab">Passive</string>
     <string name="title_active_tab">Active</string>
     <string name="title_dialog_stop_active_mode">Do you want to stop the Active-Mode?</string>
+    <string name="title_dialog_accident_guarantee_procedure">All intervals have expired. Is everything OK?</string>
 
     <!-- DESCRIPTIONS -->
     <string name="colored_background">colored background</string>

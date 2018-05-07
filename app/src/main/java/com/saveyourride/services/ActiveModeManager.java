@@ -54,9 +54,6 @@ public class ActiveModeManager extends Service {
             public void onReceive(Context context, Intent intent) {
                 switch (intent.getAction()) {
                     case "android.intent.action.START_TIMER": {
-                        // DEBUG
-                        Log.d(TAG, "'START-TIMER' - broadcast received");
-                        //
                         numberOfIntervals = intent.getIntExtra("numberOfIntervals", 0);
                         intervalTime = intent.getLongExtra("intervalTime", 0);
 
@@ -65,16 +62,10 @@ public class ActiveModeManager extends Service {
                         break;
                     }
                     case "android.intent.action.RESET_TIMER": {
-                        // DEBUG
-                        Log.d(TAG, "'RESET-TIMER' - broadcast received");
-                        //
                         resetIntervals();
                         break;
                     }
                     case "android.intent.action.STOP_TIMER": {
-                        // DEBUG
-                        Log.d(TAG, "'STOP-TIMER' - broadcast received");
-                        //
                         // stop current interval
                         currentTimer.cancel();
                         break;
@@ -116,10 +107,7 @@ public class ActiveModeManager extends Service {
 
             @Override
             public void onFinish() {
-                // DEBUG
-                Log.d(TAG, "OnFinish() von Interval: " + intervalNumber);
-                //
-                // If it was last interval (intervalNumber == numberOfIntervals) call // TODO name of "SicherStellungsverfahren"
+                // If it was last interval (intervalNumber == numberOfIntervals) send ACCIDENT_GUARANTEE_PROCEDURE broadcast.
                 if (intervalNumber < numberOfIntervals) {
                     sendBroadcast(new Intent("android.intent.action.INTERVAL_TIME_EXPIRED"));
 
@@ -127,15 +115,7 @@ public class ActiveModeManager extends Service {
                     intervalNumber++;
                     runInterval();
                 } else {
-                    // DEBUG
-                    Log.d(TAG, "Probable it was the last interval.");
-                    //
-                    // TODO Call "Sicherstellungsverfahren"
-
                     sendBroadcast(new Intent("android.intent.action.ACCIDENT_GUARANTEE_PROCEDURE"));
-                    //DEBUG
-                    Log.d(TAG, "Call 'Sicherstellungsverfahren'");
-                    //
                 }
             }
         }.start();
@@ -157,9 +137,6 @@ public class ActiveModeManager extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // DEBUG
-        Log.d(TAG, "AMM-SERVICE ON DESTROY");
-        //
         unregisterReceiver(activityReceiver);
     }
 
