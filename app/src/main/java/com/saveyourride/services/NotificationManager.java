@@ -220,6 +220,8 @@ public class NotificationManager extends Service {
                 // DEBUG
                 Log.d(TAG, "Call SOS MODE");
 
+                startService(new Intent(getApplicationContext(), SosModeManager.class));
+
             }
         }.start();
     }
