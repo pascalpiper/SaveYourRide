@@ -39,15 +39,15 @@ public class ActiveMode extends AppCompatActivity {
     //Dialog
     AlertDialog currentDialog;
 
-    // BroadcastReceiver for messages from ActiveModeManager (AMM)
+    // BroadcastReceiver
     private BroadcastReceiver receiver;
+
+    // Intents for Services | ActiveModeManager (AMM)
+    private Intent notificationService, ammService;
 
     // TextViews
     private TextView textViewIntervalNumber;
     private TextView textViewTime;
-
-    // Intents for Services | ActiveModeManager (AMM)
-    private Intent notificationService, ammService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,8 +96,8 @@ public class ActiveMode extends AppCompatActivity {
     }
 
     /**
-     * Creates new {@code BroadcastReceiver} and {@code IntentFilter} for messages from {@code ActiveModeManager} and registers them.
-     * {@code receiver} receives the broadcasts from the ActiveModeManager and Notification Manager
+     * Creates new {@code BroadcastReceiver} and {@code IntentFilter} and then registers them.
+     * {@code receiver} receives the broadcasts from the {@code ActiveModeManager} and {@code NotificationManager}.
      * It can receive following broadcasts:
      * - status, that the AMM-Service is ready
      * - intervalNumber
@@ -213,7 +213,7 @@ public class ActiveMode extends AppCompatActivity {
             }
             case ACCIDENT_GUARANTEE_PROCEDURE: {
                 AlertDialog.Builder alert = new AlertDialog.Builder(this);
-                alert.setTitle(R.string.title_dialog_accident_guarantee_procedure);
+                alert.setTitle(R.string.title_dialog_accident_guarantee_procedure_interval);
                 alert.setCancelable(false);
 
                 // Set up the buttons
@@ -275,8 +275,6 @@ public class ActiveMode extends AppCompatActivity {
 
         stopService(notificationService);
         stopService(ammService);
-
-        startActivity(new Intent(this.getApplicationContext(), MainScreen.class));
     }
 }
 

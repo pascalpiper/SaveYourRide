@@ -1,9 +1,16 @@
 package com.saveyourride.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -18,17 +25,31 @@ import com.saveyourride.services.PassiveModeManager;
 
 public class PassiveMode extends AppCompatActivity {
 
-    private Intent pmmService, notificationService;
+    // DEBUG
+    private final String TAG = "PassiveMode";
+    //
 
-    private Button buttonStopPassiveMode;
+    //Dialog IDs
+    private final int BACK_PRESSED = 0;
+    private final int NO_MOVEMENT_DETECTED = 1;
+    private final int ACCIDENT_GUARANTEE_PROCEDURE = 2;
+
+    //Dialog
+    AlertDialog currentDialog;
+
+    // BroadcastReceiver
+    private BroadcastReceiver receiver;
+
+    private Intent pmmService, notificationService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Layout
         setContentView(R.layout.activity_passive_mode);
 
-        buttonStopPassiveMode = (Button) findViewById(R.id.buttonStopPassiveMode);
-
+        // Map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapInPassiveMode);
         mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -42,30 +63,196 @@ public class PassiveMode extends AppCompatActivity {
             }
         });
 
+        // Views
+        Button buttonStopPassiveMode = (Button) findViewById(R.id.buttonStopPassiveMode);
+
+        // Keeps Activity ON also on lock screen
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        // Initialize BroadcastReceiver
+        initReceiver();
+
+        // Create intents for Services
         pmmService = new Intent(this.getApplicationContext(), PassiveModeManager.class);
         notificationService = new Intent(this.getApplicationContext(), NotificationManager.class);
 
+        // Start Services
         startService(pmmService);
         startService(notificationService);
 
+        // Button listeners
         buttonStopPassiveMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopService(pmmService);
-                stopService(notificationService);
-                PassiveMode.this.finish();
+                finish();
             }
         });
-
         /// ONLY FOR TESTS
         Button buttonRead = (Button) findViewById(R.id.buttonReadFromFile);
         buttonRead.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent readIntent = new Intent("android.intent.action.PASSIVE_MODE_ACTIVITY");
-                sendBroadcast(readIntent);
+                sendBroadcast(new Intent("android.intent.action.PASSIVE_MODE_ACTIVITY"));
             }
         });
         //
+    }
+
+    /**
+     * Creates new {@code BroadcastReceiver} and {@code IntentFilter} and then registers them.
+     * {@code receiver} receives the broadcasts from the {@code PassiveModeManager} and {@code NotificationManager}.
+     */
+    private void initReceiver() {
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //extract our message from intent
+                switch (intent.getAction()) {
+                    case "android.intent.action.NMD_SHOW_DIALOG": {
+                        showAlertDialog(NO_MOVEMENT_DETECTED);
+                        break;
+                    }
+                    case "android.intent.action.AGP_SHOW_DIALOG": {
+                        showAlertDialog(ACCIDENT_GUARANTEE_PROCEDURE);
+                        break;
+                    }
+                    case "android.intent.action.DISMISS_DIALOG": {
+                        currentDialog.dismiss();
+                        break;
+                    }
+                    default:
+                        Log.d(TAG, "Unknown Broadcast received");
+                        break;
+                }
+            }
+        };
+
+        // IntentFilter filters messages received by BroadcastReceiver
+        IntentFilter filter = new IntentFilter();
+
+        filter.addAction("android.intent.action.NMD_SHOW_DIALOG");
+        filter.addAction("android.intent.action.AGP_SHOW_DIALOG");
+        filter.addAction("android.intent.action.DISMISS_DIALOG");
+
+        // register our receiver
+        registerReceiver(receiver, filter);
+    }
+
+    /**
+     * Show a dialog with the information for a specific notification.
+     *
+     * @param dialogID determines the information to be shown.
+     */
+    private void showAlertDialog(int dialogID) {
+        switch (dialogID) {
+            case BACK_PRESSED: {
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                alert.setTitle(R.string.title_dialog_stop_passive_mode);
+
+                // Set up the buttons
+                alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        PassiveMode.super.onBackPressed();
+                    }
+                });
+                alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                currentDialog = alert.create();
+                currentDialog.show();
+                break;
+            }
+
+            case NO_MOVEMENT_DETECTED: {
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                alert.setTitle(R.string.title_dialog_no_movement_detected);
+                alert.setCancelable(false);
+
+                // Set up the buttons
+                alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        sendBroadcast(new Intent("android.intent.action.STOP_NOTIFICATION"));
+                        dialog.cancel();
+                    }
+                });
+                alert.setNegativeButton(R.string.sos, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // DEBUG
+                        Log.d(TAG, "AGP-DIALOG: SOS-Button was clicked!");
+                        //
+                        // TODO: Call SOS-MODE
+                    }
+                });
+
+                if (currentDialog != null) {
+                    if (currentDialog.isShowing()) {
+                        currentDialog.cancel();
+                    }
+                }
+                currentDialog = alert.create();
+                currentDialog.show();
+                break;
+            }
+            case ACCIDENT_GUARANTEE_PROCEDURE: {
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                alert.setTitle(R.string.title_dialog_accident_guarantee_procedure_no_movement);
+                alert.setCancelable(false);
+
+                // Set up the buttons
+                alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        sendBroadcast(new Intent("android.intent.action.STOP_NOTIFICATION"));
+                        dialog.cancel();
+                    }
+                });
+                alert.setNegativeButton(R.string.sos, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // DEBUG
+                        Log.d(TAG, "AGP-DIALOG: SOS-Button was clicked!");
+                        //
+                        // TODO: Call SOS-MODE
+                    }
+                });
+
+                if (currentDialog.isShowing()) {
+                    currentDialog.cancel();
+                }
+                currentDialog = alert.create();
+                currentDialog.show();
+                break;
+            }
+            default: {
+                Log.d(TAG, "Unknown dialog!");
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        showAlertDialog(BACK_PRESSED);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        unregisterReceiver(receiver);
+
+        stopService(notificationService);
+        stopService(pmmService);
     }
 }

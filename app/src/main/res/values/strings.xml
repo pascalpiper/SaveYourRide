@@ -29,7 +29,10 @@
     <string name="title_passive_tab">Passive</string>
     <string name="title_active_tab">Active</string>
     <string name="title_dialog_stop_active_mode">Do you want to stop the Active-Mode?</string>
-    <string name="title_dialog_accident_guarantee_procedure">All intervals have expired. Is everything OK?</string>
+    <string name="title_dialog_stop_passive_mode">Do you want to stop the Passive-Mode?</string>
+    <string name="title_dialog_no_movement_detected">You are not moving for a long time. Is everything OK?</string>
+    <string name="title_dialog_accident_guarantee_procedure_interval">All intervals have expired. Is everything OK?</string>
+    <string name="title_dialog_accident_guarantee_procedure_no_movement">You do not move for a long time and do not respond to the notifications. Is everything OK?</string>
 
     <!-- DESCRIPTIONS -->
     <string name="colored_background">colored background</string>
