@@ -61,6 +61,12 @@ public class SosModeManager extends Service {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
+    }
+
+    @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
