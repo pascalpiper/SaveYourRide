@@ -23,9 +23,9 @@ public class NotificationManager extends Service {
     private final String TAG = "NotificationManager";
     //
     /// Time of Notifications
-    // ITM
-    private final long ITM_NOTIFICATION_SOUND_TIME = 5500L;
-    private final long ITM_NOTIFICATION_DIALOG_TIME = 20000L;
+    // ITE
+    private final long ITE_NOTIFICATION_SOUND_TIME = 5500L;
+    private final long ITE_NOTIFICATION_DIALOG_TIME = 20000L;
     // AGP
     private final long AGP_NOTIFICATION_TIME = 45000L; // 20000L;
     // NMD
@@ -78,7 +78,7 @@ public class NotificationManager extends Service {
                     }
 
                     case "android.intent.action.INTERVAL_TIME_EXPIRED": {
-                        notificationITM();
+                        notificationITE();
                         break;
                     }
                     case "android.intent.action.NO_MOVEMENT_DETECTED": {
@@ -109,9 +109,9 @@ public class NotificationManager extends Service {
      * Control notification when the Interval Time from an interval from {@code ActiveModeManager}
      * is expired.
      * Start the timer which start/stop the sound and the dialog of the notification
-     * ITM = INTERVAL_TIME_EXPIRED
+     * ITE = INTERVAL_TIME_EXPIRED
      */
-    public void notificationITM() {
+    public void notificationITE() {
 
         Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound");
 
@@ -121,12 +121,12 @@ public class NotificationManager extends Service {
             e.printStackTrace();
         }
 
-        sendBroadcast(new Intent("android.intent.action.ITM_SHOW_DIALOG"));
+        sendBroadcast(new Intent("android.intent.action.ITE_SHOW_DIALOG"));
 
-        currentTimer = new CountDownTimer(ITM_NOTIFICATION_DIALOG_TIME, ITM_NOTIFICATION_SOUND_TIME) {
+        currentTimer = new CountDownTimer(ITE_NOTIFICATION_DIALOG_TIME, ITE_NOTIFICATION_SOUND_TIME) {
             @Override
             public void onTick(long millisUntilFinished) {
-                if (millisUntilFinished <= ITM_NOTIFICATION_DIALOG_TIME - ITM_NOTIFICATION_SOUND_TIME && mMediaPlayer.isPlaying()) {
+                if (millisUntilFinished <= ITE_NOTIFICATION_DIALOG_TIME - ITE_NOTIFICATION_SOUND_TIME && mMediaPlayer.isPlaying()) {
                     mMediaPlayer.stop();
                     audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_SHOW_UI);
                 }

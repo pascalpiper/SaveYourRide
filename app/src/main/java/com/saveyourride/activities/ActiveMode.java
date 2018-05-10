@@ -124,7 +124,7 @@ public class ActiveMode extends AppCompatActivity {
                         textViewIntervalNumber.setText(Integer.toString(intervalNumber) + " / " + numberOfIntervals);
                         break;
                     }
-                    case "android.intent.action.ITM_SHOW_DIALOG": {
+                    case "android.intent.action.ITE_SHOW_DIALOG": {
                         showAlertDialog(INTERVAL_TIME_EXPIRED);
                         break;
                     }
@@ -149,7 +149,7 @@ public class ActiveMode extends AppCompatActivity {
         filter.addAction("android.intent.action.AMM_SERVICE_READY");
         filter.addAction("android.intent.action.REST_INTERVAL_TIME");
         filter.addAction("android.intent.action.INTERVAL_NUMBER");
-        filter.addAction("android.intent.action.ITM_SHOW_DIALOG");
+        filter.addAction("android.intent.action.ITE_SHOW_DIALOG");
         filter.addAction("android.intent.action.AGP_SHOW_DIALOG");
         filter.addAction("android.intent.action.DISMISS_DIALOG");
 
