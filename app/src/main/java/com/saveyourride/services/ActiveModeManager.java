@@ -17,7 +17,7 @@ public class ActiveModeManager extends Service {
     //
 
     // BroadcastReceiver for messages from ActiveMode Activity
-    private BroadcastReceiver activityReceiver;
+    private BroadcastReceiver receiver;
 
     // Current interval number
     private int intervalNumber;
@@ -45,10 +45,10 @@ public class ActiveModeManager extends Service {
 
     /**
      * Creates new {@code BroadcastReceiver} and {@code IntentFilter} for messages from {@code ActiveMode} and registers them.
-     * {@code activityReceiver} receives the broadcasts from the {@code ActiveMode} activity.
+     * {@code receiver} receives the broadcasts from the {@code ActiveMode} activity.
      */
     private void initActivityReceiver() {
-        activityReceiver = new BroadcastReceiver() {
+        receiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -85,7 +85,7 @@ public class ActiveModeManager extends Service {
         filter.addAction("android.intent.action.START_TIMER");
         filter.addAction("android.intent.action.STOP_TIMER");
 
-        registerReceiver(activityReceiver, filter);
+        registerReceiver(receiver, filter);
     }
 
     /**
@@ -137,7 +137,7 @@ public class ActiveModeManager extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(activityReceiver);
+        unregisterReceiver(receiver);
     }
 
     @Nullable
