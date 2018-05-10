@@ -14,7 +14,6 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -42,12 +41,18 @@ import static android.content.Context.LOCATION_SERVICE;
  */
 public class Passive extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback {
 
+    // Debug
+    private final String TAG = "Passive_Fragment";
+
     /**
      * Request code for location permission request.
      *
      * @see #onRequestPermissionsResult(int, String[], int[])
      */
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 2;
+
+    //Permissions
+    private static final int REQUEST_CODE_SEND_SMS = 1 ;
 
     /**
      * Flag indicating whether a requested permission has been denied after returning in
@@ -93,9 +98,11 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
         buttonStartPassiveMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("PASSIVE MODE ACTIVITY");
-                Intent passiveModeIntent = new Intent(getActivity(), PassiveMode.class);
-                startActivity(passiveModeIntent);
+                requestSmsPermission();
+
+//                System.out.println("PASSIVE MODE ACTIVITY");
+//                Intent passiveModeIntent = new Intent(getActivity(), PassiveMode.class);
+//                startActivity(passiveModeIntent);
             }
         });
 
@@ -395,25 +402,26 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
             }
         };
     }
+// Taras old
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
-            return;
-        }
-
-        if (PermissionUtils.isPermissionGranted(permissions, grantResults,
-                Manifest.permission.ACCESS_FINE_LOCATION)) {
-            // Enable the my location layer if the permission has been granted.
-            enableMyLocation();
-            initWithPermission();
-        } else {
-            // Display the missing permission error dialog when the fragments resume.
-            initWithoutPermission();
-            mPermissionDenied = true;
-        }
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+//                                           @NonNull int[] grantResults) {
+//        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
+//            return;
+//        }
+//
+//        if (PermissionUtils.isPermissionGranted(permissions, grantResults,
+//                Manifest.permission.ACCESS_FINE_LOCATION)) {
+//            // Enable the my location layer if the permission has been granted.
+//            enableMyLocation();
+//            initWithPermission();
+//        } else {
+//            // Display the missing permission error dialog when the fragments resume.
+//            initWithoutPermission();
+//            mPermissionDenied = true;
+//        }
+//    }
 
     @Override
     public void onResume() {
@@ -432,5 +440,66 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
     private void showMissingPermissionError() {
         PermissionUtils.PermissionDeniedDialog
                 .newInstance(true).show(myActivity.getSupportFragmentManager(), "dialog");
+    }
+
+
+    private void requestSmsPermission() {
+
+        if (ContextCompat.checkSelfPermission(myActivity, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED) {
+
+            Log.d(TAG, "Permission for sendSMS is given");
+            Toast.makeText(myActivity, "SMS allowed.",
+                    Toast.LENGTH_LONG).show();
+        } else {
+
+            if (shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS)) {
+                Toast.makeText(myActivity, "true",
+                        Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "true");
+            }
+            else {
+                Toast.makeText(myActivity, "false",
+                        Toast.LENGTH_SHORT).show();
+
+                //TODO wichtig: permission mit "nicht mehr fragen" abgelehnt. in einstellungen aktivieren lassen
+
+            }
+
+            requestPermissions(new String[]{Manifest.permission.SEND_SMS}, REQUEST_CODE_SEND_SMS);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_SEND_SMS: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    Toast.makeText(myActivity, "SMS allowed.",
+//                            Toast.LENGTH_LONG).show();
+                } else {
+//                    Toast.makeText(myActivity, "SMS disallowed.",
+//                            Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "sms disallowed");
+
+                }
+                break;
+            }
+            case LOCATION_PERMISSION_REQUEST_CODE: {
+
+                if (PermissionUtils.isPermissionGranted(permissions, grantResults,
+                        Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    // Enable the my location layer if the permission has been granted.
+                    enableMyLocation();
+                    initWithPermission();
+                } else {
+                    // Display the missing permission error dialog when the fragments resume.
+                    initWithoutPermission();
+                    mPermissionDenied = true;
+                }
+                break;
+            }
+
+        }
     }
 }

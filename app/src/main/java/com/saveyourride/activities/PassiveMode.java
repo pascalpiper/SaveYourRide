@@ -1,17 +1,21 @@
 package com.saveyourride.activities;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -22,6 +26,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.saveyourride.R;
 import com.saveyourride.services.NotificationManager;
 import com.saveyourride.services.PassiveModeManager;
+import com.saveyourride.utils.PermissionUtils;
 
 public class PassiveMode extends AppCompatActivity {
 
@@ -99,8 +104,21 @@ public class PassiveMode extends AppCompatActivity {
                 sendBroadcast(new Intent("android.intent.action.PASSIVE_MODE_ACTIVITY"));
             }
         });
-        //
+
+//        // Ask permissions
+//        requestPermissions();
     }
+
+//    private void requestPermissions() {
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            // Permission to access the location is missing.
+//            PermissionUtils.requestPermission(this, REQUEST_CODE_SEND_SMS,
+//                    Manifest.permission.SEND_SMS, true);
+//        } else {
+//            Log.d(TAG, "Permission for sendSMS is given");
+//        }
+//    }
 
     /**
      * Creates new {@code BroadcastReceiver} and {@code IntentFilter} and then registers them.
@@ -255,4 +273,23 @@ public class PassiveMode extends AppCompatActivity {
         stopService(notificationService);
         stopService(pmmService);
     }
+
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
+//        switch (requestCode) {
+//            case REQUEST_CODE_SEND_SMS: {
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//
+//                    Toast.makeText(getApplicationContext(), "SMS-sending is allowed",
+//                            Toast.LENGTH_LONG).show();
+//                } else {
+//                    Toast.makeText(getApplicationContext(),
+//                            "SMS-sendig is not allowed", Toast.LENGTH_LONG).show();
+//                    return;
+//                }
+//            }
+//        }
+//
+//    }
 }

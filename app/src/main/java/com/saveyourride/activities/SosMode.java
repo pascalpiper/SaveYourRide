@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.saveyourride.R;
@@ -19,7 +18,7 @@ import com.saveyourride.services.SosModeManager;
 public class SosMode extends AppCompatActivity {
 
     private final String TAG = "SosMode";
-    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS =0 ;
+    private static final int REQUEST_CODE_SEND_SMS = 0 ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +66,7 @@ public class SosMode extends AppCompatActivity {
             } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.SEND_SMS},
-                        MY_PERMISSIONS_REQUEST_SEND_SMS);
+                        REQUEST_CODE_SEND_SMS);
             }
         }
         else {
@@ -77,8 +76,9 @@ public class SosMode extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
+        Log.d(TAG, " "+ requestCode);
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_SEND_SMS: {
+            case REQUEST_CODE_SEND_SMS: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 

@@ -9,7 +9,11 @@ import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 public class SosModeManager extends Service {
+
+    //TODO Location for SMS
 
     // DEBUG
     private final String TAG = "SosModeManager";
@@ -37,11 +41,43 @@ public class SosModeManager extends Service {
             public void onReceive(Context context, Intent intent) {
                 switch (intent.getAction()) {
                     case "android.intent.action.SEND_SOS_SMS": {
-                        // TODO Send sms
+                        // TODO Send sms | for-loop for alls numbers sendSms(number, text)
+
+                        // Test
+
+                        String messageSos = "Hallo Pascal, hier ist die SaveYourRide App von Pascals Handy";
+
+                        String phoneNo = "01752847846";
+
+                        ArrayList<String> phoneList = new ArrayList<String>();
+                        phoneList.add(phoneNo);
+
+                        for (String phoneNumber:phoneList) {
+                            sendSms(phoneNumber, messageSos);
+                        }
+
+                        ///
                         break;
                     }
                     case "android.intent.action.SEND_FALSE_ALARM_SMS": {
                         // TODO send sms
+
+
+                        // Test
+
+                        String messageNoSos = "Hallo Pascal, hier ist die SaveYourRide App. Die letzte Meldung war ein Fehlalarm";
+
+                        String phoneNo = "01752847846";
+
+                        ArrayList<String> phoneList = new ArrayList<String>();
+                        phoneList.add(phoneNo);
+
+                        for (String phoneNumber:phoneList) {
+                            sendSms(phoneNumber, messageNoSos);
+                        }
+
+                        ///
+
                         break;
                     }
                     default: {
@@ -69,10 +105,8 @@ public class SosModeManager extends Service {
 
 
 
-    private void sendSms(){
+    private void sendSms( String phoneNo, String message){
 
-        String phoneNo = "01752847846";
-        String message = "Hallo Pascal, hier ist die SaveYourRide App von Pascals Handy";
         SmsManager smsManager = SmsManager.getDefault();
         smsManager.sendTextMessage(phoneNo, null, message, null, null);
     }
