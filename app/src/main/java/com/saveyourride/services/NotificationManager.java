@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -33,7 +34,6 @@ public class NotificationManager extends Service {
 
     private boolean isWaiting;
     private boolean isPlaying;
-    private int waitCounter;
 
     private BroadcastReceiver receiver;
     private MediaPlayer mMediaPlayer;
@@ -144,12 +144,8 @@ public class NotificationManager extends Service {
      */
     public void notificationNMD() {
 
-        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound");
-
         isWaiting = false;
         isPlaying = false;
-        waitCounter = 0;
-
 
         sendBroadcast(new Intent("android.intent.action.NMD_SHOW_DIALOG"));
 
@@ -232,7 +228,6 @@ public class NotificationManager extends Service {
 
     public void startSound(Uri sound) throws IOException {
 
-//      Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setDataSource(getApplicationContext(), sound);
 
@@ -241,9 +236,11 @@ public class NotificationManager extends Service {
         if (currentAudioVolume < audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)) {
             audioManager.setStreamVolume(AudioManager.STREAM_ALARM, audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM), AudioManager.FLAG_SHOW_UI);
         }
-        // TODO change streamType
-        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC); // For Testing
-//        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+
+        AudioAttributes.Builder b = new AudioAttributes.Builder();
+        b.setUsage(AudioAttributes.USAGE_ALARM);
+        mMediaPlayer.setAudioAttributes(b.build());
+
         mMediaPlayer.setLooping(true);
         mMediaPlayer.prepare();
         mMediaPlayer.start();
