@@ -73,7 +73,7 @@ public class NotificationManager extends Service {
 
 
                     case "android.intent.action.ACCIDENT_GUARANTEE_PROCEDURE": {
-                        notificationNMD();
+                        notificationAGP();
                         break;
                     }
 

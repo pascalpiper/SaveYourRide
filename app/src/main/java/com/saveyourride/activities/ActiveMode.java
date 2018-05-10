@@ -28,8 +28,8 @@ public class ActiveMode extends AppCompatActivity {
     //
 
     // TODO: Pick Up values for number of intervals and interval time
-    private final int numberOfIntervals = 6;
-    private final long intervalTime = 60000L;
+    private final int numberOfIntervals = 2;
+    private final long intervalTime = 30000L;
 
     //Dialog IDs
     private final int BACK_PRESSED = 0;
