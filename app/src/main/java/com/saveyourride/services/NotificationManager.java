@@ -12,6 +12,8 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.saveyourride.activities.SosMode;
+
 import java.io.IOException;
 
 public class NotificationManager extends Service {
@@ -220,7 +222,9 @@ public class NotificationManager extends Service {
                 // DEBUG
                 Log.d(TAG, "Call SOS MODE");
 
-                startService(new Intent(getApplicationContext(), SosModeManager.class));
+                startActivity(new Intent(getApplicationContext(), SosMode.class));
+
+                //TODO stop this service, and all other service
 
             }
         }.start();
@@ -249,8 +253,13 @@ public class NotificationManager extends Service {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receiver);
-        currentTimer.cancel();
-        mMediaPlayer.stop();
+        if(currentTimer != null){
+            currentTimer.cancel();
+        }
+        if(mMediaPlayer != null){
+            mMediaPlayer.stop();
+        }
+
     }
 
     @Override
