@@ -13,6 +13,7 @@
     <string name="stop">STOP</string>
     <string name="reset">RESET</string>
     <string name="sos">SOS</string>
+    <string name="falseAlarm">FALSE ALARM</string>
 
     <!-- DIALOG-BUTTONS-->
     <string name="yes">Yes</string>
@@ -43,4 +44,11 @@
 
     <!-- ONLY FOR TESTS -->
     <string name="read">READ</string>
+    <string name="title_activity_sos_mode">SosMode</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
+
 </resources>
