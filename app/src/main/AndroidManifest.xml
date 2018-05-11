@@ -40,7 +40,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.Activity_Active"
+            android:name=".activities.Main_Settings"
             android:label="@string/title_activity__active"
             android:launchMode="singleTop"
             android:parentActivityName=".activities.MainScreen"
