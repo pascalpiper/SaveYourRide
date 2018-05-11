@@ -41,9 +41,6 @@ public class SosModeManager extends Service {
             public void onReceive(Context context, Intent intent) {
                 switch (intent.getAction()) {
                     case "android.intent.action.SEND_SOS_SMS": {
-                        // TODO Send sms | for-loop for alls numbers sendSms(number, text)
-
-                        // Test
 
                         String messageSos = "Hallo Pascal, hier ist die SaveYourRide App von Pascals Handy";
 
@@ -56,12 +53,9 @@ public class SosModeManager extends Service {
                             sendSms(phoneNumber, messageSos);
                         }
 
-                        ///
                         break;
                     }
                     case "android.intent.action.SEND_FALSE_ALARM_SMS": {
-                        // TODO send sms
-
 
                         // Test
 

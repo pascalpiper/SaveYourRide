@@ -1,5 +1,8 @@
 package com.saveyourride.activities;
 
+import android.app.Activity;
+import android.graphics.drawable.AnimationDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
@@ -9,45 +12,75 @@ import android.widget.TextView;
 
 import com.saveyourride.R;
 
-public class Activity_Active extends AppCompatActivity {
 
-    public int counter;
-    public long totalTime, interval;
-    private Button buttonStartTimer;
-    private Button buttonStopTimer;
-    private TextView textViewTimerCount;
+    public class Activity_Active extends Activity implements View.OnClickListener {
+        /** Called when the activity is first created. */
+        AnimationDrawable mFrameAnimation = null;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity__active);
-        buttonStartTimer = (Button) findViewById(R.id.buttonStartTimer1);
-        buttonStopTimer = (Button) findViewById(R.id.buttonStopTimer1);
-        textViewTimerCount = (TextView) findViewById(R.id.textViewTimerCount1);
+        boolean mbUpdating = false;
 
-        totalTime = 10000;
-        interval = 1000;
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity__active);
 
-        buttonStartTimer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new CountDownTimer(totalTime, interval) {
-                    public void onTick(long millisUntilFinished) {
-                        textViewTimerCount.setText(String.valueOf(counter));
-                        counter++;
-                    }
+            Button btnWheel = (Button)findViewById(R.id.wheel_button);
+            btnWheel.setOnClickListener(this);
 
-                    public void onFinish() {
-                        textViewTimerCount.setText("FINISH!!");
-                    }
-                }.start();
+            mFrameAnimation = (AnimationDrawable) btnWheel.getBackground();
+        }
+
+        public void onClick(View v) {
+            if(v.getId() == R.id.wheel_button) {
+                if(!mbUpdating) {
+                    mbUpdating = true;
+                    new AsyncTaskForUpdateDB().execute("");
+                }
             }
-        });
-        buttonStopTimer.setOnClickListener(new View.OnClickListener() {
+
+        }
+
+        private class AsyncTaskForUpdateDB extends AsyncTask<String, Integer, ResultOfAsyncTask> {
+
             @Override
-            public void onClick(View v) {
-                /// NICHTS PASSIERT
+            protected void onPreExecute() {
+
+                mFrameAnimation.start();
+                super.onPreExecute();
             }
-        });
+
+            @Override
+            protected ResultOfAsyncTask doInBackground(String... strData) {
+                ResultOfAsyncTask result = new ResultOfAsyncTask();
+
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                return result;
+            }
+
+            @Override
+            protected void onPostExecute(ResultOfAsyncTask result) {
+                mFrameAnimation.stop();
+                mbUpdating = false;
+            }
+
+            @Override
+            protected void onCancelled() {
+                mFrameAnimation.stop();
+                mbUpdating = false;
+                super.onCancelled();
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... progress) {
+            }
+        }
+
+        private class ResultOfAsyncTask {
+            int iErrorCode = 0;
+        }
     }
-}
