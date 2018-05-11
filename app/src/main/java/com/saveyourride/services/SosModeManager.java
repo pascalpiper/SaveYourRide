@@ -30,7 +30,7 @@ public class SosModeManager extends Service {
         initActivityReceiver();
 
         // send directly the sos-sms
-        sendSosSms();
+        //sendSosSms();
     }
 
     private void sendSosSms() {
