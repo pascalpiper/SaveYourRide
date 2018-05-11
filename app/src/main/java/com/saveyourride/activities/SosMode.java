@@ -9,6 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -17,26 +18,37 @@ import com.saveyourride.services.SosModeManager;
 
 public class SosMode extends AppCompatActivity {
 
-    private final String TAG = "SosMode";
-    private static final int REQUEST_CODE_SEND_SMS = 0 ;
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0;
+    //
+    // DEBUG
+    private final String TAG = "ActiveMode";
+    // Intents for SosModeManager-Service (SMM)
+    private Intent smmService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Layout
         setContentView(R.layout.activity_sos_mode);
 
-        Button buttonSos = (Button)findViewById(R.id.buttonSosInSosMode);
-        Button buttonFalseAlarm = (Button)findViewById(R.id.buttonFalseAlarm);
+        // Views
+        Button buttonFalseAlarm = (Button) findViewById(R.id.sosMode_buttonFalseAlarm);
+        Button buttonExit = (Button) findViewById(R.id.sosMode_buttonExit);
 
-        startService(new Intent(this,  SosModeManager.class));
+        // Keeps Activity ON also on lock screen
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        buttonSos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Sos");
-            }
-        });
+        // Create intent for Service
+        smmService = new Intent(this, SosModeManager.class);
 
+        // Start Services
+        startService(smmService);
+
+        // Button listeners
         buttonFalseAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,27 +58,25 @@ public class SosMode extends AppCompatActivity {
                 sendSMSMessage();
             }
         });
-
-
-
+        buttonExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "EXIT");
+            }
+        });
     }
 
 
-
     protected void sendSMSMessage() {
-
-
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
-
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.SEND_SMS)) {
-
             } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.SEND_SMS},
-                        REQUEST_CODE_SEND_SMS);
+                        MY_PERMISSIONS_REQUEST_SEND_SMS);
             }
         }
         else {
@@ -78,7 +88,7 @@ public class SosMode extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
         Log.d(TAG, " "+ requestCode);
         switch (requestCode) {
-            case REQUEST_CODE_SEND_SMS: {
+            case MY_PERMISSIONS_REQUEST_SEND_SMS: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
@@ -88,12 +98,16 @@ public class SosMode extends AppCompatActivity {
                             Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(getApplicationContext(),
-                            "SMS faild, please try again.", Toast.LENGTH_LONG).show();
-                    return;
+                            "SMS failed, please try again.", Toast.LENGTH_LONG).show();
                 }
             }
         }
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopService(smmService);
     }
 }
 

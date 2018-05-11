@@ -68,8 +68,7 @@ public class ActiveMode extends AppCompatActivity {
         textViewIntervalNumber = (TextView) findViewById(R.id.textViewIntervalCount);
 
         // Keeps Activity ON also on lock screen
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -197,7 +196,7 @@ public class ActiveMode extends AppCompatActivity {
                 LayoutInflater inflater = getLayoutInflater();
                 View dialogLayout = inflater.inflate(R.layout.dialog_active_mode_notification, null);
 
-                Button dialogResetButton = dialogLayout.findViewById(R.id.dialogButtonResetTimer);
+                Button dialogResetButton = dialogLayout.findViewById(R.id.activeMode_dialog_buttonReset);
 
                 dialogResetButton.setOnClickListener(new View.OnClickListener() {
                     @Override
