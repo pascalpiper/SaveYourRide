@@ -71,7 +71,6 @@
                 android:value="com.saveyourride.activities.MainScreen" />
         </activity>
 
-
         <activity
             android:name=".activities.SosMode"
             android:label="@string/title_activity_sos_mode"
@@ -94,10 +93,6 @@
         <service android:name=".services.PassiveModeManager" />
         <service android:name=".services.Accelerometer" />
         <service android:name=".services.Location" />
-
-
-
-
     </application>
 
 </manifest>
