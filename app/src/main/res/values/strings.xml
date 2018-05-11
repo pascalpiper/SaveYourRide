@@ -13,7 +13,8 @@
     <string name="stop">STOP</string>
     <string name="reset">RESET</string>
     <string name="sos">SOS</string>
-    <string name="falseAlarm">FALSE ALARM</string>
+    <string name="false_alarm">FALSE ALARM</string>
+    <string name="exit">EXIT</string>
 
     <!-- DIALOG-BUTTONS-->
     <string name="yes">Yes</string>
@@ -22,6 +23,8 @@
     <!-- TEXT VIEWS -->
     <string name="intervalCount">Interval Count</string>
     <string name="timer">TIMER</string>
+    <string name="interval_time_expired">The time of the interval has expired!</string>
+    <string name="sos_signal">SOS signal was sent!</string>
 
     <!-- TITLES -->
     <string name="app_name">SaveYourRide</string>
@@ -48,10 +51,5 @@
     <!-- ONLY FOR TESTS -->
     <string name="read">READ</string>
     <string name="title_activity_sos_mode">SosMode</string>
-    <!--
-    This string is used for square devices and overridden by hello_world in
-    values-round/strings.xml for round devices.
-    -->
-    <string name="hello_world">Hello Square World!</string>
 
 </resources>

@@ -1,54 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorWhite"
-    android:orientation="vertical"
-    tools:context=".activities.ActiveMode"
-    android:theme="@style/Theme.AppCompat.Dialog">
+    android:background="@color/colorPrimary"
+    android:padding="30dp"
+    android:theme="@style/Theme.AppCompat.Dialog"
+    tools:context=".activities.ActiveMode">
 
-    <TextView
-        android:id="@+id/textViewTimer"
+    <View
+        android:id="@+id/activeMode_dialog_gradientView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/timer"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/colorWhite"
-        android:textSize="50sp"
-        android:textStyle="bold|italic" />
+        android:background="@drawable/white_gradient"
+        android:elevation="1dp" />
 
-    <Button
-        android:id="@+id/dialogButtonResetTimer"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginBottom="50dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/round_button"
-        android:clickable="true"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:elevation="10dp"
-        android:focusable="true"
-        android:text="@string/reset"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/colorWhite"
-        android:textSize="35sp"
-        android:textStyle="bold|italic" />
+        android:orientation="vertical"
+        android:theme="@style/Theme.AppCompat.Dialog"
+        tools:context=".activities.ActiveMode">
 
-    <Button
-        android:id="@+id/dialogSosButton"
-        android:layout_width="65dp"
-        android:layout_height="65dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/round_button"
-        android:elevation="3dp"
-        android:text="@string/sos"
-        android:textColor="@color/colorWhite"
-        android:textSize="20sp"
-        android:textStyle="bold|italic" />
+        <TextView
+            android:id="@+id/activeMode_ite_dialog_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="10dp"
+            android:text="@string/interval_time_expired"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/colorWhite"
+            android:textSize="35sp"
+            android:textStyle="bold|italic" />
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
 
-</LinearLayout>
+            <Button
+                android:id="@+id/activeMode_dialog_buttonReset"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/round_button"
+                android:clickable="true"
+                android:elevation="10dp"
+                android:focusable="true"
+                android:text="@string/reset"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/colorWhite"
+                android:textSize="35sp"
+                android:textStyle="bold|italic" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <Button
+                android:id="@+id/dialogSosButton"
+                android:layout_width="85dp"
+                android:layout_height="85dp"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/round_button"
+                android:elevation="3dp"
+                android:text="@string/sos"
+                android:textColor="@color/colorWhite"
+                android:textSize="25sp"
+                android:textStyle="bold|italic" />
+        </RelativeLayout>
+    </LinearLayout>
+</RelativeLayout>
 
 
 

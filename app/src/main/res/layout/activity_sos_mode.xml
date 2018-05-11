@@ -1,40 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_passive_mode"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.PassiveMode">
+    android:background="@color/colorPrimary"
+    tools:context=".activities.SosMode">
+
+    <View
+        android:id="@+id/sosMode_gradientView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/white_gradient"
+        android:elevation="1dp" />
+
+    <TextView
+        android:id="@+id/sosMode_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:text="@string/sos_signal"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/colorWhite"
+        android:textSize="35sp"
+        android:textStyle="bold|italic" />
 
     <Button
-        android:id="@+id/buttonSosInSosMode"
+        android:id="@+id/sosMode_buttonFalseAlarm"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/round_button_red"
+        android:clickable="true"
+        android:elevation="10dp"
+        android:focusable="true"
+        android:text="@string/false_alarm"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="40sp"
+        android:textColor="@color/colorWhite"
+        android:textStyle="bold|italic" />
+
+    <Button
+        android:id="@+id/sosMode_buttonExit"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="75dp"
         android:background="@drawable/round_button"
         android:elevation="3dp"
-        android:text="@string/sos"
+        android:text="@string/exit"
+        android:textSize="30sp"
         android:textColor="@color/colorWhite"
-        android:textSize="20sp"
         android:textStyle="bold|italic" />
-
-    <Button
-        android:id="@+id/buttonFalseAlarm"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="51dp"
-        android:background="@drawable/round_button"
-        android:elevation="3dp"
-        android:text="@string/falseAlarm"
-        android:textColor="@color/colorWhite"
-        android:textSize="20sp"
-        android:textStyle="bold|italic" />
-
-
-
-
 </RelativeLayout>
