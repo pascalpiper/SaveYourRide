@@ -28,6 +28,22 @@ public class SosModeManager extends Service {
 
         // initialize BroadcastReceiver
         initActivityReceiver();
+
+        // send directly the sos-sms
+        sendSosSms();
+    }
+
+    private void sendSosSms() {
+        String messageSos = "Hallo Pascal, hier ist die SaveYourRide App von Pascals Handy";
+
+        String phoneNo = "01752847846";
+
+        ArrayList<String> phoneList = new ArrayList<String>();
+        phoneList.add(phoneNo);
+
+        for (String phoneNumber:phoneList) {
+            sendSms(phoneNumber, messageSos);
+        }
     }
 
     /**
@@ -40,21 +56,6 @@ public class SosModeManager extends Service {
             @Override
             public void onReceive(Context context, Intent intent) {
                 switch (intent.getAction()) {
-                    case "android.intent.action.SEND_SOS_SMS": {
-
-                        String messageSos = "Hallo Pascal, hier ist die SaveYourRide App von Pascals Handy";
-
-                        String phoneNo = "01752847846";
-
-                        ArrayList<String> phoneList = new ArrayList<String>();
-                        phoneList.add(phoneNo);
-
-                        for (String phoneNumber:phoneList) {
-                            sendSms(phoneNumber, messageSos);
-                        }
-
-                        break;
-                    }
                     case "android.intent.action.SEND_FALSE_ALARM_SMS": {
 
                         // Test
@@ -98,7 +99,11 @@ public class SosModeManager extends Service {
     }
 
 
-
+    /**
+     * Send a sms with the {@code message} to a member with the {@code phoneNo}
+     * @param phoneNo the number of the contact how gets the sms
+     * @param message the content of the sms
+     */
     private void sendSms( String phoneNo, String message){
 
         SmsManager smsManager = SmsManager.getDefault();

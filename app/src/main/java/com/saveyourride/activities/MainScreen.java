@@ -86,7 +86,7 @@ public class MainScreen extends AppCompatActivity {
             case R.id.settingsButton:
                 System.out.println("SETTINGS");
                 // settingsIntent.putExtra(Intent.EXTRA_TEXT, aktienInfo);
-                Intent activeIntent = new Intent(getApplicationContext(), Activity_Active.class);
+                Intent activeIntent = new Intent(getApplicationContext(), Main_Settings.class);
                 startActivityIfNeeded(activeIntent, 0);
                 //startActivity(activeIntent);
                 break;
