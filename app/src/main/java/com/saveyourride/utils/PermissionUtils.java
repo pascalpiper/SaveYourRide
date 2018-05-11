@@ -103,7 +103,7 @@ public abstract class PermissionUtils {
 
             return new AlertDialog.Builder(getActivity())
                     .setMessage(R.string.location_permission_denied)
-                    .setPositiveButton(android.R.string.ok, null)
+                    .setPositiveButton(R.string.ok, null)
                     .create();
         }
 
@@ -163,7 +163,7 @@ public abstract class PermissionUtils {
 
             return new AlertDialog.Builder(getActivity())
                     .setMessage(R.string.permission_rationale_location)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             // After click on Ok, request the permission.
@@ -174,7 +174,7 @@ public abstract class PermissionUtils {
                             mFinishActivity = false;
                         }
                     })
-                    .setNegativeButton(android.R.string.cancel, null)
+                    .setNegativeButton(R.string.cancel, null)
                     .create();
         }
 

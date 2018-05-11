@@ -12,6 +12,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
@@ -36,29 +37,32 @@ import com.saveyourride.utils.PermissionUtils;
 
 import static android.content.Context.LOCATION_SERVICE;
 
-/**
- * Updated by taraszaika on 20.04.18.
- */
 public class Passive extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback {
 
-    // Debug
-    private final String TAG = "Passive_Fragment";
+    // DEBUG
+    private final String TAG = "PassiveFragment";
+    //
 
-    /**
-     * Request code for location permission request.
-     *
-     * @see #onRequestPermissionsResult(int, String[], int[])
-     */
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 2;
+    // Permission request codes
+    private final int SEND_SMS_PERMISSIONS_REQUEST_CODE = 1;
+    private final int LOCATION_PERMISSION_REQUEST_CODE = 2;
 
-    //Permissions
-    private static final int REQUEST_CODE_SEND_SMS = 1 ;
+    // DialogIDs
+    private final int LOCATION_PERMISSION_EXPLANATION_DIALOG = 0;
+    private final int LOCATION_PERMISSION_DENIED_DIALOG = 1;
+    private final int SEND_SMS_PERMISSION_EXPLANATION_DIALOG = 2;
+    private final int SEND_SMS_PERMISSION_DENIED_DIALOG = 3;
 
     /**
      * Flag indicating whether a requested permission has been denied after returning in
      * {@link #onRequestPermissionsResult(int, String[], int[])}.
      */
     private boolean mPermissionDenied = false;
+
+    // Buttons
+    private Button buttonStartPassiveMode;
+
+    // TODO change workflow of location permission request (alles neu machen)
 
     // Because of Fragment we need an activity object.
     private FragmentActivity myActivity;
@@ -93,19 +97,16 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
         // R.id.map is a FrameLayout, not a Fragment
         getChildFragmentManager().beginTransaction().replace(R.id.map, mapFragment).commit();
 
-        Button buttonStartPassiveMode = (Button) rootView.findViewById(R.id.buttonStartPassiveMode);
+        buttonStartPassiveMode = (Button) rootView.findViewById(R.id.buttonStartPassiveMode);
 
         buttonStartPassiveMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requestSmsPermission();
-
-//                System.out.println("PASSIVE MODE ACTIVITY");
-//                Intent passiveModeIntent = new Intent(getActivity(), PassiveMode.class);
-//                startActivity(passiveModeIntent);
+                if (checkSmsPermission()) {
+                    startActivity(new Intent(getActivity(), PassiveMode.class));
+                }
             }
         });
-
         return rootView;
     }
 
@@ -281,7 +282,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
             final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
             dialog.setTitle(R.string.please_activate_location_services);
             dialog.setMessage("Click ok to goto settings else exit.");
-            dialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            dialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                     Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -289,7 +290,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
                     //get gps
                 }
             });
-            dialog.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            dialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                     paramDialogInterface.cancel();
@@ -402,26 +403,6 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
             }
         };
     }
-// Taras old
-
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-//                                           @NonNull int[] grantResults) {
-//        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
-//            return;
-//        }
-//
-//        if (PermissionUtils.isPermissionGranted(permissions, grantResults,
-//                Manifest.permission.ACCESS_FINE_LOCATION)) {
-//            // Enable the my location layer if the permission has been granted.
-//            enableMyLocation();
-//            initWithPermission();
-//        } else {
-//            // Display the missing permission error dialog when the fragments resume.
-//            initWithoutPermission();
-//            mPermissionDenied = true;
-//        }
-//    }
 
     @Override
     public void onResume() {
@@ -442,51 +423,44 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
                 .newInstance(true).show(myActivity.getSupportFragmentManager(), "dialog");
     }
 
+    /**
+     * Checks if SEND_SMS permission is granted.
+     *
+     * @return boolean value. If SEND_SMS permission is granted: true else false.
+     */
+    private boolean checkSmsPermission() {
+        if (ContextCompat.checkSelfPermission(myActivity, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(myActivity, Manifest.permission.SEND_SMS)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                showAlertDialog(SEND_SMS_PERMISSION_EXPLANATION_DIALOG);
+            } else {
+                // No explanation needed; request the permission
+                requestPermissions(new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_PERMISSIONS_REQUEST_CODE);
 
-    private void requestSmsPermission() {
-
-        if (ContextCompat.checkSelfPermission(myActivity, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED) {
-
-            Log.d(TAG, "Permission for sendSMS is given");
-            Toast.makeText(myActivity, "SMS allowed.",
-                    Toast.LENGTH_LONG).show();
+            }
+            return false;
         } else {
-
-            if (shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS)) {
-                Toast.makeText(myActivity, "true",
-                        Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "true");
-            }
-            else {
-                Toast.makeText(myActivity, "false",
-                        Toast.LENGTH_SHORT).show();
-
-                //TODO wichtig: permission mit "nicht mehr fragen" abgelehnt. in einstellungen aktivieren lassen
-
-            }
-
-            requestPermissions(new String[]{Manifest.permission.SEND_SMS}, REQUEST_CODE_SEND_SMS);
+            // Permission has already been granted
+            return true;
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case REQUEST_CODE_SEND_SMS: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    Toast.makeText(myActivity, "SMS allowed.",
-//                            Toast.LENGTH_LONG).show();
+            case SEND_SMS_PERMISSIONS_REQUEST_CODE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    buttonStartPassiveMode.callOnClick();
                 } else {
-//                    Toast.makeText(myActivity, "SMS disallowed.",
-//                            Toast.LENGTH_LONG).show();
-                    Log.d(TAG, "sms disallowed");
-
+                    showAlertDialog(SEND_SMS_PERMISSION_DENIED_DIALOG);
                 }
                 break;
             }
             case LOCATION_PERMISSION_REQUEST_CODE: {
-
                 if (PermissionUtils.isPermissionGranted(permissions, grantResults,
                         Manifest.permission.ACCESS_FINE_LOCATION)) {
                     // Enable the my location layer if the permission has been granted.
@@ -499,7 +473,76 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
                 }
                 break;
             }
+            default: {
+                Log.d(TAG, "NO SUCH REQUEST CODE!");
+                break;
+            }
+        }
+    }
 
+    /**
+     * Show a dialog with the information for a specific notification.
+     *
+     * @param dialogID determines the information to be shown.
+     */
+    private void showAlertDialog(int dialogID) {
+        switch (dialogID) {
+            case LOCATION_PERMISSION_EXPLANATION_DIALOG: {
+                // TODO implement LOCATION_PERMISSION_EXPLANATION_DIALOG
+                break;
+            }
+            case LOCATION_PERMISSION_DENIED_DIALOG: {
+                // TODO implement LOCATION_PERMISSION_DENIED_DIALOG
+                break;
+            }
+            case SEND_SMS_PERMISSION_EXPLANATION_DIALOG: {
+                AlertDialog.Builder alert = new AlertDialog.Builder(myActivity);
+                // Set dialog title
+                alert.setTitle(R.string.title_dialog_send_sms_permission);
+                // Set dialog message
+                alert.setMessage(R.string.dialog_send_sms_permission_explanation);
+                // Set up the button
+                alert.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        requestPermissions(new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_PERMISSIONS_REQUEST_CODE);
+                    }
+                });
+                AlertDialog currentDialog = alert.create();
+                currentDialog.show();
+                break;
+            }
+            case SEND_SMS_PERMISSION_DENIED_DIALOG: {
+                AlertDialog.Builder alert = new AlertDialog.Builder(myActivity);
+                // Set dialog title
+                alert.setTitle(R.string.title_dialog_send_sms_permission);
+                // Set dialog message
+                alert.setMessage(R.string.dialog_send_sms_permission_required);
+                // Set up the buttons
+                alert.setPositiveButton(R.string.settings, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Go to app settings
+                        Intent appSettings = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", myActivity.getPackageName(), null);
+                        appSettings.setData(uri);
+                        startActivity(appSettings);
+                    }
+                });
+                alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                AlertDialog currentDialog = alert.create();
+                currentDialog.show();
+                break;
+            }
+            default: {
+                Log.d(TAG, "NO SUCH DIALOG!");
+                break;
+            }
         }
     }
 }
