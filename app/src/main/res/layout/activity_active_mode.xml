@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
-        android:text="@string/numberOfIntervals"
+        android:text="@string/i_slash_n"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/colorWhite"
         android:textSize="55sp"

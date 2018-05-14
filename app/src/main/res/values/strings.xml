@@ -27,7 +27,15 @@
     <string name="dialog_send_sms_permission_required">This feature requires Send-SMS permission. If you want to use this, please go to the setting and give the permission.</string>
 
     <!-- TEXT VIEWS -->
-    <string name="numberOfIntervals">i/n</string>
+    <string name="i_slash_n">i/n</string>
+    <!-- ONLY FOR TESTS -->
+    <string name="default_number_of_intervals">3</string>
+    <string name="default_time_of_interval">01:00</string>
+    <string name="text_view_divider">____________________________</string>
+
+    <!--  -->
+    <string name="number_of_intervals">Number of intervals</string>
+    <string name="time_of_interval">Time of interval</string>
     <string name="time">TIME</string>
     <string name="interval_time_expired">The time of the interval has expired!</string>
     <string name="sos_signal">SOS signal was sent!</string>

@@ -47,7 +47,7 @@ public class Active extends Fragment {
 
         myActivity = getActivity();
 
-        buttonStartActiveMode = (Button) fragmentView.findViewById(R.id.buttonStartActiveMode);
+        buttonStartActiveMode = (Button) fragmentView.findViewById(R.id.activeFragment_buttonStart);
 
         buttonStartActiveMode.setOnClickListener(new View.OnClickListener() {
             @Override

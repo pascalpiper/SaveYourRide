@@ -95,9 +95,9 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
         }
 
         // R.id.map is a FrameLayout, not a Fragment
-        getChildFragmentManager().beginTransaction().replace(R.id.map, mapFragment).commit();
+        getChildFragmentManager().beginTransaction().replace(R.id.passiveFragment_map, mapFragment).commit();
 
-        buttonStartPassiveMode = (Button) rootView.findViewById(R.id.buttonStartPassiveMode);
+        buttonStartPassiveMode = (Button) rootView.findViewById(R.id.passiveFragment_buttonStart);
 
         buttonStartPassiveMode.setOnClickListener(new View.OnClickListener() {
             @Override
