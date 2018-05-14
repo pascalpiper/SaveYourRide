@@ -102,9 +102,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.saveyourride.activities.MainScreen" />
         </activity>
-        <activity
-            android:name=".activities.SettingsMainActivity"
-            android:label="@string/title_activity_settings_main"></activity>
     </application>
 
 </manifest>
