@@ -84,11 +84,8 @@ public class MainScreen extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) { //click listener quasi.
         switch (item.getItemId()) {
             case R.id.settingsButton:
-                System.out.println("SETTINGS");
-                // settingsIntent.putExtra(Intent.EXTRA_TEXT, aktienInfo);
-                Intent activeIntent = new Intent(getApplicationContext(), Main_Settings.class);
-                startActivityIfNeeded(activeIntent, 0);
-                //startActivity(activeIntent);
+//                Intent settingsMainIntent = new Intent(getApplicationContext(), SettingsMainActivity.class);
+//                startActivityIfNeeded(settingsMainIntent, 0);
                 break;
         }
         return super.onOptionsItemSelected(item); //To change body of generated methods, choose Tools | Templates.
