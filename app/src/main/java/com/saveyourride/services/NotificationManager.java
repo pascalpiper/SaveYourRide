@@ -24,12 +24,12 @@ public class NotificationManager extends Service {
     //
     /// Time of Notifications
     // ITE
-    private final long ITE_NOTIFICATION_SOUND_TIME = 5500L;
+    private final long ITE_NOTIFICATION_SOUND_TIME = 8000L;
     private final long ITE_NOTIFICATION_DIALOG_TIME = 20000L;
     // AGP
     private final long AGP_NOTIFICATION_TIME = 45000L; // 20000L;
     // NMD
-    private final long NMD_NOTIFICATION_SOUND_TIME = 5000L;  // 5500L;
+    private final long NMD_NOTIFICATION_SOUND_TIME = 8000L;  // 5500L;
     private final long NMD_NOTIFICATION_DIALOG_TIME = 45000L; // 20000L;
 
     private boolean isWaiting;
@@ -113,7 +113,7 @@ public class NotificationManager extends Service {
      */
     public void notificationITE() {
 
-        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound");
+        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound2");
 
         try {
             startSound(sound);
@@ -156,7 +156,7 @@ public class NotificationManager extends Service {
                 if (!isWaiting && !isPlaying) {
                     try {
                         // TODO find better solution for Sound URI
-                        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound");
+                        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound2");
                         startSound(sound);
                     } catch (IOException e) {
                         e.printStackTrace();
