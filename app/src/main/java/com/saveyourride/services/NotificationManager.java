@@ -238,7 +238,7 @@ public class NotificationManager extends Service {
         }
 
         AudioAttributes.Builder b = new AudioAttributes.Builder();
-        b.setUsage(AudioAttributes.USAGE_ALARM);
+        b.setUsage(AudioAttributes.USAGE_MEDIA); /// TODO CHANGE to USAGE_ALARM
         mMediaPlayer.setAudioAttributes(b.build());
 
         mMediaPlayer.setLooping(true);
