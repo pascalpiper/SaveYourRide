@@ -57,10 +57,10 @@ public class ActiveMode extends AppCompatActivity {
         setContentView(R.layout.activity_active_mode);
 
         // Views
-        Button buttonResetTimer = (Button) findViewById(R.id.buttonResetTimer);
-        Button buttonStopTimer = (Button) findViewById(R.id.buttonStopTimer);
-        textViewTime = (TextView) findViewById(R.id.textViewTimer);
-        textViewIntervalNumber = (TextView) findViewById(R.id.textViewIntervalCount);
+        Button buttonResetTimer = (Button) findViewById(R.id.activeMode_buttonReset);
+        Button buttonStopTimer = (Button) findViewById(R.id.activeMode_buttonStop);
+        textViewTime = (TextView) findViewById(R.id.activeMode_textViewTime);
+        textViewIntervalNumber = (TextView) findViewById(R.id.activeMode_textViewNumberOfIntervals);
 
         // Keeps Activity ON also on lock screen
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |

@@ -1,21 +1,17 @@
 package com.saveyourride.activities;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,7 +22,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.saveyourride.R;
 import com.saveyourride.services.NotificationManager;
 import com.saveyourride.services.PassiveModeManager;
-import com.saveyourride.utils.PermissionUtils;
 
 public class PassiveMode extends AppCompatActivity {
 
@@ -69,7 +64,7 @@ public class PassiveMode extends AppCompatActivity {
         });
 
         // Views
-        Button buttonStopPassiveMode = (Button) findViewById(R.id.buttonStopPassiveMode);
+        Button buttonStopPassiveMode = (Button) findViewById(R.id.passiveMode_buttonStop);
 
         // Keeps Activity ON also on lock screen
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |

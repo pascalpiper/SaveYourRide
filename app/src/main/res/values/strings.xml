@@ -27,8 +27,8 @@
     <string name="dialog_send_sms_permission_required">This feature requires Send-SMS permission. If you want to use this, please go to the setting and give the permission.</string>
 
     <!-- TEXT VIEWS -->
-    <string name="intervalCount">Interval Count</string>
-    <string name="timer">TIMER</string>
+    <string name="numberOfIntervals">i/n</string>
+    <string name="time">TIME</string>
     <string name="interval_time_expired">The time of the interval has expired!</string>
     <string name="sos_signal">SOS signal was sent!</string>
 

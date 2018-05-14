@@ -7,16 +7,31 @@
     tools:context=".activities.PassiveMode">
 
     <Button
-        android:id="@+id/buttonStopPassiveMode"
-        android:layout_width="65dp"
-        android:layout_height="65dp"
+        android:id="@+id/passiveMode_buttonStop"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="45dp"
         android:background="@drawable/round_button"
         android:elevation="3dp"
         android:text="@string/stop"
-        android:textSize="20sp"
+        android:textSize="30sp"
+        android:textColor="@color/colorWhite"
+        android:textStyle="bold|italic" />
+
+    <Button
+        android:id="@+id/activeMode_buttonSos"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/round_button_red"
+        android:elevation="3dp"
+        android:text="@string/sos"
+        android:textSize="15sp"
         android:textColor="@color/colorWhite"
         android:textStyle="bold|italic" />
 
@@ -25,7 +40,7 @@
         android:id="@+id/buttonReadFromFile"
         android:layout_width="65dp"
         android:layout_height="65dp"
-        android:layout_above="@+id/buttonStopPassiveMode"
+        android:layout_above="@+id/passiveMode_buttonStop"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="50dp"
         android:background="@drawable/round_button"
