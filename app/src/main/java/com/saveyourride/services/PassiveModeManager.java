@@ -136,6 +136,7 @@ public class PassiveModeManager extends Service {
                             noMovementTimer.cancel();
                         }
                         sendBroadcast(new Intent("android.intent.action.STOP_NOTIFICATION"));
+                        Log.d(TAG, "Movement again, Stop Notification");
                         break;
                     }
                     case "android.intent.action.LOCATION": {
