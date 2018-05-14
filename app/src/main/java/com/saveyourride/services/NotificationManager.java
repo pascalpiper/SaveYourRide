@@ -233,9 +233,11 @@ public class NotificationManager extends Service {
 
         currentAudioVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
 
-        if (currentAudioVolume < audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)) {
-            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM), AudioManager.FLAG_SHOW_UI);
-        }
+//        if (currentAudioVolume < audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)) {
+//            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM), AudioManager.FLAG_SHOW_UI);
+//        }
+
+        // TODO remove line comment
 
         AudioAttributes.Builder b = new AudioAttributes.Builder();
         b.setUsage(AudioAttributes.USAGE_MEDIA); /// TODO CHANGE to USAGE_ALARM

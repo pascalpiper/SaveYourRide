@@ -30,7 +30,10 @@ public class SosModeManager extends Service {
         initActivityReceiver();
 
         // send directly the sos-sms
-        //sendSosSms();
+        //sendSosSms(); // TODO remove line comment
+        // DEBUG
+        Log.d(TAG, "Send SOS-SMS (TODO)");
+        //
     }
 
     private void sendSosSms() {
@@ -68,7 +71,10 @@ public class SosModeManager extends Service {
                         phoneList.add(phoneNo);
 
                         for (String phoneNumber:phoneList) {
-                            sendSms(phoneNumber, messageNoSos);
+                            //sendSms(phoneNumber, messageNoSos); // TODO remove line comment
+                            // DEBUG
+                            Log.d(TAG, "Send False Alarm SMS (TODO)");
+                            //
                         }
 
                         ///

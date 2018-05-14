@@ -47,7 +47,7 @@ public class SosMode extends AppCompatActivity {
         buttonFalseAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendBroadcast(new Intent("android.intent.action.SEND_SMS"));
+                sendBroadcast(new Intent("android.intent.action.SEND_FALSE_ALARM_SMS"));
             }
         });
         buttonExit.setOnClickListener(new View.OnClickListener() {
