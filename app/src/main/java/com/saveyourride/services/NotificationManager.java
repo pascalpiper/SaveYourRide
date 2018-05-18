@@ -113,7 +113,7 @@ public class NotificationManager extends Service {
      */
     public void notificationITE() {
 
-        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound2");
+        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound");
 
         try {
             startSound(sound);
@@ -233,14 +233,14 @@ public class NotificationManager extends Service {
 
         currentAudioVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
 
-//        if (currentAudioVolume < audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)) {
-//            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM), AudioManager.FLAG_SHOW_UI);
-//        }
+        if (currentAudioVolume < audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)) {
+            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM), AudioManager.FLAG_SHOW_UI);
+        }
 
         // TODO remove line comment
 
         AudioAttributes.Builder b = new AudioAttributes.Builder();
-        b.setUsage(AudioAttributes.USAGE_MEDIA); /// TODO CHANGE to USAGE_ALARM
+        b.setUsage(AudioAttributes.USAGE_ALARM); /// TODO CHANGE to USAGE_ALARM
         mMediaPlayer.setAudioAttributes(b.build());
 
         mMediaPlayer.setLooping(true);
