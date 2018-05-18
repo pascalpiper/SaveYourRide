@@ -96,8 +96,7 @@
         <activity
             android:name=".activities.SettingsMain"
             android:label="@string/title_activity_settings_main"
-            android:parentActivityName=".activities.MainScreen"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:parentActivityName=".activities.MainScreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.saveyourride.activities.MainScreen" />

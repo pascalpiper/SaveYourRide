@@ -1,10 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <android.support.v7.preference.SwitchPreferenceCompat
-        android:defaultValue="true"
-        android:key="gps"
-        android:summaryOff="Turn Gps on"
-        android:summaryOn="Turn GPS off"
-        android:title="GPS" />
+    <PreferenceCategory android:title="@string/categorie_title_main_settings">
+        <EditTextPreference
+            android:defaultValue="@string/title_name"
+            android:key="pref_name"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/title_name"
+            android:summary="@string/summary_name" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/categorie_title_sos_message">
+        <EditTextPreference
+            android:defaultValue="MessageContent"
+            android:key="pref_custom_message"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Custom Message" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_gps"
+            android:summaryOff="@string/summary_gps_off"
+            android:summaryOn="@string/summary_gps_on"
+            android:title="@string/title_gps" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_accident_time"
+            android:summaryOff="@string/summary_accident_off"
+            android:summaryOn="@string/summary_accident_time_on"
+            android:title="@string/title_accident_time" />
+    </PreferenceCategory>
+
 </PreferenceScreen>
