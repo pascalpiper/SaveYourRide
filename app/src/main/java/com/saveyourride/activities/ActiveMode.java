@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,10 +27,6 @@ public class ActiveMode extends AppCompatActivity {
     // DEBUG
     private final String TAG = "ActiveMode";
     //
-
-    // TODO: Pick Up values for number of intervals and interval time
-    private final int numberOfIntervals = 2;
-    private final long intervalTime = 30000L;
 
     // Dialog IDs
     private final int BACK_PRESSED = 0;
@@ -111,7 +108,16 @@ public class ActiveMode extends AppCompatActivity {
                 //extract our message from intent
                 switch (intent.getAction()) {
                     case "android.intent.action.AMM_SERVICE_READY": {
-                        sendBroadcast(new Intent("android.intent.action.START_TIMER").putExtra("numberOfIntervals", numberOfIntervals).putExtra("intervalTime", intervalTime));
+                        SharedPreferences timerValues = getSharedPreferences(getString(R.string.sp_key_timer_values), Context.MODE_PRIVATE);
+                        int numberOfIntervals = timerValues.getInt(                             // Value from shared preferences, getInt(key, defaultValue)
+                                getString(R.string.sp_key_number_of_interval),                  // key (String)
+                                getResources().getInteger(R.integer.default_number_of_intervals)// defaultValue (int)
+                        );
+                        long timeOfInterval = timerValues.getLong(                              // Value from shared preferences, getLong(key, defaultValue)
+                                getString(R.string.sp_key_time_of_interval),                    // key (String)
+                                getResources().getInteger(R.integer.default_time_of_interval)   // defaultValue (long or int)
+                        );
+                        sendBroadcast(new Intent("android.intent.action.START_TIMER").putExtra("numberOfIntervals", numberOfIntervals).putExtra("timeOfInterval", timeOfInterval));
                         break;
                     }
                     case "android.intent.action.REST_INTERVAL_TIME": {
@@ -121,7 +127,8 @@ public class ActiveMode extends AppCompatActivity {
                     }
                     case "android.intent.action.INTERVAL_NUMBER": {
                         int intervalNumber = intent.getIntExtra("interval_number", -1);
-                        textViewIntervalNumber.setText(Integer.toString(intervalNumber) + " / " + numberOfIntervals);
+                        int numberOfIntervals = intent.getIntExtra("number_of_intervals", -1);
+                        textViewIntervalNumber.setText(intervalNumber + " / " + numberOfIntervals);
                         break;
                     }
                     case "android.intent.action.ITE_SHOW_DIALOG": {

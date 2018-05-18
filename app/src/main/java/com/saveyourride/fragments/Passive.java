@@ -82,7 +82,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
         View rootView = inflater.inflate(R.layout.fragment_passive, container, false);
 
         myActivity = getActivity();
-        sharedPreferencesLastLocation = myActivity.getSharedPreferences("Location", Context.MODE_PRIVATE);
+        sharedPreferencesLastLocation = myActivity.getSharedPreferences(getString(R.string.sp_key_location), Context.MODE_PRIVATE);
 
         if (mapFragment == null) {
             mapFragment = SupportMapFragment.newInstance();
@@ -224,10 +224,11 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
 
         currentLocation = lastLocation;
 
-        double sharedLatitude = sharedPreferencesLastLocation.getString("Latitude", null) != null ?
-                Double.parseDouble(sharedPreferencesLastLocation.getString("Latitude", null)) : 0;
-        double sharedLongitude = sharedPreferencesLastLocation.getString("Longitude", null) != null ?
-                Double.parseDouble(sharedPreferencesLastLocation.getString("Longitude", null)) : 0;
+        // TODO remove not important check if null. Use default value.
+        double sharedLatitude = sharedPreferencesLastLocation.getString(getString(R.string.sp_key_latitude), null) != null ?
+                Double.parseDouble(sharedPreferencesLastLocation.getString(getString(R.string.sp_key_latitude), null)) : 0;
+        double sharedLongitude = sharedPreferencesLastLocation.getString(getString(R.string.sp_key_longitude), null) != null ?
+                Double.parseDouble(sharedPreferencesLastLocation.getString(getString(R.string.sp_key_longitude), null)) : 0;
 
         if (currentLocation == null) {
             if (sharedLatitude == 0 && sharedLongitude == 0) {
@@ -349,8 +350,8 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
             public void onLocationChanged(Location location) {
                 currentLocation = location;
                 SharedPreferences.Editor editor = sharedPreferencesLastLocation.edit();
-                editor.putString("Latitude", Double.toString(location.getLatitude()));
-                editor.putString("Longitude", Double.toString(location.getLongitude()));
+                editor.putString(getString(R.string.sp_key_latitude), Double.toString(location.getLatitude()));
+                editor.putString(getString(R.string.sp_key_longitude), Double.toString(location.getLongitude()));
                 editor.apply();
                 LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                 myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17));
@@ -382,8 +383,8 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
             public void onLocationChanged(Location location) {
                 currentLocation = location;
                 SharedPreferences.Editor editor = sharedPreferencesLastLocation.edit();
-                editor.putString("Latitude", Double.toString(location.getLatitude()));
-                editor.putString("Longitude", Double.toString(location.getLongitude()));
+                editor.putString(getString(R.string.sp_key_latitude), Double.toString(location.getLatitude()));
+                editor.putString(getString(R.string.sp_key_longitude), Double.toString(location.getLongitude()));
                 editor.apply();
                 LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                 myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17));
@@ -502,7 +503,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
                 // Set dialog message
                 alert.setMessage(R.string.dialog_send_sms_permission_explanation);
                 // Set up the button
-                alert.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+                alert.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         requestPermissions(new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_PERMISSIONS_REQUEST_CODE);

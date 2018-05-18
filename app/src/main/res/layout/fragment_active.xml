@@ -39,7 +39,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="@string/default_number_of_intervals"
             android:textColor="@android:color/black"
             android:textSize="60sp"
             android:textStyle="bold|italic" />
@@ -81,7 +80,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="@string/default_time_of_interval"
             android:textColor="@android:color/black"
             android:textSize="60sp"
             android:textStyle="bold|italic" />

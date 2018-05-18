@@ -3,7 +3,6 @@
     <!-- GOOGLE MAPS KEY -->
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyB6LKT60C_EPzIXzTo13PFcZKFFABt9q3E</string>
 
-
     <string name="edit_message">Enter a message</string>
     <string name="title_activity__active">Activity_Active</string>
 
@@ -28,12 +27,10 @@
 
     <!-- TEXT VIEWS -->
     <string name="i_slash_n">i/n</string>
-    <!-- ONLY FOR TESTS -->
-    <string name="default_number_of_intervals">3</string>
-    <string name="default_time_of_interval">01:00</string>
     <string name="text_view_divider">____________________________</string>
-
-    <!--  -->
+    <string name="double_point_symbol">:</string>
+    <string name="minutes">Minutes</string>
+    <string name="seconds">Seconds</string>
     <string name="number_of_intervals">Number of intervals</string>
     <string name="time_of_interval">Time of interval</string>
     <string name="time">TIME</string>
@@ -56,6 +53,14 @@
     <!-- DESCRIPTIONS -->
     <string name="colored_background">colored background</string>
     <string name="image_button">image button</string>
+
+    <!-- SHARED_PREFERENCES_KEYS (sp_keys) -->
+    <string name="sp_key_location">Location</string>
+    <string name="sp_key_latitude">Latitude</string>
+    <string name="sp_key_longitude">Longitude</string>
+    <string name="sp_key_timer_values">timerValues</string>
+    <string name="sp_key_number_of_interval">numberOfIntervals</string>
+    <string name="sp_key_time_of_interval">timeOfInterval</string>
 
     <!-- PERMISSIONS -->
     <string name="location_permission_denied">Your Location-Services are probably disabled. You can not use some features. Please go to settings to enable it.</string>
