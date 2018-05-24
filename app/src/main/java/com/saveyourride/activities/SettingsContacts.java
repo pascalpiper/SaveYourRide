@@ -15,7 +15,7 @@ import com.saveyourride.utils.ContactsListAdapter;
 import java.util.Objects;
 
 
-public class Main_Settings extends AppCompatActivity {
+public class SettingsContacts extends AppCompatActivity {
 
     // Array of strings...
     ListView contactListView;
@@ -30,7 +30,7 @@ public class Main_Settings extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_settings);
+        setContentView(R.layout.activity_settings_contacts);
         Objects.requireNonNull(getSupportActionBar()).setElevation(0);
 
         contactListView = (ListView) findViewById(R.id.contactList_contactListView);

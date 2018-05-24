@@ -49,6 +49,7 @@
     <string name="title_dialog_no_movement_detected">You are not moving for a long time. Is everything OK?</string>
     <string name="title_dialog_accident_guarantee_procedure_interval">All intervals have expired. Is everything OK?</string>
     <string name="title_dialog_accident_guarantee_procedure_no_movement">You do not move for a long time and do not respond to the notifications. Is everything OK?</string>
+    <string name="title_activity_settings_preview_message">Preview</string>
 
     <!-- DESCRIPTIONS -->
     <string name="colored_background">colored background</string>
@@ -74,5 +75,46 @@
     <!-- ONLY FOR TESTS -->
     <string name="read">READ</string>
     <string name="title_activity_sos_mode">SosMode</string>
+    <string name="title_activity_settings_main">Settings</string>
+
+    <!-- SETTINGS -->
+    <string name="category_title_main_settings">Emergency information</string>
+    <string name="category_title_sos_message">SOS-Message</string>
+
+    <string name="title_name">Name</string>
+    <string name="default_value_name">Default_Name</string>
+    <string name="summary_name">Your name, which is shown in SOS-MESSAGE</string>
+
+    <string name="default_value_diseases">No diseasos</string>
+    <string name="title_diseases">Diseases</string>
+
+    <string name="title_allergies">Allergies</string>
+    <string name="default_value_allergies">no allergies</string>
+
+    <string name="title_drugs">Drugs</string>
+    <string name="default_value_drugs">no drugs</string>
+
+    <string name="title_contacts">Contacts</string>
+
+    <string name="title_enable_custom_message">Custom Message</string>
+    <string name="summary_custom_message">Send custom message to SOS-Contacts instead of the default message </string>
+
+    <string name="title_custom_message">Custom Message</string>
+
+    <string name="title_gps">GPS</string>
+    <string name="summary_gps">Turn GPS on/off</string>
+
+    <string name="summary_accident">Shows the the time of the accident</string>
+    <string name="title_accident_time">Accident Time</string>
+    <string name="pref_included_information">Informations included in message</string>
+    <string name="title_preview">Preview</string>
+
+    <string name="pref_preview_message">pref_preview_message</string>
+    <string name="pref_name">pref_name</string>
+    <string name="pref_diseases">pref_diseases</string>
+    <string name="pref_enable_custom_message">pref_enable_custom_message</string>
+    <string name="pref_custom_message">pref_custom_message</string>
+    <string name="pref_allergies">pref_allergies</string>
+    <string name="pref_drugs">pref_drugs</string>
 
 </resources>
