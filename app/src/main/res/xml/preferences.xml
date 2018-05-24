@@ -4,6 +4,7 @@
     <PreferenceCategory android:title="@string/category_title_main_settings">
         <EditTextPreference
             android:defaultValue="@string/default_value_name"
+            android:icon="@drawable/ic_account_circle_black_24dp"
             android:key="@string/pref_name"
             android:selectAllOnFocus="true"
             android:singleLine="true"
@@ -11,6 +12,7 @@
 
         <EditTextPreference
             android:defaultValue="@string/default_value_diseases"
+            android:icon="@drawable/ic_sentiment_very_dissatisfied_black_24dp"
             android:key="@string/pref_diseases"
             android:selectAllOnFocus="true"
             android:singleLine="false"
@@ -18,6 +20,7 @@
 
         <EditTextPreference
             android:defaultValue="@string/default_value_allergies"
+            android:icon="@drawable/ic_do_not_disturb_black_24dp"
             android:key="@string/pref_allergies"
             android:selectAllOnFocus="true"
             android:singleLine="false"
@@ -25,6 +28,7 @@
 
         <EditTextPreference
             android:defaultValue="@string/default_value_drugs"
+            android:icon="@drawable/ic_healing_black_24dp"
             android:key="@string/pref_drugs"
             android:selectAllOnFocus="true"
             android:singleLine="false"
@@ -32,7 +36,8 @@
 
         <Preference
             android:title="@string/title_contacts"
-            android:key="pref_contacts"></Preference>
+            android:key="pref_contacts"
+            android:icon="@drawable/ic_group_black_24dp"></Preference>
 
     </PreferenceCategory>
 
@@ -61,18 +66,9 @@
 
         <Preference
             android:title="@string/title_preview"
-            android:key="@string/pref_preview_message"></Preference>
-        <!-- <SwitchPreference
-             android:defaultValue="true"
-             android:key="pref_gps"
-             android:summary="@string/summary_gps"
-             android:title="@string/title_gps" />
-         <SwitchPreference
-             android:defaultValue="true"
-             android:key="pref_accident_time"
-             android:summary="@string/summary_accident"
-             android:title="@string/title_accident_time" />
-             -->
+            android:key="@string/pref_preview_message"
+            android:icon="@drawable/ic_tv_black_24dp"></Preference>
+
     </PreferenceCategory>
 
 </PreferenceScreen>
