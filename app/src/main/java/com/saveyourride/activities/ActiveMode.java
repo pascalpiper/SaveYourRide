@@ -90,6 +90,17 @@ public class ActiveMode extends AppCompatActivity {
             }
         });
 
+        Button buttonSos = (Button) findViewById(R.id.activeMode_buttonSos);
+
+        buttonSos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), SosMode.class));
+                finish();
+            }
+        });
+
+
     }
 
     /**
@@ -238,7 +249,8 @@ public class ActiveMode extends AppCompatActivity {
                         // DEBUG
                         Log.d(TAG, "AGP-DIALOG: SOS-Button was clicked!");
                         //
-                        // TODO: Call SOS-MODE
+                        startActivity(new Intent(getApplicationContext(), SosMode.class));
+                        finish();
                     }
                 });
 
