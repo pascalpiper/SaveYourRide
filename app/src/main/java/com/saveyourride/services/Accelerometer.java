@@ -47,7 +47,7 @@ public class Accelerometer extends Service implements SensorEventListener {
 
             float acceleration = Math.abs(x) + Math.abs(y) + Math.abs(z);
 
-            System.out.println("----  " + acceleration + "  ------ C: " + noMovementCounter);
+            // System.out.println("----  " + acceleration + "  ------ C: " + noMovementCounter);
 
             if (!noMovementBroadcastWasSent && acceleration <= NO_MOVE_THRESHOLD) {
 

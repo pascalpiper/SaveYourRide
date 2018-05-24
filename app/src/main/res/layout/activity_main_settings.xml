@@ -7,9 +7,9 @@
     tools:context=".activities.MainScreen">
 
     <ListView
-        android:id="@+id/simpleListView"
+        android:id="@+id/contactList_contactListView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp" />
+        android:divider="@null"
+        android:listSelector="@android:color/transparent" />
 </LinearLayout>

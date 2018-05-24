@@ -156,7 +156,7 @@ public class NotificationManager extends Service {
                 if (!isWaiting && !isPlaying) {
                     try {
                         // TODO find better solution for Sound URI
-                        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound2");
+                        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound");
                         startSound(sound);
                     } catch (IOException e) {
                         e.printStackTrace();

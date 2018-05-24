@@ -7,5 +7,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:navigationBarColor">@color/colorDefaultBackground</item>
         <item name="android:windowLightNavigationBar">true</item>
+
+        <item name="cardViewStyle">@style/CardView</item>
     </style>
 </resources>

@@ -9,7 +9,8 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.saveyourride.R;
-import com.saveyourride.utils.ListAdapterContacts;
+import com.saveyourride.utils.Contact;
+import com.saveyourride.utils.ContactsListAdapter;
 
 import java.util.Objects;
 
@@ -17,23 +18,29 @@ import java.util.Objects;
 public class Main_Settings extends AppCompatActivity {
 
     // Array of strings...
-    ListView simpleList;
-    String nameList[] = {"Pascal", "Taras", "Patrick", "Vater", "Mutter", "Ricarda"};
-    String numberList[] = {"1234", "5678", "1234", "5678", "1234", "5678"};
+    ListView contactListView;
+    Contact[] contactsList = {
+            new Contact("Pascal", "Piper", "+491752847846"),
+            new Contact("Taras", "Zaika", "+4915738196717"),
+            new Contact("Patrick", "Piper", "+4915000000000"),
+            new Contact("Philipp", "Hoedt", "+4915228791403"),
+            new Contact("Paulo", "Pinto", "+491633629003")
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_settings);
         Objects.requireNonNull(getSupportActionBar()).setElevation(0);
-        simpleList = (ListView) findViewById(R.id.simpleListView);
 
-        ListAdapterContacts customAdapter = new ListAdapterContacts(this, nameList, numberList);
-        simpleList.setAdapter(customAdapter);
+        contactListView = (ListView) findViewById(R.id.contactList_contactListView);
+
+        ContactsListAdapter listAdapter = new ContactsListAdapter(this, contactsList);
+        contactListView.setAdapter(listAdapter);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) { //menu activity bekannt
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.contacts_toolbar, menu);
         return super.onCreateOptionsMenu(menu);
@@ -43,7 +50,6 @@ public class Main_Settings extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) { //click listener quasi.
         switch (item.getItemId()) {
             case R.id.addContactBtn:
-                // settingsIntent.putExtra(Intent.EXTRA_TEXT, aktienInfo);
                 Intent activeIntent = new Intent(getApplicationContext(), MainScreen.class);
                 startActivityIfNeeded(activeIntent, 0);
                 startActivity(activeIntent);
