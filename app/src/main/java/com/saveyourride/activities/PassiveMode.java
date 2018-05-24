@@ -99,9 +99,20 @@ public class PassiveMode extends AppCompatActivity {
             }
         });
 
+        Button buttonSos = (Button) findViewById(R.id.passiveMode_buttonSos);
+
+        buttonSos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), SosMode.class));
+                finish();
+            }
+        });
+
 //        // Ask permissions
 //        requestPermissions();
     }
+
 
 //    private void requestPermissions() {
 //        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
@@ -235,7 +246,8 @@ public class PassiveMode extends AppCompatActivity {
                         // DEBUG
                         Log.d(TAG, "AGP-DIALOG: SOS-Button was clicked!");
                         //
-                        // TODO: Call SOS-MODE
+                        startActivity(new Intent(getApplicationContext(), SosMode.class));
+                        finish();
                     }
                 });
 
