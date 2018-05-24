@@ -7,8 +7,7 @@
             android:key="@string/pref_name"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="@string/title_name"
-            android:summary="@string/summary_name" />
+            android:title="@string/title_name" />
 
         <EditTextPreference
             android:defaultValue="@string/default_value_diseases"

@@ -36,7 +36,7 @@ public class SettingsPreviewMessage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_preview_message);
 
-        gotInformations();
+        gotInformation();
 
         TextView textViewPreviewMessage = findViewById(R.id.preview_message);
         textViewPreviewMessage.setText(createMessage());
@@ -106,7 +106,7 @@ public class SettingsPreviewMessage extends AppCompatActivity {
         }
     }
 
-    public void gotInformations() {
+    public void gotInformation() {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 

@@ -27,5 +27,5 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:singleLine="false"
-        tools:hint='"Default"' />
+        android:textSize="24sp" />
 </RelativeLayout>
