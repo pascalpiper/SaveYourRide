@@ -30,6 +30,14 @@ public class SettingsPreviewMessage extends AppCompatActivity {
     private Boolean customMessageEnabled;
     private String defaultMessage;
 
+    private String[] informationList;
+
+    private final int LOCATION = 0;
+    private final int ACCIDENT_TIME = 1;
+    private final int DISEASES = 2;
+    private final int ALLERGIES = 3;
+    private final int DRUGS = 4;
+    private final int INFORMED_CONTACTS = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +45,8 @@ public class SettingsPreviewMessage extends AppCompatActivity {
         setContentView(R.layout.activity_settings_preview_message);
 
         gotInformation();
+
+        informationList = new String[6];
 
         TextView textViewPreviewMessage = findViewById(R.id.preview_message);
         textViewPreviewMessage.setText(createMessage());
@@ -61,37 +71,46 @@ public class SettingsPreviewMessage extends AppCompatActivity {
 
         for (String each : included_information) {
             Log.d(TAG, each);
-            message = appendToMessage(each, message);
+            saveInInformationList(each);
         }
+
+        message = appendInformationToMessage(message);
 
         return message;
     }
 
-    public String appendToMessage(String typeOfInformation, String message) {
+    public void saveInInformationList(String typeOfInformation) {
         String newInformation = null;
+        int informationID = -1;
 
         switch (typeOfInformation) {
             case "GPS-Location": {
+                informationID = LOCATION;
                 newInformation = longitude + " " + latitude;
                 break;
             }
             case "Time of Accident": {
+                informationID = ACCIDENT_TIME;
                 newInformation = accidentTime;
                 break;
             }
             case "Diseases": {
+                informationID = DISEASES;
                 newInformation = diseases;
                 break;
             }
             case "Allergies": {
+                informationID = ALLERGIES;
                 newInformation = allergies;
                 break;
             }
             case "Drugs": {
+                informationID = DRUGS;
                 newInformation = drugs;
                 break;
             }
             case "Informed contacts": {
+                informationID = INFORMED_CONTACTS;
                 newInformation = informedContacts;
                 break;
             }
@@ -99,11 +118,19 @@ public class SettingsPreviewMessage extends AppCompatActivity {
             default:
                 newInformation = null;
         }
-        if (newInformation == null) {
-            return message;
-        } else {
-            return message + "\n" + typeOfInformation + ": " + newInformation;
+        if (newInformation != null && informationID >= 0) {
+            informationList[informationID] = "\n" + typeOfInformation + ": " + newInformation;
         }
+    }
+
+    private String appendInformationToMessage(String message) {
+        int i;
+        for (i = 0; i < informationList.length; i++) {
+            if (informationList[i] != null) {
+                message = message + informationList[i];
+            }
+        }
+        return message;
     }
 
     public void gotInformation() {

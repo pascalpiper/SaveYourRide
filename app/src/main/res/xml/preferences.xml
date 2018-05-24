@@ -38,6 +38,12 @@
 
     <PreferenceCategory android:title="@string/category_title_sos_message">
 
+        <MultiSelectListPreference
+            android:defaultValue="@array/list_information_included_in_message"
+            android:entries="@array/list_information_included_in_message"
+            android:entryValues="@array/list_information_included_in_message"
+            android:key="pref_included_information"
+            android:title="@string/pref_included_information" />
 
         <SwitchPreference
             android:defaultValue="false"
@@ -52,12 +58,6 @@
             android:singleLine="false"
             android:title="@string/title_custom_message"
             android:enabled="false" />
-        <MultiSelectListPreference
-            android:defaultValue="@array/list_information_included_in_message"
-            android:entries="@array/list_information_included_in_message"
-            android:entryValues="@array/list_information_included_in_message"
-            android:key="pref_included_information"
-            android:title="@string/pref_included_information" />
 
         <Preference
             android:title="@string/title_preview"
