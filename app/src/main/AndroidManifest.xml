@@ -101,6 +101,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.saveyourride.activities.MainScreen" />
         </activity>
+        <activity
+            android:name=".activities.SettingsPreviewMessage"
+            android:label="@string/title_activity_settings_preview_message"
+            android:parentActivityName=".activities.SettingsMain">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.saveyourride.activities.SettingsMain" />
+        </activity>
     </application>
 
 </manifest>

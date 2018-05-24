@@ -1,35 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/categorie_title_main_settings">
+    <PreferenceCategory android:title="@string/category_title_main_settings">
         <EditTextPreference
-            android:defaultValue="@string/title_name"
-            android:key="pref_name"
+            android:defaultValue="@string/default_value_name"
+            android:key="@string/pref_name"
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/title_name"
             android:summary="@string/summary_name" />
+
+        <EditTextPreference
+            android:defaultValue="@string/default_value_diseases"
+            android:key="@string/pref_diseases"
+            android:selectAllOnFocus="true"
+            android:singleLine="false"
+            android:title="@string/title_diseases" />
+
+        <EditTextPreference
+            android:defaultValue="@string/default_value_allergies"
+            android:key="@string/pref_allergies"
+            android:selectAllOnFocus="true"
+            android:singleLine="false"
+            android:title="@string/title_allergies" />
+
+        <EditTextPreference
+            android:defaultValue="@string/default_value_drugs"
+            android:key="@string/pref_drugs"
+            android:selectAllOnFocus="true"
+            android:singleLine="false"
+            android:title="@string/title_drugs" />
+
+        <Preference
+            android:title="@string/title_contacts"
+            android:key="pref_contacts"></Preference>
+
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/categorie_title_sos_message">
+    <PreferenceCategory android:title="@string/category_title_sos_message">
+
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/pref_enable_custom_message"
+            android:summary="@string/summary_custom_message"
+            android:title="@string/title_enable_custom_message" />
+
         <EditTextPreference
             android:defaultValue="MessageContent"
-            android:key="pref_custom_message"
+            android:key="@string/pref_custom_message"
             android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:title="Custom Message" />
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="pref_gps"
-            android:summaryOff="@string/summary_gps_off"
-            android:summaryOn="@string/summary_gps_on"
-            android:title="@string/title_gps" />
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="pref_accident_time"
-            android:summaryOff="@string/summary_accident_off"
-            android:summaryOn="@string/summary_accident_time_on"
-            android:title="@string/title_accident_time" />
+            android:singleLine="false"
+            android:title="@string/title_custom_message"
+            android:enabled="false" />
+        <MultiSelectListPreference
+            android:defaultValue="@array/list_information_included_in_message"
+            android:entries="@array/list_information_included_in_message"
+            android:entryValues="@array/list_information_included_in_message"
+            android:key="pref_included_information"
+            android:title="@string/pref_included_information" />
+
+        <Preference
+            android:title="@string/title_preview"
+            android:key="@string/pref_preview_message"></Preference>
+        <!-- <SwitchPreference
+             android:defaultValue="true"
+             android:key="pref_gps"
+             android:summary="@string/summary_gps"
+             android:title="@string/title_gps" />
+         <SwitchPreference
+             android:defaultValue="true"
+             android:key="pref_accident_time"
+             android:summary="@string/summary_accident"
+             android:title="@string/title_accident_time" />
+             -->
     </PreferenceCategory>
 
 </PreferenceScreen>
