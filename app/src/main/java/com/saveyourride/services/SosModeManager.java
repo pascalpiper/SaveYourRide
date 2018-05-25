@@ -1,5 +1,7 @@
 package com.saveyourride.services;
 
+import android.app.Activity;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -69,8 +71,11 @@ public class SosModeManager extends Service {
     }
 
     private void sendSmsToContact(String phoneNumber, String message) {
+        PendingIntent sentIntent = PendingIntent.getBroadcast(this, 0, new Intent("SMS_SENT"), 0);
+        PendingIntent deliveredIntent = PendingIntent.getBroadcast(this, 0, new Intent("SMS_DELIVERED"), 0);
+
         if (message.length() <= 160) {
-            smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+            smsManager.sendTextMessage(phoneNumber, null, message, sentIntent, null);
         } else {
             String part1 = message.substring(0, MAX_SMS_LENGTH);
             String part2 = message.substring(MAX_SMS_LENGTH);
@@ -80,29 +85,16 @@ public class SosModeManager extends Service {
 
             char[] part1AsCharArray = part1.toCharArray();
             for (int i = part1.length() - 1; i >= 0; i--) {
-                Log.d(TAG, " " + part1AsCharArray[i] + i);
                 if (part1AsCharArray[i] == ' ') {
                     indexOfBlank = i;
                     break;
                 }
             }
-            Log.d(TAG, "IndexOfBlank" + indexOfBlank);
+
             if (indexOfBlank > 0) {
                 part2 = part1.substring(indexOfBlank) + part2;
                 part1 = part1.substring(0, indexOfBlank);
             }
-
-//            // Test
-//            String part1split = part1.substring(MAX_SMS_LENGTH - 20);
-//
-//            if (part1split.contains(" ")){
-//                String [] part1splitAsArray = part1split.split(" ");
-//
-//                part1 = part1.substring(0, MAX_SMS_LENGTH - part1splitAsArray[part1splitAsArray.length-1].length());
-//                part2 = part1splitAsArray[part1splitAsArray.length -1] + part2;
-//
-//            }
-//            //
 
             smsManager.sendTextMessage(phoneNumber, null, part1, null, null);
             sendSmsToContact(phoneNumber, part2);
@@ -124,6 +116,31 @@ public class SosModeManager extends Service {
                         sendSms(phoneList, true);
                         break;
                     }
+                    case "SMS_SENT": {
+                        String s;
+                        switch (getResultCode()) {
+                            case Activity.RESULT_OK:
+                                s = "Message Sent Successfully !!";
+                                break;
+                            case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                                s = "Generic Failure Error";
+                                break;
+                            case SmsManager.RESULT_ERROR_NO_SERVICE:
+                                s = "Error : No Service Available";
+                                break;
+                            case SmsManager.RESULT_ERROR_NULL_PDU:
+                                s = "Error : Null PDU";
+                                break;
+                            case SmsManager.RESULT_ERROR_RADIO_OFF:
+                                s = "Error : Radio is off";
+                                break;
+                            default:
+                                s = "Error SMS";
+                                break;
+                        }
+                        Log.d(TAG, s);
+                        break;
+                    }
                     default: {
                         Log.d(TAG, "NO SUCH ACTION IN BROADCAST!");
                         break;
@@ -135,7 +152,7 @@ public class SosModeManager extends Service {
         // IntentFilter filters broadcasts received by BroadcastReceiver
         IntentFilter filter = new IntentFilter();
 
-        filter.addAction("android.intent.action.SEND_SOS_SMS");
+        filter.addAction("SMS_SENT");
         filter.addAction("android.intent.action.SEND_FALSE_ALARM_SMS");
 
         registerReceiver(receiver, filter);

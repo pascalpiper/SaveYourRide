@@ -1,6 +1,9 @@
 package com.saveyourride.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -19,12 +22,16 @@ public class SosMode extends AppCompatActivity {
     // Intents for SosModeManager-Service (SMM)
     private Intent smmService;
 
+    //
+    private BroadcastReceiver receiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Layout
         setContentView(R.layout.activity_sos_mode);
+
 
         // Views
         Button buttonFalseAlarm = (Button) findViewById(R.id.sosMode_buttonFalseAlarm);
@@ -57,10 +64,21 @@ public class SosMode extends AppCompatActivity {
         });
     }
 
+    private void initReceiver() {
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                finish();
+            }
+        };
+        registerReceiver(receiver, new IntentFilter("android.intent.action.SEND_SMS_SUCCESSFUL"));
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         stopService(smmService);
+        unregisterReceiver(receiver);
     }
 }
 
