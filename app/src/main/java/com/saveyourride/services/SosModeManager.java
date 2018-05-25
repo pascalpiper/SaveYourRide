@@ -9,6 +9,8 @@ import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.util.Log;
 
+import com.saveyourride.utils.MessageBuilder;
+
 import java.util.ArrayList;
 
 public class SosModeManager extends Service {
@@ -22,6 +24,15 @@ public class SosModeManager extends Service {
     // BroadcastReceiver for messages from ActiveMode Activity
     private BroadcastReceiver receiver;
 
+
+    // TestPhoneNumber
+    ArrayList<String> phoneList = new ArrayList<String>();
+
+    // SMS-Manager
+    private SmsManager smsManager = SmsManager.getDefault();
+    private final int MAX_SMS_LENGTH = 160;
+
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -30,22 +41,71 @@ public class SosModeManager extends Service {
         initActivityReceiver();
 
         // send directly the sos-sms
-        //sendSosSms(); // TODO remove line comment
-        // DEBUG
-        Log.d(TAG, "Send SOS-SMS (TODO)");
-        //
-    }
-
-    private void sendSosSms() {
-        String messageSos = "Hallo Pascal, hier ist die SaveYourRide App von Pascals Handy";
-
+        // Test
         String phoneNo = "01752847846";
-
-        ArrayList<String> phoneList = new ArrayList<String>();
         phoneList.add(phoneNo);
 
-        for (String phoneNumber:phoneList) {
-            sendSms(phoneNumber, messageSos);
+        sendSms(phoneList, false);
+    }
+
+
+    private void sendSms(ArrayList<String> phoneList, boolean falseAlarm) {
+
+        MessageBuilder messageBuilder = new MessageBuilder(this);
+
+        if (falseAlarm) {
+            for (String phoneNumber : phoneList) {
+                sendSmsToContact(phoneNumber, messageBuilder.buildFalseAlarmMessage(phoneNumber));
+                // TODO Name instead of Number
+            }
+        } else {
+            for (String phoneNumber : phoneList) {
+                String[] message = messageBuilder.buildSosMessage(phoneNumber);
+                sendSmsToContact(phoneNumber, message[0]);
+                sendSmsToContact(phoneNumber, message[1]);
+                // TODO Name instead of Number
+            }
+        }
+    }
+
+    private void sendSmsToContact(String phoneNumber, String message) {
+        if (message.length() <= 160) {
+            smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+        } else {
+            String part1 = message.substring(0, MAX_SMS_LENGTH);
+            String part2 = message.substring(MAX_SMS_LENGTH);
+
+            int indexOfBlank = 0;
+
+
+            char[] part1AsCharArray = part1.toCharArray();
+            for (int i = part1.length() - 1; i >= 0; i--) {
+                Log.d(TAG, " " + part1AsCharArray[i] + i);
+                if (part1AsCharArray[i] == ' ') {
+                    indexOfBlank = i;
+                    break;
+                }
+            }
+            Log.d(TAG, "IndexOfBlank" + indexOfBlank);
+            if (indexOfBlank > 0) {
+                part2 = part1.substring(indexOfBlank) + part2;
+                part1 = part1.substring(0, indexOfBlank);
+            }
+
+//            // Test
+//            String part1split = part1.substring(MAX_SMS_LENGTH - 20);
+//
+//            if (part1split.contains(" ")){
+//                String [] part1splitAsArray = part1split.split(" ");
+//
+//                part1 = part1.substring(0, MAX_SMS_LENGTH - part1splitAsArray[part1splitAsArray.length-1].length());
+//                part2 = part1splitAsArray[part1splitAsArray.length -1] + part2;
+//
+//            }
+//            //
+
+            smsManager.sendTextMessage(phoneNumber, null, part1, null, null);
+            sendSmsToContact(phoneNumber, part2);
         }
     }
 
@@ -61,24 +121,7 @@ public class SosModeManager extends Service {
                 switch (intent.getAction()) {
                     case "android.intent.action.SEND_FALSE_ALARM_SMS": {
 
-                        // Test
-
-                        String messageNoSos = "Hallo Pascal, hier ist die SaveYourRide App. Die letzte Meldung war ein Fehlalarm";
-
-                        String phoneNo = "01752847846";
-
-                        ArrayList<String> phoneList = new ArrayList<String>();
-                        phoneList.add(phoneNo);
-
-                        for (String phoneNumber:phoneList) {
-                            //sendSms(phoneNumber, messageNoSos); // TODO remove line comment
-                            // DEBUG
-                            Log.d(TAG, "Send False Alarm SMS (TODO)");
-                            //
-                        }
-
-                        ///
-
+                        sendSms(phoneList, true);
                         break;
                     }
                     default: {
@@ -103,19 +146,6 @@ public class SosModeManager extends Service {
         super.onDestroy();
         unregisterReceiver(receiver);
     }
-
-
-    /**
-     * Send a sms with the {@code message} to a member with the {@code phoneNo}
-     * @param phoneNo the number of the contact how gets the sms
-     * @param message the content of the sms
-     */
-    private void sendSms( String phoneNo, String message){
-
-        SmsManager smsManager = SmsManager.getDefault();
-        smsManager.sendTextMessage(phoneNo, null, message, null, null);
-    }
-
 
     @Override
     public IBinder onBind(Intent intent) {

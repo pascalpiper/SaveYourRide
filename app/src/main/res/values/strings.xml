@@ -117,4 +117,12 @@
     <string name="pref_allergies">pref_allergies</string>
     <string name="pref_drugs">pref_drugs</string>
 
+    <!-- preview message -->
+    <string name="test_contact">Test Contact</string>
+
+    <!-- message -->
+    <string name="greeting">Hello</string>
+    <string name="sos_message">The mobile app Save Your Ride has found a Accident</string>
+    <string name="false_alarm_message">The Alarm, wich was sent before , was an false alarm. Everything is okay.</string>
+
 </resources>
