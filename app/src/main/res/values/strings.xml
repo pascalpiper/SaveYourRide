@@ -82,33 +82,19 @@
     <string name="category_title_sos_message">SOS-Message</string>
 
     <string name="title_name">Name</string>
-    <string name="default_value_name">Default_Name</string>
-    <string name="summary_name">Your name, which is shown in SOS-MESSAGE</string>
-
-    <string name="default_value_diseases">No diseasos</string>
     <string name="title_diseases">Diseases</string>
-
     <string name="title_allergies">Allergies</string>
-    <string name="default_value_allergies">no allergies</string>
-
     <string name="title_drugs">Drugs</string>
-    <string name="default_value_drugs">no drugs</string>
-
     <string name="title_contacts">Contacts</string>
-
     <string name="title_enable_custom_message">Custom Message</string>
-    <string name="summary_custom_message">Send custom message to SOS-Contacts instead of the default message </string>
-
     <string name="title_custom_message">Custom Message</string>
 
-    <string name="title_gps">GPS</string>
-    <string name="summary_gps">Turn GPS on/off</string>
-
-    <string name="summary_accident">Shows the the time of the accident</string>
     <string name="title_accident_time">Accident Time</string>
     <string name="pref_included_information">Informations included in message</string>
+
     <string name="title_preview">Preview</string>
 
+    <!-- keys -->
     <string name="pref_preview_message">pref_preview_message</string>
     <string name="pref_name">pref_name</string>
     <string name="pref_diseases">pref_diseases</string>
@@ -123,6 +109,6 @@
     <!-- message -->
     <string name="greeting">Hello</string>
     <string name="sos_message">The mobile app Save Your Ride has found a Accident</string>
-    <string name="false_alarm_message">The Alarm, wich was sent before , was an false alarm. Everything is okay.</string>
+    <string name="false_alarm_message">False Alarm</string>
 
 </resources>

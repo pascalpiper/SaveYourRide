@@ -129,6 +129,7 @@ public class MessageBuilder {
         }
     }
 
+
     public void readPreferences() {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 

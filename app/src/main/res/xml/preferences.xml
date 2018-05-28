@@ -3,7 +3,6 @@
 
     <PreferenceCategory android:title="@string/category_title_main_settings">
         <EditTextPreference
-            android:defaultValue="@string/default_value_name"
             android:icon="@drawable/ic_account_circle_black_24dp"
             android:key="@string/pref_name"
             android:selectAllOnFocus="true"
@@ -11,7 +10,6 @@
             android:title="@string/title_name" />
 
         <EditTextPreference
-            android:defaultValue="@string/default_value_diseases"
             android:icon="@drawable/ic_sentiment_very_dissatisfied_black_24dp"
             android:key="@string/pref_diseases"
             android:selectAllOnFocus="true"
@@ -19,7 +17,6 @@
             android:title="@string/title_diseases" />
 
         <EditTextPreference
-            android:defaultValue="@string/default_value_allergies"
             android:icon="@drawable/ic_do_not_disturb_black_24dp"
             android:key="@string/pref_allergies"
             android:selectAllOnFocus="true"
@@ -27,7 +24,6 @@
             android:title="@string/title_allergies" />
 
         <EditTextPreference
-            android:defaultValue="@string/default_value_drugs"
             android:icon="@drawable/ic_healing_black_24dp"
             android:key="@string/pref_drugs"
             android:selectAllOnFocus="true"
@@ -44,20 +40,17 @@
     <PreferenceCategory android:title="@string/category_title_sos_message">
 
         <MultiSelectListPreference
-            android:defaultValue="@array/list_information_included_in_message"
             android:entries="@array/list_information_included_in_message"
             android:entryValues="@array/list_information_included_in_message"
             android:key="pref_included_information"
             android:title="@string/pref_included_information" />
 
         <SwitchPreference
-            android:defaultValue="false"
             android:key="@string/pref_enable_custom_message"
             android:summary="@string/summary_custom_message"
             android:title="@string/title_enable_custom_message" />
 
         <EditTextPreference
-            android:defaultValue="MessageContent"
             android:key="@string/pref_custom_message"
             android:selectAllOnFocus="true"
             android:singleLine="false"

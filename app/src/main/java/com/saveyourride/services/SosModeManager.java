@@ -33,6 +33,7 @@ public class SosModeManager extends Service {
     // SMS-Manager
     private SmsManager smsManager = SmsManager.getDefault();
     private final int MAX_SMS_LENGTH = 160;
+    private ArrayList<Boolean> smsSentSuccessfullyList;
 
 
     @Override
@@ -41,6 +42,9 @@ public class SosModeManager extends Service {
 
         // initialize BroadcastReceiver
         initActivityReceiver();
+
+        // list for sms
+        smsSentSuccessfullyList = new ArrayList<>();
 
         // send directly the sos-sms
         // Test
@@ -56,10 +60,25 @@ public class SosModeManager extends Service {
         MessageBuilder messageBuilder = new MessageBuilder(this);
 
         if (falseAlarm) {
+            smsSentSuccessfullyList = new ArrayList<>();
             for (String phoneNumber : phoneList) {
                 sendSmsToContact(phoneNumber, messageBuilder.buildFalseAlarmMessage(phoneNumber));
                 // TODO Name instead of Number
             }
+            boolean successful = true;
+            for (Boolean each : smsSentSuccessfullyList) {
+                if (!each) {
+                    // TODO sendBroadcast not successful
+                    successful = false;
+                    break;
+                }
+            }
+            if (successful) {
+                Log.d(TAG, "Alles hat geklappt");
+            } else {
+                Log.d(TAG, "Irgendwas ist schiefgelaufen");
+            }
+
         } else {
             for (String phoneNumber : phoneList) {
                 String[] message = messageBuilder.buildSosMessage(phoneNumber);
@@ -72,7 +91,7 @@ public class SosModeManager extends Service {
 
     private void sendSmsToContact(String phoneNumber, String message) {
         PendingIntent sentIntent = PendingIntent.getBroadcast(this, 0, new Intent("SMS_SENT"), 0);
-        PendingIntent deliveredIntent = PendingIntent.getBroadcast(this, 0, new Intent("SMS_DELIVERED"), 0);
+//        PendingIntent deliveredIntent = PendingIntent.getBroadcast(this, 0, new Intent("SMS_DELIVERED"), 0);
 
         if (message.length() <= 160) {
             smsManager.sendTextMessage(phoneNumber, null, message, sentIntent, null);
@@ -117,28 +136,33 @@ public class SosModeManager extends Service {
                         break;
                     }
                     case "SMS_SENT": {
-                        String s;
+                        boolean successful = false;
                         switch (getResultCode()) {
                             case Activity.RESULT_OK:
-                                s = "Message Sent Successfully !!";
+                                successful = true;
                                 break;
-                            case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                                s = "Generic Failure Error";
-                                break;
-                            case SmsManager.RESULT_ERROR_NO_SERVICE:
-                                s = "Error : No Service Available";
-                                break;
-                            case SmsManager.RESULT_ERROR_NULL_PDU:
-                                s = "Error : Null PDU";
-                                break;
-                            case SmsManager.RESULT_ERROR_RADIO_OFF:
-                                s = "Error : Radio is off";
-                                break;
+//                            case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+//                                s = "Generic Failure Error";
+//                                break;
+//                            case SmsManager.RESULT_ERROR_NO_SERVICE:
+//                                s = "Error : No Service Available";
+//                                break;
+//                            case SmsManager.RESULT_ERROR_NULL_PDU:
+//                                s = "Error : Null PDU";
+//                                break;
+//                            case SmsManager.RESULT_ERROR_RADIO_OFF:
+//                                s = "Error : Radio is off";
+//                                break;
                             default:
-                                s = "Error SMS";
+                                successful = false;
                                 break;
                         }
-                        Log.d(TAG, s);
+                        if (successful) {
+                            smsSentSuccessfullyList.add(true);
+                        } else {
+                            smsSentSuccessfullyList.add(false);
+                        }
+
                         break;
                     }
                     default: {

@@ -63,9 +63,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
                 }
 
-                gotInformation();
-                setPreferenceSummary();
-
                 return false;
             }
         });
@@ -89,32 +86,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     }
 
-    public void setPreferenceSummary() {
-        getPreferenceManager().getPreferenceScreen().findPreference("pref_name").setSummary(name);
-    }
-
-    public void gotInformation() {
-        sharedPreferences = android.preference.PreferenceManager.getDefaultSharedPreferences(getActivity());
 
 
-        latitude = "5456.666"; // TODO Location
-        longitude = "4156.24";
 
-        accidentTime = "15:45pm"; // TODO Got Time
-
-        firstContact = "Taras Zaika"; // TODO Erster Konakt
-
-        name = sharedPreferences.getString("pref_name", "default_name");
-        diseases = sharedPreferences.getString("pref_diseases", "default_name");
-        allergies = sharedPreferences.getString("pref_allergies", "default_name");
-        drugs = sharedPreferences.getString("pref_drugs", "default_name");
-
-        informedContacts = "Pascal Piper, Kerstin Piper, Patrick Piper"; // TODO Liste von Kontakten
-
-        customMessageEnabled = sharedPreferences.getBoolean("pref_enable_custom_message", false);
-
-        defaultMessage = "die App SaveYourRide hat bemerkt, dass " + name + " wahrscheinlich einen Unfall hatte! ";
-    }
 
 
 }
