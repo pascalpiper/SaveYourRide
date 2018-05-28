@@ -128,7 +128,7 @@ public class NotificationManager extends Service {
             public void onTick(long millisUntilFinished) {
                 if (millisUntilFinished <= ITE_NOTIFICATION_DIALOG_TIME - ITE_NOTIFICATION_SOUND_TIME && mMediaPlayer.isPlaying()) {
                     mMediaPlayer.stop();
-                    audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_SHOW_UI);
+                    audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_VIBRATE);
                 }
             }
             @Override
@@ -164,7 +164,7 @@ public class NotificationManager extends Service {
                     isPlaying = true;
                 } else if (!isWaiting && isPlaying) {
                     mMediaPlayer.stop();
-                    audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_SHOW_UI);
+                    audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_VIBRATE);
                     isWaiting = true;
                     isPlaying = false;
                 } else if (isWaiting) {
@@ -210,13 +210,9 @@ public class NotificationManager extends Service {
             @Override
             public void onFinish() {
                 mMediaPlayer.stop();
-                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_SHOW_UI);
+                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_VIBRATE);
 
                 sendBroadcast(new Intent("android.intent.action.DISMISS_DIALOG"));
-
-                // TODO CALL SOS_MODE
-                // DEBUG
-                Log.d(TAG, "Call SOS MODE");
 
                 startActivity(new Intent(getApplicationContext(), SosMode.class));
 
@@ -234,7 +230,7 @@ public class NotificationManager extends Service {
         currentAudioVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
 
         if (currentAudioVolume < audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)) {
-            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM), AudioManager.FLAG_SHOW_UI);
+            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM), AudioManager.FLAG_VIBRATE);
         }
 
         // TODO remove line comment

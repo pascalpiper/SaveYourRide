@@ -114,7 +114,10 @@
     <string name="default_contacts_json">[]</string>
 
     <string name="title_enable_custom_message">Custom Message</string>
+    <string name="summary_enable_custom_message">Use custom text as SOS-Message instead of the default message</string>
+
     <string name="title_custom_message">Custom Message</string>
+
 
     <string name="title_accident_time">Accident Time</string>
     <string name="pref_included_information">Information included in message</string>
@@ -137,6 +140,6 @@
     <string name="greeting">Hello</string>
     <string name="sos_message">The mobile app Save Your Ride has found a Accident</string>
     <string name="false_alarm_message">False Alarm</string>
-    <string name="summary_custom_message">custom message</string>
+
 
 </resources>

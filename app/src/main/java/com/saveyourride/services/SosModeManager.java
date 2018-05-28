@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -60,18 +61,11 @@ public class SosModeManager extends Service {
         contactList = readContacts();
 
         sendSms(contactList, false);
-    }
 
-    private ArrayList<Contact> readContacts() {
-        // Set SharedPreferences
-        savedContacts = getSharedPreferences(getString(R.string.sp_key_saved_contacts), Context.MODE_PRIVATE);
+        // Set Ring Stream Volume to max for incoming Calls from Sos-Contacts
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamMaxVolume(AudioManager.STREAM_RING), AudioManager.FLAG_VIBRATE);
 
-        // Set contactList
-        String contactsJSON = savedContacts.getString(getString(R.string.sp_key_contacts_json), getString(R.string.default_contacts_json));
-        Type type = new TypeToken<ArrayList<Contact>>() {
-        }.getType();
-        contactList = new Gson().fromJson(contactsJSON, type);
-        return contactList;
     }
 
     private void sendSms(ArrayList<Contact> contactList, boolean falseAlarm) {
@@ -100,7 +94,7 @@ public class SosModeManager extends Service {
 
         } else {
             for (Contact contact : contactList) {
-                String[] message = messageBuilder.buildSosMessage(contact.getPhoneNumber());
+                String[] message = messageBuilder.buildSosMessage(contact.getFirstName() + " " + contact.getLastName());
                 sendSmsToContact(contact.getPhoneNumber(), message[0]);
                 sendSmsToContact(contact.getPhoneNumber(), message[1]);
                 // TODO Name instead of Number
@@ -199,6 +193,18 @@ public class SosModeManager extends Service {
         filter.addAction("android.intent.action.SEND_FALSE_ALARM_SMS");
 
         registerReceiver(receiver, filter);
+    }
+
+    private ArrayList<Contact> readContacts() {
+        // Set SharedPreferences
+        savedContacts = getSharedPreferences(getString(R.string.sp_key_saved_contacts), Context.MODE_PRIVATE);
+
+        // Set contactList
+        String contactsJSON = savedContacts.getString(getString(R.string.sp_key_contacts_json), getString(R.string.default_contacts_json));
+        Type type = new TypeToken<ArrayList<Contact>>() {
+        }.getType();
+        contactList = new Gson().fromJson(contactsJSON, type);
+        return contactList;
     }
 
     @Override

@@ -48,8 +48,8 @@
 
         <SwitchPreference
             android:key="@string/pref_enable_custom_message"
-            android:summary="@string/summary_custom_message"
-            android:title="fwefgt3q n46m17,q @string/title_enable_custom_message" />
+            android:summary="@string/summary_enable_custom_message"
+            android:title="@string/title_enable_custom_message" />
 
         <EditTextPreference
             android:key="@string/pref_custom_message"

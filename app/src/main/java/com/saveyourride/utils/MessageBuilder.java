@@ -9,7 +9,9 @@ import com.google.gson.reflect.TypeToken;
 import com.saveyourride.R;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Set;
 
 public class MessageBuilder {
@@ -142,7 +144,8 @@ public class MessageBuilder {
         latitude = "5456.666"; // TODO Location
         longitude = "4156.24";
 
-        accidentTime = "15:45pm"; // TODO Got Time
+        SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm");
+        accidentTime = mdformat.format(Calendar.getInstance().getTime());
 
         name = sharedPreferencesSettings.getString("pref_name", "default_name");
         diseases = sharedPreferencesSettings.getString("pref_diseases", "default_name");
@@ -150,9 +153,16 @@ public class MessageBuilder {
         drugs = sharedPreferencesSettings.getString("pref_drugs", "default_name");
 
         for (Contact contact : readContacts()) {
-            informedContacts = informedContacts + contact.getFirstName() + " " +
+
+            String currentContact = contact.getFirstName() + " " +
                     contact.getLastName() + " " +
                     contact.getPhoneNumber() + "; ";
+
+            if (informedContacts == null) {
+                informedContacts = currentContact;
+            } else {
+                informedContacts = informedContacts + currentContact;
+            }
         }
 
         customMessageEnabled = sharedPreferencesSettings.getBoolean("pref_enable_custom_message", false);
