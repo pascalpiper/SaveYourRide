@@ -140,8 +140,11 @@
 
     <!-- message -->
     <string name="greeting">Hello</string>
-    <string name="sos_message">The mobile app Save Your Ride has found a Accident</string>
-    <string name="false_alarm_message">False Alarm</string>
+    <string name="sos_message_part1">Das ist ein Notfall-Signal.Die App SaveYourRide hat einen Notfall registriet. </string>
+    <string name="sos_message_part2">//Name/ is possible injured. Please try to contact him. So you can help or know if it is an false alarm or not.</string>
+    <string name="sos_message_part3">If you can not reach //the person/ then please call the official emergency numbers</string>
+
+    <string name="false_alarm_message">the emergency singal wich was sent before, was a false alarm. Everything is okay. </string>
 
 
 </resources>
