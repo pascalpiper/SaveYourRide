@@ -24,10 +24,10 @@ public class SettingsPreviewMessage extends AppCompatActivity {
 
         String[] message = messageBuilder.buildSosMessage(firstContact);
 
-        TextView textViewPreviewMessage_part1 = findViewById(R.id.preview_message_part1);
-        textViewPreviewMessage_part1.setText(message[0]);
+        TextView textViewPreviewMessage_part1 = findViewById(R.id.preview_message);
+        textViewPreviewMessage_part1.setText(message[0] + message[1]);
         // TODO 2. Textview
-        TextView textViewPreviewMessage_part2 = findViewById(R.id.preview_message_part2);
-        textViewPreviewMessage_part2.setText(message[1]);
+//        TextView textViewPreviewMessage_part2 = findViewById(R.id.preview_message_part2);
+//        textViewPreviewMessage_part2.setText(message[1]);
     }
 }
