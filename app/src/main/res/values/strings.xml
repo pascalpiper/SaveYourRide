@@ -110,5 +110,6 @@
     <string name="greeting">Hello</string>
     <string name="sos_message">The mobile app Save Your Ride has found a Accident</string>
     <string name="false_alarm_message">False Alarm</string>
+    <string name="summary_custom_message">custom message</string>
 
 </resources>

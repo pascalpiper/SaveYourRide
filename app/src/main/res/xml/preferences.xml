@@ -40,6 +40,7 @@
     <PreferenceCategory android:title="@string/category_title_sos_message">
 
         <MultiSelectListPreference
+            android:defaultValue="@string/pref_included_information"
             android:entries="@array/list_information_included_in_message"
             android:entryValues="@array/list_information_included_in_message"
             android:key="pref_included_information"
