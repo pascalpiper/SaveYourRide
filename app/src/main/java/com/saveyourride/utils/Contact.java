@@ -19,23 +19,29 @@ public class Contact {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public String getLastName() {
         return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
+    public void setContact(String firstName, String lastName, String phoneNumber) {
+        setFirstName(firstName);
+        setLastName(lastName);
+        setPhoneNumber(phoneNumber);
+    }
+
+    private void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    private void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    private void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 }

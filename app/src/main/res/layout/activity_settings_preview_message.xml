@@ -1,41 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="horizontal"
     tools:context=".activities.SettingsPreviewMessage">
 
-    <!-- <android.support.design.widget.AppBarLayout
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:theme="@style/AppTheme.AppBarOverlay">
-
-         <android.support.v7.widget.Toolbar
-             android:id="@+id/toolbar"
-             android:layout_width="match_parent"
-             android:layout_height="?attr/actionBarSize"
-             android:background="?attr/colorPrimary"
-             app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-     </android.support.design.widget.AppBarLayout>
-     -->
-
-
-    <TextView
-        android:id="@+id/preview_message_part1"
+    <!-- A CardView that contains a TextView -->
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:singleLine="false"
-        android:textSize="24sp" />
+        android:layout_margin="20dp"
+        android:backgroundTint="@color/colorPrimaryLight"
+        card_view:cardCornerRadius="15dp">
 
-    <TextView
-        android:id="@+id/preview_message_part2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:singleLine="false"
-        android:textSize="24sp"
-        android:layout_alignBottom="@id/preview_message_part1"
-        android:layout_marginTop="10dp" />
-</RelativeLayout>
+        <TextView
+            android:id="@+id/preview_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:singleLine="false"
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
+    </android.support.v7.widget.CardView>
+</LinearLayout>

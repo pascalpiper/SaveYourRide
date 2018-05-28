@@ -31,9 +31,9 @@
             android:title="@string/title_drugs" />
 
         <Preference
-            android:title="@string/title_contacts"
             android:key="pref_contacts"
-            android:icon="@drawable/ic_group_black_24dp"></Preference>
+            android:icon="@drawable/ic_group_black_24dp"
+            android:title="@string/title_activity_settings_contacts" />
 
     </PreferenceCategory>
 
@@ -59,10 +59,9 @@
             android:enabled="false" />
 
         <Preference
-            android:title="@string/title_preview"
             android:key="@string/pref_preview_message"
-            android:icon="@drawable/ic_tv_black_24dp"></Preference>
-
+            android:icon="@drawable/ic_tv_black_24dp"
+            android:title="@string/title_activity_settings_preview_message" />
     </PreferenceCategory>
 
 </PreferenceScreen>

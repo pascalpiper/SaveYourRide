@@ -4,12 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activities.MainScreen">
+    tools:context=".activities.SettingsContacts">
 
     <ListView
-        android:id="@+id/contactList_contactListView"
+        android:id="@+id/settingsContacts_contactListView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:divider="@null"
         android:listSelector="@android:color/transparent" />
+
+    <TextView
+        android:id="@+id/settingsContacts_emptyListText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="20dp"
+        android:text="@string/empty_contacts_list"
+        android:textAlignment="center"
+        android:textSize="15sp"
+        android:textStyle="italic|bold" />
 </LinearLayout>
