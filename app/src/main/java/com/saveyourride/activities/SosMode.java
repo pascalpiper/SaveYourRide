@@ -32,6 +32,9 @@ public class SosMode extends AppCompatActivity {
         // Layout
         setContentView(R.layout.activity_sos_mode);
 
+        //init Receiver
+        initReceiver();
+
 
         // Views
         Button buttonFalseAlarm = (Button) findViewById(R.id.sosMode_buttonFalseAlarm);
