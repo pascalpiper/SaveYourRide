@@ -45,6 +45,7 @@
     <string name="time">TIME</string>
     <string name="interval_time_expired">The time of the interval has expired!</string>
     <string name="sos_signal">SOS signal was sent!</string>
+    <string name="restTime">SOS signal will send in</string>
 
     <!-- HINTS -->
     <string name="first_name">First Name</string>
@@ -72,6 +73,7 @@
     <string name="title_dialog_add_emergency_contact">Add emergency contact</string>
     <string name="title_dialog_edit_emergency_contact">Edit emergency contact</string>
     <string name="title_dialog_delete_emergency_contact">Are you sure you want to delete this contact?</string>
+    <string name="title_dialog_sos_button">Are you sure you want to send an emergency signal?</string>
 
     <!-- DESCRIPTIONS -->
     <string name="colored_background">colored background</string>

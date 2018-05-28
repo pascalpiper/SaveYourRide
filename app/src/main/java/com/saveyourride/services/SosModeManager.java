@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -47,6 +48,11 @@ public class SosModeManager extends Service {
     private final int MAX_SMS_LENGTH = 160;
     private ArrayList<Boolean> smsSentSuccessfullyList;
 
+    // Timer witch start the SOS procedure
+    private CountDownTimer sosModeStartTimer;
+    private final long WAIT_TIME_IN_SECONDS = 10;
+    private final long SECOND_IN_MILLISECONDS = 1000;
+
 
     @Override
     public void onCreate() {
@@ -55,17 +61,32 @@ public class SosModeManager extends Service {
         // initialize BroadcastReceiver
         initActivityReceiver();
 
+        sosModeStartTimer = new CountDownTimer(WAIT_TIME_IN_SECONDS * SECOND_IN_MILLISECONDS, SECOND_IN_MILLISECONDS) {
+            int restTime = (int) WAIT_TIME_IN_SECONDS;
+            ;
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                sendBroadcast(new Intent("android.intent.action.SECOND_IS_OVER").putExtra("restTime", restTime));
+                restTime--;
+            }
+
+            @Override
+            public void onFinish() {
+
+                sendBroadcast(new Intent("android.intent.action.SOS_PROCEDURE_IS_RUNNING"));
+                contactList = readContacts();
+
+                sendSms(contactList, false);
+
+                // Set Ring Stream Volume to max for incoming Calls from Sos-Contacts
+                AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamMaxVolume(AudioManager.STREAM_RING), AudioManager.FLAG_VIBRATE);
+            }
+        }.start();
+
         // list for sms
         smsSentSuccessfullyList = new ArrayList<>();
-
-        contactList = readContacts();
-
-        sendSms(contactList, false);
-
-        // Set Ring Stream Volume to max for incoming Calls from Sos-Contacts
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamMaxVolume(AudioManager.STREAM_RING), AudioManager.FLAG_VIBRATE);
-
     }
 
     private void sendSms(ArrayList<Contact> contactList, boolean falseAlarm) {
@@ -211,6 +232,10 @@ public class SosModeManager extends Service {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receiver);
+
+        if (sosModeStartTimer != null) {
+            sosModeStartTimer.cancel();
+        }
     }
 
     @Override

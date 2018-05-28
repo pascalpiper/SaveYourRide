@@ -33,6 +33,7 @@ public class PassiveMode extends AppCompatActivity {
     private final int BACK_PRESSED = 0;
     private final int NO_MOVEMENT_DETECTED = 1;
     private final int ACCIDENT_GUARANTEE_PROCEDURE = 2;
+    private final int SOS_BUTTON = 3;
 
     //Dialog
     AlertDialog currentDialog;
@@ -104,8 +105,7 @@ public class PassiveMode extends AppCompatActivity {
         buttonSos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), SosMode.class));
-                finish();
+                showAlertDialog(SOS_BUTTON);
             }
         });
 
@@ -254,6 +254,30 @@ public class PassiveMode extends AppCompatActivity {
                 if (currentDialog.isShowing()) {
                     currentDialog.cancel();
                 }
+                currentDialog = alert.create();
+                currentDialog.show();
+                break;
+            }
+            case SOS_BUTTON: {
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                alert.setTitle(R.string.title_dialog_sos_button);
+                alert.setCancelable(false);
+
+                // Set up the buttons
+                alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(getApplicationContext(), SosMode.class));
+                        finish();
+                    }
+                });
+                alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
                 currentDialog = alert.create();
                 currentDialog.show();
                 break;
