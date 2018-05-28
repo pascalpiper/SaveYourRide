@@ -4,13 +4,17 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.saveyourride.R;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Set;
 
 public class MessageBuilder {
     private Context context;
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferencesSettings;
 
     // Informations
 
@@ -23,7 +27,6 @@ public class MessageBuilder {
     private String drugs;
     private String informedContacts;
     private Boolean customMessageEnabled;
-    private String defaultMessage;
 
     private String[] informationList;
 
@@ -53,14 +56,16 @@ public class MessageBuilder {
         String messageContent;
 
         if (customMessageEnabled) {
-            messageContent = sharedPreferences.getString("pref_custom_message", "default");
+            messageContent = sharedPreferencesSettings.getString("pref_custom_message", "default");
         } else {
             messageContent = context.getString(R.string.sos_message);
         }
 
         message = context.getString(R.string.greeting) + " "
                 + contact + ", \n"
-                + messageContent;
+                + messageContent
+                + "\n "
+        ;
 
         return new String[]{message, getImportantInformations()};
 
@@ -69,7 +74,7 @@ public class MessageBuilder {
     private String getImportantInformations() {
         String message = "Important information: ";
 
-        Set<String> included_information = sharedPreferences.getStringSet("pref_included_information", null);
+        Set<String> included_information = sharedPreferencesSettings.getStringSet("pref_included_information", null);
         informationList = new String[6];
 
         for (String each : included_information) {
@@ -131,7 +136,7 @@ public class MessageBuilder {
 
 
     public void readPreferences() {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        sharedPreferencesSettings = PreferenceManager.getDefaultSharedPreferences(context);
 
 
         latitude = "5456.666"; // TODO Location
@@ -139,16 +144,31 @@ public class MessageBuilder {
 
         accidentTime = "15:45pm"; // TODO Got Time
 
-        name = sharedPreferences.getString("pref_name", "default_name");
-        diseases = sharedPreferences.getString("pref_diseases", "default_name");
-        allergies = sharedPreferences.getString("pref_allergies", "default_name");
-        drugs = sharedPreferences.getString("pref_drugs", "default_name");
+        name = sharedPreferencesSettings.getString("pref_name", "default_name");
+        diseases = sharedPreferencesSettings.getString("pref_diseases", "default_name");
+        allergies = sharedPreferencesSettings.getString("pref_allergies", "default_name");
+        drugs = sharedPreferencesSettings.getString("pref_drugs", "default_name");
 
-        informedContacts = "Pascal Piper, Kerstin Piper, Patrick Piper"; // TODO Liste von Kontakten
+        for (Contact contact : readContacts()) {
+            informedContacts = informedContacts + contact.getFirstName() + " " +
+                    contact.getLastName() + " " +
+                    contact.getPhoneNumber() + "; ";
+        }
 
-        customMessageEnabled = sharedPreferences.getBoolean("pref_enable_custom_message", false);
+        customMessageEnabled = sharedPreferencesSettings.getBoolean("pref_enable_custom_message", false);
 
-        defaultMessage = "die App SaveYourRide hat bemerkt, dass " + name + " wahrscheinlich einen Unfall hatte! ";
+    }
+
+    private ArrayList<Contact> readContacts() {
+        // Set SharedPreferences
+        SharedPreferences savedContacts = context.getSharedPreferences(context.getString(R.string.sp_key_saved_contacts), Context.MODE_PRIVATE);
+
+        // Set contactList
+        String contactsJSON = savedContacts.getString(context.getString(R.string.sp_key_contacts_json), context.getString(R.string.default_contacts_json));
+        Type type = new TypeToken<ArrayList<Contact>>() {
+        }.getType();
+        ArrayList<Contact> contactList = new Gson().fromJson(contactsJSON, type);
+        return contactList;
     }
 
 }
