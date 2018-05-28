@@ -7,12 +7,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.saveyourride.R;
+import com.saveyourride.utils.Contact;
 import com.saveyourride.utils.MessageBuilder;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class SosModeManager extends Service {
@@ -25,6 +31,11 @@ public class SosModeManager extends Service {
 
     // BroadcastReceiver for messages from ActiveMode Activity
     private BroadcastReceiver receiver;
+
+    // Shared Preferences
+    SharedPreferences savedContacts;
+
+    ArrayList<Contact> contactList;
 
 
     // TestPhoneNumber
@@ -46,23 +57,31 @@ public class SosModeManager extends Service {
         // list for sms
         smsSentSuccessfullyList = new ArrayList<>();
 
-        // send directly the sos-sms
-        // Test
-        String phoneNo = "01752847846";
-        phoneList.add(phoneNo);
+        contactList = readContacts();
 
-        sendSms(phoneList, false);
+        sendSms(contactList, false);
     }
 
+    private ArrayList<Contact> readContacts() {
+        // Set SharedPreferences
+        savedContacts = getSharedPreferences(getString(R.string.sp_key_saved_contacts), Context.MODE_PRIVATE);
 
-    private void sendSms(ArrayList<String> phoneList, boolean falseAlarm) {
+        // Set contactList
+        String contactsJSON = savedContacts.getString(getString(R.string.sp_key_contacts_json), getString(R.string.default_contacts_json));
+        Type type = new TypeToken<ArrayList<Contact>>() {
+        }.getType();
+        contactList = new Gson().fromJson(contactsJSON, type);
+        return contactList;
+    }
+
+    private void sendSms(ArrayList<Contact> contactList, boolean falseAlarm) {
 
         MessageBuilder messageBuilder = new MessageBuilder(this);
 
         if (falseAlarm) {
             smsSentSuccessfullyList = new ArrayList<>();
-            for (String phoneNumber : phoneList) {
-                sendSmsToContact(phoneNumber, messageBuilder.buildFalseAlarmMessage(phoneNumber));
+            for (Contact contact : contactList) {
+                sendSmsToContact(contact.getPhoneNumber(), messageBuilder.buildFalseAlarmMessage(contact.getFirstName() + " " + contact.getLastName()));
                 // TODO Name instead of Number
             }
             boolean successful = true;
@@ -80,10 +99,10 @@ public class SosModeManager extends Service {
             }
 
         } else {
-            for (String phoneNumber : phoneList) {
-                String[] message = messageBuilder.buildSosMessage(phoneNumber);
-                sendSmsToContact(phoneNumber, message[0]);
-                sendSmsToContact(phoneNumber, message[1]);
+            for (Contact contact : contactList) {
+                String[] message = messageBuilder.buildSosMessage(contact.getPhoneNumber());
+                sendSmsToContact(contact.getPhoneNumber(), message[0]);
+                sendSmsToContact(contact.getPhoneNumber(), message[1]);
                 // TODO Name instead of Number
             }
         }
@@ -132,7 +151,7 @@ public class SosModeManager extends Service {
                 switch (intent.getAction()) {
                     case "android.intent.action.SEND_FALSE_ALARM_SMS": {
 
-                        sendSms(phoneList, true);
+                        sendSms(contactList, true);
                         break;
                     }
                     case "SMS_SENT": {
