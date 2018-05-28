@@ -31,8 +31,8 @@
             android:title="@string/title_drugs" />
 
         <Preference
-            android:title="@string/title_contacts"
-            android:key="pref_contacts"></Preference>
+            android:key="pref_contacts"
+            android:title="@string/title_activity_settings_contacts" />
 
     </PreferenceCategory>
 
@@ -60,8 +60,8 @@
             android:title="@string/pref_included_information" />
 
         <Preference
-            android:title="@string/title_preview"
-            android:key="@string/pref_preview_message"></Preference>
+            android:key="@string/pref_preview_message"
+            android:title="@string/title_activity_settings_preview_message" />
         <!-- <SwitchPreference
              android:defaultValue="true"
              android:key="pref_gps"

@@ -122,7 +122,6 @@ public class Active extends Fragment {
             } else {
                 // No explanation needed; request the permission
                 requestPermissions(new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_PERMISSIONS_REQUEST_CODE);
-
             }
             return false;
         } else {
@@ -205,11 +204,7 @@ public class Active extends Fragment {
                 PickerEditor.setNumberPickerTextColor(numberOfIntervalsPicker, myActivity.getColor(android.R.color.black));
                 numberOfIntervalsPicker.setMinValue(getResources().getInteger(R.integer.min_number_of_intervals));
                 numberOfIntervalsPicker.setMaxValue(getResources().getInteger(R.integer.max_number_of_intervals));
-                numberOfIntervalsPicker.setValue(                                                   // Value from shared preferences
-                        timerValues.getInt(                                                         // getInt(key, defaultValue)
-                                getString(R.string.sp_key_number_of_interval),                      // key (String)
-                                getResources().getInteger(R.integer.default_number_of_intervals)    // defaultValue (int)
-                        ));
+                numberOfIntervalsPicker.setValue(timerValues.getInt(getString(R.string.sp_key_number_of_interval), getResources().getInteger(R.integer.default_number_of_intervals)));
 
                 //Dialog
                 AlertDialog.Builder alert = new AlertDialog.Builder(myActivity);
@@ -243,10 +238,7 @@ public class Active extends Fragment {
                 LayoutInflater inflater = getLayoutInflater();
                 View dialogView = inflater.inflate(R.layout.dialog_time_of_interval_picker, null);
 
-                final long timeOfIntervalMillis = timerValues.getLong(                  // Value from shared preferences, getLong(key, defaultValue)
-                        getString(R.string.sp_key_time_of_interval),                    // key (String)
-                        getResources().getInteger(R.integer.default_time_of_interval)   // defaultValue (long or int)
-                );
+                final long timeOfIntervalMillis = timerValues.getLong(getString(R.string.sp_key_time_of_interval), getResources().getInteger(R.integer.default_time_of_interval));
 
                 final NumberPicker minutesPicker = (NumberPicker) dialogView.findViewById(R.id.dialog_minutesPicker);
                 final NumberPicker secondsPicker = (NumberPicker) dialogView.findViewById(R.id.dialog_secondsPicker);
@@ -329,12 +321,7 @@ public class Active extends Fragment {
      * Text is the value from {@code SharedPreferences} {@code timerValues}.
      */
     private void setNumberOfIntervalsText() {
-        textViewNumberOfIntervals.setText(Integer.toString(                                 // Value from shared preferences
-                timerValues.getInt(                                                         // getInt(key, defaultValue)
-                        getString(R.string.sp_key_number_of_interval),                      // key (String)
-                        getResources().getInteger(R.integer.default_number_of_intervals)    // defaultValue (int)
-                ))
-        );
+        textViewNumberOfIntervals.setText(Integer.toString(timerValues.getInt(getString(R.string.sp_key_number_of_interval), getResources().getInteger(R.integer.default_number_of_intervals))));
     }
 
     /**
@@ -342,10 +329,7 @@ public class Active extends Fragment {
      * Text is the value from {@code SharedPreferences} {@code timerValues}.
      */
     private void setTimeOfIntervalText() {
-        long timeOfIntervalMillis = timerValues.getLong(                        // Value from shared preferences, getLong(key, defaultValue)
-                getString(R.string.sp_key_time_of_interval),                    // key (String)
-                getResources().getInteger(R.integer.default_time_of_interval)   // defaultValue (long or int)
-        );
+        long timeOfIntervalMillis = timerValues.getLong(getString(R.string.sp_key_time_of_interval), getResources().getInteger(R.integer.default_time_of_interval));
         String timeOfIntervalString = String.format("%02d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes(timeOfIntervalMillis),
                 TimeUnit.MILLISECONDS.toSeconds(timeOfIntervalMillis) -

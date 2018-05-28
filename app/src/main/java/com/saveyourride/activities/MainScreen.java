@@ -30,6 +30,8 @@ public class MainScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        // TODO: Add Splash Screen on launch of App
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
 

@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 def versionMajor = 0
-def versionMinor = 5
-def versionBuild = 1 // bump for dogfood builds, public alphas, public betas, etc.
+def versionMinor = 7
+def versionBuild = 0 // bump for dogfood builds, public alphas, public betas, etc.
 
 android {
 
@@ -33,6 +33,8 @@ dependencies {
     implementation 'com.android.support:support-v4:27.1.1'
 
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
+
+    implementation 'com.google.code.gson:gson:2.8.4'
 
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'

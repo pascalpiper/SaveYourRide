@@ -25,7 +25,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     private SharedPreferences sharedPreferences;
 
-    // Informations
+    // Information
 
     private String latitude;
     private String longitude;

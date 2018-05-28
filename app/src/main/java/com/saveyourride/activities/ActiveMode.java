@@ -109,15 +109,11 @@ public class ActiveMode extends AppCompatActivity {
                 switch (intent.getAction()) {
                     case "android.intent.action.AMM_SERVICE_READY": {
                         SharedPreferences timerValues = getSharedPreferences(getString(R.string.sp_key_timer_values), Context.MODE_PRIVATE);
-                        int numberOfIntervals = timerValues.getInt(                             // Value from shared preferences, getInt(key, defaultValue)
-                                getString(R.string.sp_key_number_of_interval),                  // key (String)
-                                getResources().getInteger(R.integer.default_number_of_intervals)// defaultValue (int)
-                        );
-                        long timeOfInterval = timerValues.getLong(                              // Value from shared preferences, getLong(key, defaultValue)
-                                getString(R.string.sp_key_time_of_interval),                    // key (String)
-                                getResources().getInteger(R.integer.default_time_of_interval)   // defaultValue (long or int)
-                        );
-                        sendBroadcast(new Intent("android.intent.action.START_TIMER").putExtra("numberOfIntervals", numberOfIntervals).putExtra("timeOfInterval", timeOfInterval));
+                        int numberOfIntervals = timerValues.getInt(getString(R.string.sp_key_number_of_interval), getResources().getInteger(R.integer.default_number_of_intervals));
+                        long timeOfInterval = timerValues.getLong(getString(R.string.sp_key_time_of_interval), getResources().getInteger(R.integer.default_time_of_interval));
+                        sendBroadcast(new Intent("android.intent.action.START_TIMER")
+                                .putExtra("numberOfIntervals", numberOfIntervals)
+                                .putExtra("timeOfInterval", timeOfInterval));
                         break;
                     }
                     case "android.intent.action.REST_INTERVAL_TIME": {

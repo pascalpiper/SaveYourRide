@@ -17,7 +17,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:padding="10dp">
+            android:paddingBottom="10dp"
+            android:paddingEnd="15dp"
+            android:paddingStart="15dp"
+            android:paddingTop="10dp">
 
             <View
                 android:id="@+id/contactList_listItem_profilePicture"
