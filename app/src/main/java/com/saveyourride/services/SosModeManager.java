@@ -42,7 +42,7 @@ public class SosModeManager extends Service {
     // SMS-Manager
     private SmsManager smsManager = SmsManager.getDefault();
     private final int MAX_SMS_LENGTH = 160;
-    private ArrayList<Boolean> smsSentSuccessfullyList;
+    private ArrayList<String> smsSentSuccessfullyList;
     private int numberOfContactPersons;
 
     // Timer witch start the SOS procedure
@@ -55,10 +55,10 @@ public class SosModeManager extends Service {
     public void onCreate() {
         super.onCreate();
 
+        Log.d(TAG, "onCreate: ");
+
         // initialize BroadcastReceiver
         initActivityReceiver();
-
-        Log.d(TAG, "onCreate: ");
 
         sosModeStartTimer = new CountDownTimer(WAIT_TIME_IN_SECONDS * SECOND_IN_MILLISECONDS, SECOND_IN_MILLISECONDS) {
             int restTime = (int) WAIT_TIME_IN_SECONDS;
@@ -84,14 +84,15 @@ public class SosModeManager extends Service {
         }.start();
 
         // list for sms
-        smsSentSuccessfullyList = new ArrayList<Boolean>();
+        smsSentSuccessfullyList = new ArrayList<String>();
+
     }
 
     private void sendSms(ArrayList<Contact> contactList, boolean falseAlarm) {
 
         MessageBuilder messageBuilder = new MessageBuilder(this);
 
-        smsSentSuccessfullyList = new ArrayList<>();
+        smsSentSuccessfullyList = new ArrayList<String>();
         numberOfContactPersons = 0;
 
         if (falseAlarm) {
@@ -105,7 +106,6 @@ public class SosModeManager extends Service {
                 sendSmsToContact(contact.getPhoneNumber(), splitMessageToSmsFormat(message[0] + message[1]), falseAlarm);
             }
         }
-        checkIfSendSmsSuccessful();
     }
 
     private void sendSmsToContact(String phoneNumber, ArrayList<String> smsList, boolean falseAlarm) {
@@ -114,13 +114,11 @@ public class SosModeManager extends Service {
         Intent normalSmsPart = new Intent("SMS_SENT");
 
         PendingIntent sentIntent = PendingIntent.getBroadcast(this, 0, normalSmsPart, 0);
-
-
         for (int i = 0; i < smsList.size(); i++) {
             if (i == smsList.size() - 1) {
                 sentIntent = PendingIntent.getBroadcast(this, 0, lastPart, 0);
-            } else
-                smsManager.sendTextMessage(phoneNumber, null, smsList.get(i), sentIntent, null);
+            }
+            smsManager.sendTextMessage(phoneNumber, null, smsList.get(i), sentIntent, null);
         }
     }
 
@@ -167,17 +165,16 @@ public class SosModeManager extends Service {
      */
     private void initActivityReceiver() {
         receiver = new BroadcastReceiver() {
-
             @Override
             public void onReceive(Context context, Intent intent) {
                 switch (intent.getAction()) {
                     case "android.intent.action.SEND_FALSE_ALARM_SMS": {
-
                         sendSms(contactList, true);
                         break;
                     }
                     case "SMS_SENT": {
                         boolean successful;
+
                         switch (getResultCode()) {
                             case Activity.RESULT_OK: {
                                 successful = true;
@@ -199,16 +196,16 @@ public class SosModeManager extends Service {
                                 successful = false;
                                 break;
                             }
-                            default:
-                                successful = true;
+                            default: {
+                                successful = false;
                                 break;
-
+                            }
                         }
-                        smsSentSuccessfullyList.add(false);
+
                         if (successful) {
-                            smsSentSuccessfullyList.add(true);
+                            smsSentSuccessfullyList.add("true");
                         } else {
-                            smsSentSuccessfullyList.add(false);
+                            smsSentSuccessfullyList.add("false");
                         }
                         break;
                     }
@@ -235,14 +232,16 @@ public class SosModeManager extends Service {
                                 successful = false;
                                 break;
                             }
-                            default:
-                                successful = true;
+                            default: {
+                                successful = false;
                                 break;
+                            }
                         }
+
                         if (successful) {
-                            smsSentSuccessfullyList.add(true);
+                            smsSentSuccessfullyList.add("true");
                         } else {
-                            smsSentSuccessfullyList.add(false);
+                            smsSentSuccessfullyList.add("false");
                         }
                         Log.d(TAG, "onReceive: " + smsSentSuccessfullyList.size());
 
@@ -287,9 +286,9 @@ public class SosModeManager extends Service {
         Log.d(TAG, "Check SMS");
         boolean successful = true;
         Log.d(TAG, "checkIfSendSmsSuccessful size : " + smsSentSuccessfullyList.size());
-        for (boolean sentSms : smsSentSuccessfullyList) {
+        for (String sentSms : smsSentSuccessfullyList) {
             Log.d(TAG, "checkIfSendSmsSuccessful: " + sentSms);
-            if (!sentSms) {
+            if (sentSms == "false") {
                 Log.d(TAG, "checkIfSendSmsSuccessful:  smsSent == false");
                 sendBroadcast(new Intent("android.intent.action.SMS_SENT_STATUS").putExtra("status", false));
                 successful = false;
