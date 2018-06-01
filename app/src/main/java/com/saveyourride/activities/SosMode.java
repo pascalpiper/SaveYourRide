@@ -102,6 +102,16 @@ public class SosMode extends AppCompatActivity {
                         textViewStatus.setText(getString(R.string.sos_signal));
                         break;
                     }
+                    case "android.intent.action.SMS_SENT_STATUS": {
+
+                        if (!intent.getBooleanExtra("status", false)) {
+                            textViewStatus.setText(textViewStatus.getText() + " " + getString(R.string.status_sent_sms_not_successful));
+                        } else {
+                            textViewStatus.setText(textViewStatus.getText() + " " + getString(R.string.status_sent_sms_successful));
+                        }
+
+                        break;
+                    }
                     default: {
 
                     }
@@ -111,7 +121,7 @@ public class SosMode extends AppCompatActivity {
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.intent.action.SECOND_IS_OVER");
         filter.addAction("android.intent.action.SOS_PROCEDURE_IS_RUNNING");
-        filter.addAction("android.intent.action.SEND_SMS_SUCCESSFUL");
+        filter.addAction("android.intent.action.SMS_SENT_STATUS");
 
         registerReceiver(receiver, filter);
     }

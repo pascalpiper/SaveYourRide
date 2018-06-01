@@ -46,8 +46,8 @@ public class MessageBuilder {
 
 
     public String buildFalseAlarmMessage(String contact) {
-        String message = context.getString(R.string.greeting) + " "
-                + contact + ", \n"
+        String message = String.format(context.getString(R.string.greeting), contact)
+                + "\n"
                 + context.getString(R.string.false_alarm_message);
         return message;
     }

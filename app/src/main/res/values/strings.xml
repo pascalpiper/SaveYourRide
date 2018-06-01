@@ -140,9 +140,12 @@
 
     <!-- message -->
     <string name="greeting">Hello %1$s, </string>
-    <string name="sos_message">This is an emergency signal. The app SaveYourRide on %1$s mobilephone registered an emergency. %1$s is possible injured. Please try to contact him. So you can help or know if it is a false alarm or not. If you can not reach %1$s then please call the official emergency numbers</string>
+    <string name="sos_message">This is an emergency signal. The app SaveYourRide on %1$s mobilephone registered an emergency. %1$s is possible injured. Please try to contact him. So you can help or know if it is a false alarm or not. If you can not reach %1$s then please call the official emergency numbers. </string>
 
     <string name="false_alarm_message">The emergency sigal which was sent before, was a false alarm. Everything is okay. </string>
 
+    <!-- status in Sos mode -->
+    <string name="status_sent_sms_not_successful">Not all SMSs have sent successful!</string>
+    <string name="status_sent_sms_successful">All SMSs have sent successful!</string>
 
 </resources>
