@@ -139,12 +139,10 @@
     <string name="test_contact">Test Contact</string>
 
     <!-- message -->
-    <string name="greeting">Hello</string>
-    <string name="sos_message">Das ist ein Notfall-Signal.Die App SaveYourRide hat einen Notfall registriet.
-    //Name/ is possible injured. Please try to contact him. So you can help or know if it is an false alarm or not.
-    If you can not reach //the person/ then please call the official emergency numbers</string>
+    <string name="greeting">Hello %1$s, </string>
+    <string name="sos_message">This is an emergency signal. The app SaveYourRide on %1$s mobilephone registered an emergency. %1$s is possible injured. Please try to contact him. So you can help or know if it is a false alarm or not. If you can not reach %1$s then please call the official emergency numbers</string>
 
-    <string name="false_alarm_message">the emergency sigal wich was sent before, was a false alarm. Everything is okay. </string>
+    <string name="false_alarm_message">The emergency sigal which was sent before, was a false alarm. Everything is okay. </string>
 
 
 </resources>

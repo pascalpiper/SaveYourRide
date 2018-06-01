@@ -60,11 +60,11 @@ public class MessageBuilder {
         if (customMessageEnabled) {
             messageContent = sharedPreferencesSettings.getString("pref_custom_message", "default");
         } else {
-            messageContent = context.getString(R.string.sos_message);
+            messageContent = String.format(context.getString(R.string.sos_message), name);
         }
 
-        message = context.getString(R.string.greeting) + " "
-                + contact + ", \n"
+        message = String.format(context.getString(R.string.greeting), contact)
+                + "\n"
                 + messageContent
                 + "\n "
         ;
@@ -84,7 +84,7 @@ public class MessageBuilder {
         }
 
         for (int i = 0; i < informationList.length; i++) {
-            if (informationList[i] != null) {
+            if (informationList[i] != null && !informationList[i].isEmpty()) {
                 message = message + informationList[i];
             }
         }
@@ -130,7 +130,7 @@ public class MessageBuilder {
             default:
                 newInformation = null;
         }
-        if (newInformation != null && informationID >= 0) {
+        if (newInformation != null && !newInformation.isEmpty() && informationID >= 0) {
 //            informationList[informationID] = typeOfInformation + "- " + newInformation;
             informationList[informationID] = "\n->" + typeOfInformation + ":" + newInformation + " ";
         }
@@ -147,10 +147,10 @@ public class MessageBuilder {
         SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm");
         accidentTime = mdformat.format(Calendar.getInstance().getTime());
 
-        name = sharedPreferencesSettings.getString("pref_name", "default_name");
-        diseases = sharedPreferencesSettings.getString("pref_diseases", "default_name");
-        allergies = sharedPreferencesSettings.getString("pref_allergies", "default_name");
-        drugs = sharedPreferencesSettings.getString("pref_drugs", "default_name");
+        name = sharedPreferencesSettings.getString("pref_name", "");
+        diseases = sharedPreferencesSettings.getString("pref_diseases", "");
+        allergies = sharedPreferencesSettings.getString("pref_allergies", "");
+        drugs = sharedPreferencesSettings.getString("pref_drugs", "");
 
         for (Contact contact : readContacts()) {
 
