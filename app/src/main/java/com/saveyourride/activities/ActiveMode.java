@@ -100,8 +100,6 @@ public class ActiveMode extends AppCompatActivity {
                 showAlertDialog(SOS_BUTTON);
             }
         });
-
-
     }
 
     /**
