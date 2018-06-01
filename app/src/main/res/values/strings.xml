@@ -3,8 +3,10 @@
     <!-- GOOGLE MAPS KEY -->
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyB6LKT60C_EPzIXzTo13PFcZKFFABt9q3E</string>
 
-    <string name="edit_message">Enter a message</string>
-    <string name="title_activity__active">Activity_Active</string>
+    <!-- DESCRIPTIONS -->
+    <string name="colored_background">colored background</string>
+    <string name="image_button">image button</string>
+    <string name="my_location_drawable">my location drawable</string>
 
     <!-- BUTTONS-->
     <string name="start">START</string>
@@ -26,9 +28,11 @@
 
     <!-- DIALOG MESSAGES -->
     <string name="dialog_send_sms_permission_explanation">Send SMS permission is very important to this feature. You can not use it without permission.</string>
-    <string name="dialog_send_sms_permission_required">This feature requires Send-SMS permission. If you want to use this, please go to the setting and give the permission.</string>
+    <string name="dialog_send_sms_permission_denied">This feature requires Send-SMS permission. If you want to use this, please go to the setting and give the permission.</string>
     <string name="dialog_read_contacts_permission_explanation">Read Contacts permission is needed for this feature. You can not pick contact from your address book without this permission.</string>
-    <string name="dialog_read_contacts_permission_required">This feature requires Read Contacts permission. If you want to use this, please go to the setting and give the permission.</string>
+    <string name="dialog_read_contacts_permission_denied">This feature requires Read Contacts permission. If you want to use this, please go to the setting and give the permission.</string>
+    <string name="dialog_location_permission_explanation">Location permission is very important to this feature. You can not use it without permission.</string>
+    <string name="dialog_location_services_are_disabled">Your Location-Services are probably disabled. You can not use some features. Please go to settings to enable it.</string>
 
     <!-- INPUT ERRORS-->
     <string name="empty_phone_number">The phone number can not be empty</string>
@@ -62,8 +66,10 @@
     <string name="title_activity_settings_contacts">Emergency contacts</string>
     <string name="title_activity_settings_main">Settings</string>
     <string name="title_activity_settings_preview_message">Preview</string>
+    <string name="title_dialog_location_services">Location services.</string>
     <string name="title_dialog_send_sms_permission">Send-SMS permission is required.</string>
     <string name="title_dialog_read_contacts_permission">Read Contacts permission is required.</string>
+    <string name="title_dialog_location_permission">Location permission is required.</string>
     <string name="title_dialog_stop_active_mode">Do you want to stop the Active-Mode?</string>
     <string name="title_dialog_stop_passive_mode">Do you want to stop the Passive-Mode?</string>
     <string name="title_dialog_no_movement_detected">You are not moving for a long time. Is everything OK?</string>
@@ -73,22 +79,23 @@
     <string name="title_dialog_edit_emergency_contact">Edit emergency contact</string>
     <string name="title_dialog_delete_emergency_contact">Are you sure you want to delete this contact?</string>
 
-    <!-- DESCRIPTIONS -->
-    <string name="colored_background">colored background</string>
-    <string name="image_button">image button</string>
-
     <!-- SHARED_PREFERENCES_KEYS (sp_keys) -->
-    <string name="sp_key_location">Location</string>
-    <string name="sp_key_latitude">Latitude</string>
-    <string name="sp_key_longitude">Longitude</string>
+    <string name="sp_key_last_known_location">lastKnownLocation</string>
+    <string name="sp_key_latitude">latitude</string>
+    <string name="sp_key_longitude">longitude</string>
     <string name="sp_key_timer_values">timerValues</string>
     <string name="sp_key_number_of_interval">numberOfIntervals</string>
     <string name="sp_key_time_of_interval">timeOfInterval</string>
     <string name="sp_key_saved_contacts">savedContacts</string>
     <string name="sp_key_contacts_json">contactsJSON</string>
 
+    <!-- DEFAULT VALUES FOR GOOGLE-MAP -->
+    <string name="default_germany_latitude">51</string>
+    <string name="default_germany_longitude">10.4</string>
+    <string name="default_germany_zoom">6f</string>
+    <string name="default_user_location_zoom">16.5f</string>
+
     <!-- PERMISSIONS -->
-    <string name="location_permission_denied">Your Location-Services are probably disabled. You can not use some features. Please go to settings to enable it.</string>
     <string name="permission_required_toast">Location permission is required for this feature.</string>
     <string name="permission_rationale_location">Access to the location service is required for this feature.</string>
     <string name="please_activate_location_services">Please activate location services</string>
@@ -97,6 +104,7 @@
     <string name="send_sms_permission_denied">Send SMS permission is very important to this feature. You can not use it without permission.</string>
     <string name="no_contact_added">You have not added a contact.</string>
     <string name="no_contact_edited">You have not edited a contact.</string>
+    <string name="location_permission_denied">Location permission is not granted. Please go to settings and give the permission.</string>
 
     <!-- ONLY FOR TESTS -->
     <string name="read">READ</string>

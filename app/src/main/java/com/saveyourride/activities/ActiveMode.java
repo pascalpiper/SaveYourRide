@@ -99,8 +99,6 @@ public class ActiveMode extends AppCompatActivity {
                 finish();
             }
         });
-
-
     }
 
     /**

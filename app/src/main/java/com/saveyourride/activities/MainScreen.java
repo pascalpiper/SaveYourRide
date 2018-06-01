@@ -38,8 +38,8 @@ public class MainScreen extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setElevation(0);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.title_passive_tab)));
-        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.title_active_tab)));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.title_passive_tab)));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.title_active_tab)));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.fragment_container);
@@ -87,7 +87,7 @@ public class MainScreen extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.settingsButton:
                 Intent settingsMainIntent = new Intent(getApplicationContext(), SettingsMain.class);
-                startActivityIfNeeded(settingsMainIntent, 0);
+                startActivity(settingsMainIntent);
                 break;
         }
         return super.onOptionsItemSelected(item); //To change body of generated methods, choose Tools | Templates.
