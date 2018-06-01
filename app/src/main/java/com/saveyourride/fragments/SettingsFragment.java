@@ -49,19 +49,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public void onCreatePreferences(Bundle savedInstanceState,
                                     String rootKey) {
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
         setPreferencesFromResource(R.xml.preferences, rootKey);
+
+        checkIfCustomMessageEnabled();
+
         getPreferenceManager().getPreferenceScreen().findPreference("pref_enable_custom_message").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Boolean switchPref = sharedPref.getBoolean
-                        (KEY_PREF_CUSTOM_MESSAGE_SWITCH, false);
-                if (!switchPref) {
-                    getPreferenceManager().getPreferenceScreen().findPreference("pref_custom_message").setEnabled(false);
-                } else {
-                    getPreferenceManager().getPreferenceScreen().findPreference("pref_custom_message").setEnabled(true);
 
-                }
+                checkIfCustomMessageEnabled();
 
                 return false;
             }
@@ -83,7 +79,17 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
+    }
 
+    private void checkIfCustomMessageEnabled() {
+        Boolean switchPref = sharedPref.getBoolean
+                (KEY_PREF_CUSTOM_MESSAGE_SWITCH, false);
+        if (!switchPref) {
+            getPreferenceManager().getPreferenceScreen().findPreference("pref_custom_message").setEnabled(false);
+        } else {
+            getPreferenceManager().getPreferenceScreen().findPreference("pref_custom_message").setEnabled(true);
+
+        }
     }
 
 
