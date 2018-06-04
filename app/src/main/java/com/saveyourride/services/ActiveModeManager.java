@@ -24,7 +24,7 @@ public class ActiveModeManager extends Service {
 
     // Values received from Activity
     private int numberOfIntervals;
-    private long intervalTime;
+    private long timeOfInterval;
 
     // CountDownTimer to run interval
     private CountDownTimer currentTimer;
@@ -55,7 +55,7 @@ public class ActiveModeManager extends Service {
                 switch (intent.getAction()) {
                     case "android.intent.action.START_TIMER": {
                         numberOfIntervals = intent.getIntExtra("numberOfIntervals", 0);
-                        intervalTime = intent.getLongExtra("intervalTime", 0);
+                        timeOfInterval = intent.getLongExtra("timeOfInterval", 0);
 
                         //run first interval | intervalNumber must be 1 at this moment
                         runInterval();
@@ -96,7 +96,7 @@ public class ActiveModeManager extends Service {
         // One Second contains 1000 millis | onTick() will be called every second
         final long MILLISECONDS_IN_SECOND = 1000L;
 
-        currentTimer = new CountDownTimer(intervalTime, MILLISECONDS_IN_SECOND) {
+        currentTimer = new CountDownTimer(timeOfInterval, MILLISECONDS_IN_SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
                 // DEBUG
@@ -119,7 +119,7 @@ public class ActiveModeManager extends Service {
                 }
             }
         }.start();
-        sendBroadcast(new Intent("android.intent.action.INTERVAL_NUMBER").putExtra("interval_number", intervalNumber));
+        sendBroadcast(new Intent("android.intent.action.INTERVAL_NUMBER").putExtra("interval_number", intervalNumber).putExtra("number_of_intervals", numberOfIntervals));
     }
 
     /**

@@ -1,15 +1,16 @@
 package com.saveyourride.fragments;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.net.Uri;
@@ -24,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -33,9 +35,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.saveyourride.R;
 import com.saveyourride.activities.PassiveMode;
-import com.saveyourride.utils.PermissionUtils;
-
-import static android.content.Context.LOCATION_SERVICE;
+import com.saveyourride.services.Location;
 
 public class Passive extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -49,32 +49,37 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
 
     // DialogIDs
     private final int LOCATION_PERMISSION_EXPLANATION_DIALOG = 0;
-    private final int LOCATION_PERMISSION_DENIED_DIALOG = 1;
     private final int SEND_SMS_PERMISSION_EXPLANATION_DIALOG = 2;
     private final int SEND_SMS_PERMISSION_DENIED_DIALOG = 3;
-
-    /**
-     * Flag indicating whether a requested permission has been denied after returning in
-     * {@link #onRequestPermissionsResult(int, String[], int[])}.
-     */
-    private boolean mPermissionDenied = false;
+    private final int LOCATION_SERVICES_DISABLED = 4;
 
     // Buttons
     private Button buttonStartPassiveMode;
 
-    // TODO change workflow of location permission request (alles neu machen)
+    // BroadcastReceiver
+    private BroadcastReceiver receiver;
+
+    // IntentFilter
+    private IntentFilter filter;
+
+    // Intents for Services
+    private Intent locationService;
+
+    // Location providers state (enabled per default = true)
+    private boolean gpsState = true, networkState = true;
+
+    // SharedPreferences
+    private SharedPreferences lastKnownLocation;
+
+    // GoogleMap
+    private GoogleMap myGoogleMap;
+
+    // ImageViews for myLocation
+    private ImageView myLocationCircleView, myLocationAnimatedView;
 
     // Because of Fragment we need an activity object.
     private FragmentActivity myActivity;
     private SupportMapFragment mapFragment;
-    private GoogleMap myGoogleMap;
-    private LocationManager myLocationManager;
-    private String bestLocationProvider;
-    private LocationProvider myLocationProvider;
-    private Location currentLocation;
-    private SharedPreferences sharedPreferencesLastLocation;
-    private LocationListener gpsLocationListener;
-    private LocationListener networkLocationListener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -82,8 +87,11 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
         View rootView = inflater.inflate(R.layout.fragment_passive, container, false);
 
         myActivity = getActivity();
-        sharedPreferencesLastLocation = myActivity.getSharedPreferences("Location", Context.MODE_PRIVATE);
 
+        // Set SharedPreferences
+        lastKnownLocation = myActivity.getSharedPreferences(getString(R.string.sp_key_last_known_location), Context.MODE_PRIVATE);
+
+        // Set Map
         if (mapFragment == null) {
             mapFragment = SupportMapFragment.newInstance();
             mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -93,12 +101,28 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
                 }
             });
         }
+        getChildFragmentManager().beginTransaction().replace(R.id.passiveFragment_map, mapFragment).commit();
 
-        // R.id.map is a FrameLayout, not a Fragment
-        getChildFragmentManager().beginTransaction().replace(R.id.map, mapFragment).commit();
+        // My Location View
+        myLocationAnimatedView = (ImageView) rootView.findViewById(R.id.passiveFragment_myLocationAnimated);
+        ObjectAnimator scaleDown = ObjectAnimator.ofPropertyValuesHolder(
+                myLocationAnimatedView,
+                PropertyValuesHolder.ofFloat("scaleX", 6f),
+                PropertyValuesHolder.ofFloat("scaleY", 6f));
+        scaleDown.setDuration(1000);
+        scaleDown.setRepeatCount(ObjectAnimator.INFINITE);
+        scaleDown.setRepeatMode(ObjectAnimator.REVERSE);
+        scaleDown.start();
+        // TODO: scaleDown.cancel() and not only set transparent
+        myLocationCircleView = (ImageView) rootView.findViewById(R.id.passiveFragment_myLocationCircle);
 
-        buttonStartPassiveMode = (Button) rootView.findViewById(R.id.buttonStartPassiveMode);
+        // Set Button
+        buttonStartPassiveMode = (Button) rootView.findViewById(R.id.passiveFragment_buttonStart);
 
+        // Initialize BroadcastReceiver
+        initReceiver();
+
+        // Button Listener
         buttonStartPassiveMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -121,312 +145,45 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
     private void myOnMapReady(GoogleMap googleMap) {
 
         myGoogleMap = googleMap;
-        googleMap.getUiSettings().setAllGesturesEnabled(false);
+        myGoogleMap.getUiSettings().setAllGesturesEnabled(false);
 
-        if (ContextCompat.checkSelfPermission(myActivity, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Permission to access the location is missing.
-            PermissionUtils.requestPermission(myActivity, LOCATION_PERMISSION_REQUEST_CODE,
-                    Manifest.permission.ACCESS_FINE_LOCATION, true);
-        } else {
-            enableMyLocation();
+        if (checkLocationPermission()) {
             initWithPermission();
-        }
-    }
-
-    /**
-     * Enables the My Location layer if the fine location permission has been granted.
-     */
-    private void enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(myActivity, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Permission to access the location is missing.
-            PermissionUtils.requestPermission(myActivity, LOCATION_PERMISSION_REQUEST_CODE,
-                    Manifest.permission.ACCESS_FINE_LOCATION, true);
-        } else if (myGoogleMap != null) {
-            // Access to the location has been granted to the app.
-            myGoogleMap.setMyLocationEnabled(true);
-        }
-    }
-
-    /**
-     * Init with permission. First steps. But only after permission check.
-     */
-    private void initWithPermission() {
-        if (!getMyLocation()) {
-            if (!locationServicesCheck(myLocationManager)) {
-                // location services are enabled
-                LatLng germanyLatLng = new LatLng(50.980602, 10.314458);
-                myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(germanyLatLng, 6));
-                Toast.makeText(myActivity, "Your Location-Services are enabled\n" +
-                        "You can use some 'My Location' button.", Toast.LENGTH_LONG).show();
-
-            } else {
-                // location services are disabled
-                LatLng germanyLatLng = new LatLng(50.980602, 10.314458);
-                myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(germanyLatLng, 6));
-                Toast.makeText(myActivity, "Your Location-Services are probably disabled. You can not use some features.", Toast.LENGTH_LONG).show();
-            }
         } else {
-            locationServicesCheck(myLocationManager);
-        }
-
-    }
-
-    /**
-     * Init without permission. First steps. But only after permission check.
-     */
-    private void initWithoutPermission() {
-        // location services are disabled
-        LatLng germanyLatLng = new LatLng(50.980602, 10.314458);
-        myGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(germanyLatLng, 6));
-        Toast.makeText(myActivity, "Your Location-Services are probably disabled\n" +
-                "You can not use some features.", Toast.LENGTH_LONG).show();
-    }
-
-    /**
-     * Tries to get {@link Location} of Device. First of all it checkes last known {@link Location}. If no one is available it requests for one.
-     *
-     * @return true if location found, flase - if not.
-     */
-    private boolean getMyLocation() {
-
-        // Permission Check
-        if (ContextCompat.checkSelfPermission(myActivity, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Permission to access the location is missing.
-            PermissionUtils.requestPermission(myActivity, LOCATION_PERMISSION_REQUEST_CODE,
-                    Manifest.permission.ACCESS_FINE_LOCATION, true);
-        }
-
-        // Move to current Position
-        if (myLocationManager == null || myLocationProvider == null) {
-            myLocationManager = (LocationManager) myActivity.getSystemService(LOCATION_SERVICE);
-
-            Criteria criteria = new Criteria();
-            criteria.setAccuracy(Criteria.ACCURACY_FINE);
-            criteria.setAltitudeRequired(true);
-            criteria.setSpeedRequired(false);
-
-            bestLocationProvider = myLocationManager.getBestProvider(criteria, true);
-            if (bestLocationProvider == null) {
-                return false;
-            } else {
-                myLocationProvider = myLocationManager.getProvider(bestLocationProvider);
-            }
-        }
-
-        // Find last location
-        Location lastLocation = myLocationManager.getLastKnownLocation(bestLocationProvider);
-        lastLocation = lastLocation == null ? myLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) : lastLocation;
-        lastLocation = lastLocation == null ? myLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER) : lastLocation;
-        lastLocation = lastLocation == null ? currentLocation : lastLocation;
-
-        currentLocation = lastLocation;
-
-        double sharedLatitude = sharedPreferencesLastLocation.getString("Latitude", null) != null ?
-                Double.parseDouble(sharedPreferencesLastLocation.getString("Latitude", null)) : 0;
-        double sharedLongitude = sharedPreferencesLastLocation.getString("Longitude", null) != null ?
-                Double.parseDouble(sharedPreferencesLastLocation.getString("Longitude", null)) : 0;
-
-        if (currentLocation == null) {
-            if (sharedLatitude == 0 && sharedLongitude == 0) {
-                requestLocation();
-                return false;
-            } else {
-                myLocationManager.removeUpdates(getGpsLocationListener());
-                myLocationManager.removeUpdates(getNetworkLocationListener());
-                LatLng currentLatLng = new LatLng(sharedLatitude, sharedLongitude);
-                myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17));
-                return true;
-            }
-        } else {
-            // Move camera to my Location
-            myLocationManager.removeUpdates(getGpsLocationListener());
-            myLocationManager.removeUpdates(getNetworkLocationListener());
-            double latitude = currentLocation.getLatitude();
-            double longitude = currentLocation.getLongitude();
-            LatLng currentLatLng = new LatLng(latitude, longitude);
-            myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17));
-            return true;
-        }
-
-    }
-
-    /**
-     * Check if Location Services are enabled. If they are not, start dialog window and settings.
-     *
-     * @param lm LocationManager provide information about Location-Services.
-     */
-    private boolean locationServicesCheck(LocationManager lm) {
-
-        boolean gps_enabled = false;
-        boolean network_enabled = false;
-
-        try {
-            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch (Exception ex) {
-            Log.d("Location", "Probable GPS_PROVIDER is null");
-            ex.printStackTrace();
-        }
-
-        try {
-            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch (Exception ex) {
-            Log.d("Location", "Probable NETWORK_PROVIDER is null");
-            ex.printStackTrace();
-        }
-
-        if (!gps_enabled && !network_enabled) {
-            // notify user
-            final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-            dialog.setTitle(R.string.please_activate_location_services);
-            dialog.setMessage("Click ok to goto settings else exit.");
-            dialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(myIntent);
-                    //get gps
-                }
-            });
-            dialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    paramDialogInterface.cancel();
-                }
-            });
-            dialog.show();
-        } else {
-            return true;
-        }
-
-        // Check if the user has enabled the location data.
-        // !!!NEVER USED BECOUSE of MULTI-THREAD
-        // TODO Implement in right way "Check if the user has enabled the location data."
-        try {
-            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch (Exception ex) {
-            Log.d("Location", "Probable GPS_PROVIDER is null");
-            ex.printStackTrace();
-        }
-        try {
-            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch (Exception ex) {
-            Log.d("Location", "Probable NETWORK_PROVIDER is null");
-            ex.printStackTrace();
-        }
-        return !gps_enabled && !network_enabled;
-    }
-
-    /**
-     * Request for Location with GPS_PROVIDER and NETWORK_PROVIDER
-     */
-    private void requestLocation() {
-
-        // Permission Check
-        if (ContextCompat.checkSelfPermission(myActivity, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Permission to access the location is missing.
-            PermissionUtils.requestPermission(myActivity, LOCATION_PERMISSION_REQUEST_CODE,
-                    Manifest.permission.ACCESS_FINE_LOCATION, true);
-        }
-
-        gpsLocationListener = getGpsLocationListener();
-        myLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsLocationListener);
-        networkLocationListener = getNetworkLocationListener();
-        myLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, networkLocationListener);
-    }
-
-    /**
-     * Get GPS_PROVIDER {@link LocationListener}
-     *
-     * @return LocationListener
-     */
-    private LocationListener getGpsLocationListener() {
-        return gpsLocationListener != null ? gpsLocationListener : new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                currentLocation = location;
-                SharedPreferences.Editor editor = sharedPreferencesLastLocation.edit();
-                editor.putString("Latitude", Double.toString(location.getLatitude()));
-                editor.putString("Longitude", Double.toString(location.getLongitude()));
-                editor.apply();
-                LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17));
-
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-            }
-        };
-    }
-
-    /**
-     * Get NETWORK_PROVIDER {@link LocationListener}
-     *
-     * @return LocationListener
-     */
-    private LocationListener getNetworkLocationListener() {
-        return networkLocationListener != null ? networkLocationListener : new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                currentLocation = location;
-                SharedPreferences.Editor editor = sharedPreferencesLastLocation.edit();
-                editor.putString("Latitude", Double.toString(location.getLatitude()));
-                editor.putString("Longitude", Double.toString(location.getLongitude()));
-                editor.apply();
-                LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17));
-
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-            }
-        };
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mPermissionDenied) {
-            // Permission was not granted, display error dialog.
-            showMissingPermissionError();
             initWithoutPermission();
-            mPermissionDenied = false;
+            Toast.makeText(myActivity, getString(R.string.location_permission_denied), Toast.LENGTH_LONG).show();
         }
     }
 
     /**
-     * Displays a dialog with error message explaining that the location permission is missing.
+     * Checks if {@link Manifest.permission#ACCESS_FINE_LOCATION} permission is granted.
+     *
+     * @return boolean value. If {@link Manifest.permission#ACCESS_FINE_LOCATION} permission is granted: true else false.
      */
-    private void showMissingPermissionError() {
-        PermissionUtils.PermissionDeniedDialog
-                .newInstance(true).show(myActivity.getSupportFragmentManager(), "dialog");
+    private boolean checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(myActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(myActivity, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                showAlertDialog(LOCATION_PERMISSION_EXPLANATION_DIALOG);
+            } else {
+                // No explanation needed; request the permission
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+            }
+            return false;
+        } else {
+            // Permission has already been granted
+            return true;
+        }
     }
 
     /**
-     * Checks if SEND_SMS permission is granted.
+     * Checks if {@link Manifest.permission#SEND_SMS} permission is granted.
      *
-     * @return boolean value. If SEND_SMS permission is granted: true else false.
+     * @return boolean value. If {@link Manifest.permission#SEND_SMS} permission is granted: true else false.
      */
     private boolean checkSmsPermission() {
         if (ContextCompat.checkSelfPermission(myActivity, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
@@ -440,12 +197,141 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
             } else {
                 // No explanation needed; request the permission
                 requestPermissions(new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_PERMISSIONS_REQUEST_CODE);
-
             }
             return false;
         } else {
             // Permission has already been granted
             return true;
+        }
+    }
+
+    /**
+     * Initialize map-fragment with permission. First steps. But only after permission check.
+     */
+    private void initWithPermission() {
+        String latString = lastKnownLocation.getString(getString(R.string.sp_key_latitude), getString(R.string.default_germany_latitude));
+        String lngString = lastKnownLocation.getString(getString(R.string.sp_key_longitude), getString(R.string.default_germany_longitude));
+        double latitude = Double.parseDouble(latString);
+        double longitude = Double.parseDouble(lngString);
+        float zoom = Float.parseFloat(getString(R.string.default_user_location_zoom));
+        LatLng lastKnownLatLng = new LatLng(latitude, longitude);
+        moveMapCamera(lastKnownLatLng, zoom, false);
+
+        // Start location service only if permission was granted
+        locationService = new Intent(myActivity.getApplicationContext(), Location.class);
+        myActivity.startService(locationService);
+    }
+
+    /**
+     * Initialize map-fragment without permission. First steps. But only after permission check.
+     */
+    private void initWithoutPermission() {
+        // Disable drawables
+        myLocationCircleView.setBackgroundResource(R.color.colorTransparent);
+        myLocationAnimatedView.setBackgroundResource(R.color.colorTransparent);
+
+        // location services are disabled
+        double latitude = Double.parseDouble(getString(R.string.default_germany_latitude));
+        double longitude = Double.parseDouble(getString(R.string.default_germany_longitude));
+        float zoom = Float.parseFloat(getString(R.string.default_germany_zoom));
+        LatLng lastKnownLatLng = new LatLng(latitude, longitude);
+        moveMapCamera(lastKnownLatLng, zoom, false);
+    }
+
+    /**
+     * Creates new {@link BroadcastReceiver} and {@link IntentFilter} and then registers them.
+     * {@code receiver} receives the broadcasts from the {@code Location} service.
+     */
+    private void initReceiver() {
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //extract our message from intent
+                switch (intent.getAction()) {
+                    case "android.intent.action.LOCATION_UPDATE": {
+                        if (intent.getStringExtra("locationProvider").equals(LocationManager.NETWORK_PROVIDER)) {
+                            myLocationCircleView.setBackgroundResource(R.drawable.my_location_red_circle);
+                            myLocationAnimatedView.setBackgroundResource(R.drawable.my_location_animated_circle);
+                            Log.d(TAG, "Network provider was detected!");
+                        } else if (intent.getStringExtra("locationProvider").equals(LocationManager.GPS_PROVIDER)) {
+                            myLocationCircleView.setBackgroundResource(R.drawable.my_location_green_circle);
+                            myLocationAnimatedView.setBackgroundResource(R.drawable.my_location_animated_circle);
+                            Log.d(TAG, "GPS provider was detected!");
+                        }
+                        double defaultLatitude = Double.parseDouble(getString(R.string.default_germany_latitude));
+                        double defaultLongitude = Double.parseDouble(getString(R.string.default_germany_longitude));
+                        float zoom = Float.parseFloat(getString(R.string.default_user_location_zoom));
+                        double newLatitude = intent.getDoubleExtra("latitude", defaultLatitude);
+                        double newLongitude = intent.getDoubleExtra("longitude", defaultLongitude);
+                        LatLng newLatLng = new LatLng(newLatitude, newLongitude);
+                        moveMapCamera(newLatLng, zoom, true);
+                        break;
+                    }
+                    case "android.intent.action.LOCATION_PROVIDER_STATUS_UPDATE": {
+                        String provider = intent.getStringExtra("locationProvider");
+                        int status = intent.getIntExtra("locationProviderStatus", LocationProvider.OUT_OF_SERVICE);
+                        if (provider.equals(LocationManager.GPS_PROVIDER)) {
+                            if (status == LocationProvider.TEMPORARILY_UNAVAILABLE) {
+                                myLocationCircleView.setBackgroundResource(R.drawable.my_location_yellow_circle);
+                                Log.d(TAG, "Gps is temporarily unavailable!");
+                            } else if (status == LocationProvider.AVAILABLE) {
+                                myLocationCircleView.setBackgroundResource(R.drawable.my_location_green_circle);
+                                Log.d(TAG, "Gps is available!");
+                            }
+                        }
+                        break;
+                    }
+                    case "android.intent.action.LOCATION_PROVIDER_DISABLED": {
+                        if (intent.getStringExtra("locationProvider").equals(LocationManager.GPS_PROVIDER)) {
+                            gpsState = false;
+                        } else if (intent.getStringExtra("locationProvider").equals(LocationManager.NETWORK_PROVIDER)) {
+                            networkState = false;
+                        }
+                        if (!gpsState && !networkState) {
+                            showAlertDialog(LOCATION_SERVICES_DISABLED);
+                            initWithoutPermission();
+                        }
+                        break;
+                    }
+                    case "android.intent.action.LOCATION_PROVIDER_ENABLED": {
+                        if (intent.getStringExtra("locationProvider").equals(LocationManager.GPS_PROVIDER)) {
+                            gpsState = true;
+                        } else if (intent.getStringExtra("locationProvider").equals(LocationManager.NETWORK_PROVIDER)) {
+                            networkState = true;
+                        }
+                        break;
+                    }
+                    default:
+                        Log.d(TAG, "Unknown Broadcast received");
+                        break;
+                }
+            }
+        };
+
+        // IntentFilter filters messages received by BroadcastReceiver
+        filter = new IntentFilter();
+
+        filter.addAction("android.intent.action.LOCATION_UPDATE");
+        filter.addAction("android.intent.action.LOCATION_PROVIDER_STATUS_UPDATE");
+        filter.addAction("android.intent.action.LOCATION_PROVIDER_DISABLED");
+        filter.addAction("android.intent.action.LOCATION_PROVIDER_ENABLED");
+
+        // register our receiver
+        myActivity.registerReceiver(receiver, filter);
+    }
+
+    /**
+     * Move Google-Map camera to new or changed position ({@link LatLng}).
+     *
+     * @param latLng   new or changed position ({@link LatLng}).
+     * @param zoom     zoom of camera.
+     * @param animated move camera with animation (true) or not (false).
+     */
+    private void moveMapCamera(LatLng latLng, float zoom, boolean animated) {
+        if (animated) {
+            myGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+        } else {
+            myGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
         }
     }
 
@@ -461,15 +347,11 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
                 break;
             }
             case LOCATION_PERMISSION_REQUEST_CODE: {
-                if (PermissionUtils.isPermissionGranted(permissions, grantResults,
-                        Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    // Enable the my location layer if the permission has been granted.
-                    enableMyLocation();
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     initWithPermission();
                 } else {
-                    // Display the missing permission error dialog when the fragments resume.
                     initWithoutPermission();
-                    mPermissionDenied = true;
+                    Toast.makeText(myActivity, getString(R.string.location_permission_denied), Toast.LENGTH_LONG).show();
                 }
                 break;
             }
@@ -488,11 +370,20 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
     private void showAlertDialog(int dialogID) {
         switch (dialogID) {
             case LOCATION_PERMISSION_EXPLANATION_DIALOG: {
-                // TODO implement LOCATION_PERMISSION_EXPLANATION_DIALOG
-                break;
-            }
-            case LOCATION_PERMISSION_DENIED_DIALOG: {
-                // TODO implement LOCATION_PERMISSION_DENIED_DIALOG
+                AlertDialog.Builder alert = new AlertDialog.Builder(myActivity);
+                // Set dialog title
+                alert.setTitle(R.string.title_dialog_location_permission);
+                // Set dialog message
+                alert.setMessage(R.string.dialog_location_permission_explanation);
+                // Set up the button
+                alert.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+                    }
+                });
+                AlertDialog currentDialog = alert.create();
+                currentDialog.show();
                 break;
             }
             case SEND_SMS_PERMISSION_EXPLANATION_DIALOG: {
@@ -502,7 +393,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
                 // Set dialog message
                 alert.setMessage(R.string.dialog_send_sms_permission_explanation);
                 // Set up the button
-                alert.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+                alert.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         requestPermissions(new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_PERMISSIONS_REQUEST_CODE);
@@ -517,7 +408,7 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
                 // Set dialog title
                 alert.setTitle(R.string.title_dialog_send_sms_permission);
                 // Set dialog message
-                alert.setMessage(R.string.dialog_send_sms_permission_required);
+                alert.setMessage(R.string.dialog_send_sms_permission_denied);
                 // Set up the buttons
                 alert.setPositiveButton(R.string.settings, new DialogInterface.OnClickListener() {
                     @Override
@@ -539,10 +430,68 @@ public class Passive extends Fragment implements ActivityCompat.OnRequestPermiss
                 currentDialog.show();
                 break;
             }
+            case LOCATION_SERVICES_DISABLED: {
+                AlertDialog.Builder alert = new AlertDialog.Builder(myActivity);
+                // Set dialog title
+                alert.setTitle(R.string.title_dialog_location_services);
+                // Set dialog message
+                alert.setMessage(R.string.dialog_location_services_are_disabled);
+                // Set up the buttons
+                alert.setPositiveButton(R.string.settings, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Go to location settings
+                        Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(intent);
+                    }
+                });
+                alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                AlertDialog currentDialog = alert.create();
+                currentDialog.show();
+                break;
+            }
             default: {
                 Log.d(TAG, "NO SUCH DIALOG!");
                 break;
             }
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // DEBUG
+        Log.d(TAG, "onPause!");
+        //
+        if (locationService != null)
+            myActivity.stopService(locationService);
+        myActivity.unregisterReceiver(receiver);
+    }
+
+    public void onResume() {
+        super.onResume();
+        // DEBUG
+        Log.d(TAG, "onResume!");
+        //
+        if (locationService != null) {
+            locationService = new Intent(myActivity.getApplicationContext(), Location.class);
+            myActivity.startService(locationService);
+        }
+        myActivity.registerReceiver(receiver, filter);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // DEBUG
+        Log.d(TAG, "onDestroy!");
+        //
+        if (locationService != null)
+            myActivity.stopService(locationService);
     }
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -27,14 +28,12 @@ public class ActiveMode extends AppCompatActivity {
     private final String TAG = "ActiveMode";
     //
 
-    // TODO: Pick Up values for number of intervals and interval time
-    private final int numberOfIntervals = 2;
-    private final long intervalTime = 30000L;
-
     // Dialog IDs
     private final int BACK_PRESSED = 0;
     private final int INTERVAL_TIME_EXPIRED = 1;
     private final int ACCIDENT_GUARANTEE_PROCEDURE = 2;
+    private final int SOS_BUTTON = 3;
+
 
     // Dialog
     AlertDialog currentDialog;
@@ -57,10 +56,10 @@ public class ActiveMode extends AppCompatActivity {
         setContentView(R.layout.activity_active_mode);
 
         // Views
-        Button buttonResetTimer = (Button) findViewById(R.id.buttonResetTimer);
-        Button buttonStopTimer = (Button) findViewById(R.id.buttonStopTimer);
-        textViewTime = (TextView) findViewById(R.id.textViewTimer);
-        textViewIntervalNumber = (TextView) findViewById(R.id.textViewIntervalCount);
+        Button buttonResetTimer = (Button) findViewById(R.id.activeMode_buttonReset);
+        Button buttonStopTimer = (Button) findViewById(R.id.activeMode_buttonStop);
+        textViewTime = (TextView) findViewById(R.id.activeMode_textViewTime);
+        textViewIntervalNumber = (TextView) findViewById(R.id.activeMode_textViewNumberOfIntervals);
 
         // Keeps Activity ON also on lock screen
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
@@ -93,6 +92,14 @@ public class ActiveMode extends AppCompatActivity {
             }
         });
 
+        Button buttonSos = (Button) findViewById(R.id.activeMode_buttonSos);
+
+        buttonSos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAlertDialog(SOS_BUTTON);
+            }
+        });
     }
 
     /**
@@ -111,7 +118,12 @@ public class ActiveMode extends AppCompatActivity {
                 //extract our message from intent
                 switch (intent.getAction()) {
                     case "android.intent.action.AMM_SERVICE_READY": {
-                        sendBroadcast(new Intent("android.intent.action.START_TIMER").putExtra("numberOfIntervals", numberOfIntervals).putExtra("intervalTime", intervalTime));
+                        SharedPreferences timerValues = getSharedPreferences(getString(R.string.sp_key_timer_values), Context.MODE_PRIVATE);
+                        int numberOfIntervals = timerValues.getInt(getString(R.string.sp_key_number_of_interval), getResources().getInteger(R.integer.default_number_of_intervals));
+                        long timeOfInterval = timerValues.getLong(getString(R.string.sp_key_time_of_interval), getResources().getInteger(R.integer.default_time_of_interval));
+                        sendBroadcast(new Intent("android.intent.action.START_TIMER")
+                                .putExtra("numberOfIntervals", numberOfIntervals)
+                                .putExtra("timeOfInterval", timeOfInterval));
                         break;
                     }
                     case "android.intent.action.REST_INTERVAL_TIME": {
@@ -121,7 +133,8 @@ public class ActiveMode extends AppCompatActivity {
                     }
                     case "android.intent.action.INTERVAL_NUMBER": {
                         int intervalNumber = intent.getIntExtra("interval_number", -1);
-                        textViewIntervalNumber.setText(Integer.toString(intervalNumber) + " / " + numberOfIntervals);
+                        int numberOfIntervals = intent.getIntExtra("number_of_intervals", -1);
+                        textViewIntervalNumber.setText(intervalNumber + " / " + numberOfIntervals);
                         break;
                     }
                     case "android.intent.action.ITE_SHOW_DIALOG": {
@@ -231,7 +244,32 @@ public class ActiveMode extends AppCompatActivity {
                         // DEBUG
                         Log.d(TAG, "AGP-DIALOG: SOS-Button was clicked!");
                         //
-                        // TODO: Call SOS-MODE
+                        startActivity(new Intent(getApplicationContext(), SosMode.class));
+                        finish();
+                    }
+                });
+
+                currentDialog = alert.create();
+                currentDialog.show();
+                break;
+            }
+            case SOS_BUTTON: {
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                alert.setTitle(R.string.title_dialog_sos_button);
+                alert.setCancelable(false);
+
+                // Set up the buttons
+                alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(getApplicationContext(), SosMode.class));
+                        finish();
+                    }
+                });
+                alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
                     }
                 });
 

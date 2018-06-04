@@ -30,14 +30,16 @@ public class MainScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        // TODO: Add Splash Screen on launch of App
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
 
         Objects.requireNonNull(getSupportActionBar()).setElevation(0);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.title_passive_tab)));
-        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.title_active_tab)));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.title_passive_tab)));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.title_active_tab)));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.fragment_container);
@@ -74,7 +76,7 @@ public class MainScreen extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) { //menu activity bekannt
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.toolbar, menu);
         return super.onCreateOptionsMenu(menu);
@@ -84,11 +86,8 @@ public class MainScreen extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) { //click listener quasi.
         switch (item.getItemId()) {
             case R.id.settingsButton:
-                System.out.println("SETTINGS");
-                // settingsIntent.putExtra(Intent.EXTRA_TEXT, aktienInfo);
-                Intent activeIntent = new Intent(getApplicationContext(), Main_Settings.class);
-                startActivityIfNeeded(activeIntent, 0);
-                //startActivity(activeIntent);
+                Intent settingsMainIntent = new Intent(getApplicationContext(), SettingsMain.class);
+                startActivity(settingsMainIntent);
                 break;
         }
         return super.onOptionsItemSelected(item); //To change body of generated methods, choose Tools | Templates.

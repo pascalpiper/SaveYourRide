@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <!-- TEST -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -13,8 +14,8 @@
     <!-- DEBUG -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!--  -->
 
+    <!--  -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -30,6 +31,8 @@
             android:value="@integer/google_play_services_version" />
 
         <!-- Activities -->
+
+        <!-- Main -->
         <activity
             android:name=".activities.MainScreen"
             android:screenOrientation="portrait">
@@ -39,43 +42,66 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Settings activities -->
         <activity
-            android:name=".activities.Main_Settings"
-            android:label="@string/title_activity__active"
-            android:launchMode="singleTop"
-            android:parentActivityName=".activities.MainScreen"
+            android:name=".activities.SettingsMain"
+            android:label="@string/title_activity_settings_main"
             android:screenOrientation="portrait"
-            android:showOnLockScreen="true">
+            android:parentActivityName=".activities.MainScreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.saveyourride.activities.MainScreen" />
         </activity>
+        <activity
+            android:name=".activities.SettingsContacts"
+            android:label="@string/title_activity_settings_contacts"
+            android:parentActivityName=".activities.SettingsMain"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.saveyourride.activities.SettingsMain" />
+        </activity>
+        <activity
+            android:name=".activities.SettingsPreviewMessage"
+            android:label="@string/title_activity_settings_preview_message"
+            android:parentActivityName=".activities.SettingsMain"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.saveyourride.activities.SettingsMain" />
+        </activity>
+
+        <!-- PassiveMode -->
         <activity
             android:name=".activities.PassiveMode"
             android:label="@string/title_activity_passive_mode"
-            android:parentActivityName=".activities.MainScreen"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.saveyourride.activities.MainScreen" />
-        </activity>
-        <activity
-            android:name=".activities.ActiveMode"
-            android:label="@string/title_activity_active_mode"
             android:parentActivityName=".activities.MainScreen"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.saveyourride.activities.MainScreen" />
         </activity>
 
+        <!-- ActiveMode -->
+        <activity
+            android:name=".activities.ActiveMode"
+            android:label="@string/title_activity_active_mode"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".activities.MainScreen"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.saveyourride.activities.MainScreen" />
+        </activity>
+
+        <!-- SosMode -->
         <activity
             android:name=".activities.SosMode"
             android:label="@string/title_activity_sos_mode"
-            android:parentActivityName=".activities.MainScreen"
             android:screenOrientation="portrait"
+            android:parentActivityName=".activities.MainScreen"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
