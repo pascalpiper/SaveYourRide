@@ -80,6 +80,8 @@ public class SosModeManager extends Service {
                 // Set Ring Stream Volume to max for incoming Calls from Sos-Contacts
                 AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                 audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamMaxVolume(AudioManager.STREAM_RING), AudioManager.FLAG_VIBRATE);
+
+                smsManager.sendTextMessage("+491752847846", null, "Test", null, null);
             }
         }.start();
 
@@ -124,7 +126,7 @@ public class SosModeManager extends Service {
 
         Intent normalSmsPart, lastPart;
 
-        if (falseAlarm) {
+        if (!falseAlarm) {
             normalSmsPart = new Intent("SMS_SENT");
             lastPart = new Intent("LAST_SMS_SENT");
         } else {
@@ -137,6 +139,7 @@ public class SosModeManager extends Service {
             if (i == smsList.size() - 1) {
                 sentIntent = PendingIntent.getBroadcast(this, 0, lastPart, 0);
             }
+            Log.d(TAG, "" + phoneNumber);
             smsManager.sendTextMessage(phoneNumber, null, smsList.get(i), sentIntent, null);
         }
     }

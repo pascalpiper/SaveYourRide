@@ -112,6 +112,19 @@ public class SosMode extends AppCompatActivity {
 
                         break;
                     }
+                    case "android.intent.action.SMS_FALSE_ALARM_SENT_STATUS": {
+
+                        if (!intent.getBooleanExtra("status", false)) {
+                            textViewStatus.setText(getString(R.string.status_sent_false_alarm_sms_not_successful));
+                        } else {
+                            textViewStatus.setText(getString(R.string.status_sent_false_alarm_sms_successful));
+                            buttonFalseAlarm.setClickable(false);
+                            // TODO ETWAS SCHÖNER
+                            buttonFalseAlarm.setBackgroundColor(getResources().getColor(R.color.cardview_dark_background, null));
+                        }
+
+                        break;
+                    }
                     default: {
 
                     }
@@ -122,6 +135,7 @@ public class SosMode extends AppCompatActivity {
         filter.addAction("android.intent.action.SECOND_IS_OVER");
         filter.addAction("android.intent.action.SOS_PROCEDURE_IS_RUNNING");
         filter.addAction("android.intent.action.SMS_SENT_STATUS");
+        filter.addAction("android.intent.action.SMS_FALSE_ALARM_SENT_STATUS");
 
         registerReceiver(receiver, filter);
     }
