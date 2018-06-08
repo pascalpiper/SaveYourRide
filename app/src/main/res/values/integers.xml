@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <!-- DEFAULT_TIMER_VALUES -->
     <integer name="default_number_of_intervals">2</integer>
     <integer name="min_number_of_intervals">2</integer>

@@ -16,6 +16,24 @@
         android:layout_height="wrap_content"
         android:background="@drawable/white_gradient" />
 
+    <ImageView
+        android:id="@+id/passiveFragment_myLocationAnimated"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="center"
+        android:background="@drawable/my_location_animated_circle"
+        android:contentDescription="@string/my_location_drawable"
+        android:elevation="5dp" />
+
+    <ImageView
+        android:id="@+id/passiveFragment_myLocationCircle"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
+        android:background="@drawable/my_location_red_circle"
+        android:contentDescription="@string/my_location_drawable"
+        android:elevation="10dp" />
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="400dp"

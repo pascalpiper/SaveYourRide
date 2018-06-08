@@ -177,7 +177,7 @@ public class Active extends Fragment {
                 // Set dialog title
                 alert.setTitle(R.string.title_dialog_send_sms_permission);
                 // Set dialog message
-                alert.setMessage(R.string.dialog_send_sms_permission_required);
+                alert.setMessage(R.string.dialog_send_sms_permission_denied);
                 // Set up the buttons
                 alert.setPositiveButton(R.string.settings, new DialogInterface.OnClickListener() {
                     @Override

@@ -57,11 +57,14 @@ public class SettingsContacts extends AppCompatActivity {
     private final int ADD_CONTACT_DIALOG = 2;
     private final int EDIT_CONTACT_DIALOG = 3;
     private final int DELETE_CONTACT_DIALOG = 4;
+
     // Button in Dialog
-    Button searchContactButton;
+    private Button searchContactButton;
+
     // Dialog InputFields
     private TextInputLayout firstNameInputLayout, phoneNumberInputLayout;
     private EditText firstNameInput, lastNameInput, phoneNumberInput;
+
     // SharedPreferences for saved contacts
     private SharedPreferences savedContacts;
 
@@ -299,7 +302,7 @@ public class SettingsContacts extends AppCompatActivity {
                 // Set dialog title
                 alert.setTitle(R.string.title_dialog_read_contacts_permission);
                 // Set dialog message
-                alert.setMessage(R.string.dialog_read_contacts_permission_required);
+                alert.setMessage(R.string.dialog_read_contacts_permission_denied);
                 // Set up the buttons
                 alert.setPositiveButton(R.string.settings, new DialogInterface.OnClickListener() {
                     @Override
