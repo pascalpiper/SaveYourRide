@@ -105,9 +105,9 @@ public class SosMode extends AppCompatActivity {
                     case "android.intent.action.SMS_SENT_STATUS": {
 
                         if (!intent.getBooleanExtra("status", false)) {
-                            textViewStatus.setText(textViewStatus.getText() + " " + getString(R.string.status_sent_sms_not_successful));
+                            textViewStatus.setText(getString(R.string.status_sent_sms_not_successful));
                         } else {
-                            textViewStatus.setText(textViewStatus.getText() + " " + getString(R.string.status_sent_sms_successful));
+                            textViewStatus.setText(getString(R.string.status_sent_sms_successful));
                         }
 
                         break;

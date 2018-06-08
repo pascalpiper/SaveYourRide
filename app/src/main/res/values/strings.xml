@@ -125,14 +125,10 @@
 
     <string name="title_enable_custom_message">Custom Message</string>
     <string name="summary_enable_custom_message">Use custom text as SOS-Message instead of the default message</string>
-
     <string name="title_custom_message">Custom Message</string>
-
-
     <string name="title_accident_time">Accident Time</string>
-    <string name="pref_included_information">Information included in message</string>
-
     <string name="title_preview">Preview</string>
+    <string name="title_included_information">Included information</string>
 
     <!-- keys -->
     <string name="pref_preview_message">pref_preview_message</string>
@@ -142,6 +138,7 @@
     <string name="pref_custom_message">pref_custom_message</string>
     <string name="pref_allergies">pref_allergies</string>
     <string name="pref_drugs">pref_drugs</string>
+    <string name="pref_included_information">pref_included_information</string>
 
     <!-- preview message -->
     <string name="test_contact">Test Contact</string>

@@ -44,7 +44,7 @@
             android:entries="@array/list_information_included_in_message"
             android:entryValues="@array/list_information_included_in_message"
             android:key="pref_included_information"
-            android:title="@string/pref_included_information" />
+            android:title="@string/title_included_information" />
 
         <SwitchPreference
             android:key="@string/pref_enable_custom_message"

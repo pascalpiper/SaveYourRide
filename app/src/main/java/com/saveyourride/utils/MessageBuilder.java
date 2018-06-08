@@ -58,7 +58,7 @@ public class MessageBuilder {
         String messageContent;
 
         if (customMessageEnabled) {
-            messageContent = sharedPreferencesSettings.getString("pref_custom_message", "default");
+            messageContent = sharedPreferencesSettings.getString(context.getResources().getString(R.string.pref_custom_message), "default");
         } else {
             messageContent = String.format(context.getString(R.string.sos_message), name);
         }
@@ -76,7 +76,7 @@ public class MessageBuilder {
     private String getImportantInformations() {
         String message = "Important information: ";
 
-        Set<String> included_information = sharedPreferencesSettings.getStringSet("pref_included_information", null);
+        Set<String> included_information = sharedPreferencesSettings.getStringSet(context.getResources().getString(R.string.pref_included_information), null);
         informationList = new String[6];
 
         for (String each : included_information) {
@@ -139,18 +139,21 @@ public class MessageBuilder {
 
     public void readPreferences() {
         sharedPreferencesSettings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences locationPreferences = context.getSharedPreferences(context.getString(R.string.sp_key_last_known_location), Context.MODE_PRIVATE);
 
 
-        latitude = "5456.666"; // TODO Location
-        longitude = "4156.24";
+        latitude = locationPreferences.getString(context.getResources().getString(R.string.sp_key_latitude), " ");
+        longitude = locationPreferences.getString(context.getResources().getString(R.string.sp_key_longitude), " ");
 
         SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm");
         accidentTime = mdformat.format(Calendar.getInstance().getTime());
 
-        name = sharedPreferencesSettings.getString("pref_name", "");
-        diseases = sharedPreferencesSettings.getString("pref_diseases", "");
-        allergies = sharedPreferencesSettings.getString("pref_allergies", "");
-        drugs = sharedPreferencesSettings.getString("pref_drugs", "");
+
+        name = sharedPreferencesSettings.getString(context.getResources().getString(R.string.pref_name), " ");
+        diseases = sharedPreferencesSettings.getString(context.getResources().getString(R.string.pref_diseases), " ");
+        allergies = sharedPreferencesSettings.getString(context.getResources().getString(R.string.pref_allergies), " ");
+        drugs = sharedPreferencesSettings.getString(context.getResources().getString(R.string.pref_drugs), " ");
+
 
         for (Contact contact : readContacts()) {
 
@@ -165,7 +168,7 @@ public class MessageBuilder {
             }
         }
 
-        customMessageEnabled = sharedPreferencesSettings.getBoolean("pref_enable_custom_message", false);
+        customMessageEnabled = sharedPreferencesSettings.getBoolean(context.getResources().getString(R.string.pref_enable_custom_message), false);
 
     }
 
