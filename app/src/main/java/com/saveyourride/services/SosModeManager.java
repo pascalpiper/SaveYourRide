@@ -39,14 +39,11 @@ public class SosModeManager extends Service {
 
     ArrayList<Contact> contactList;
 
-
-    // TestPhoneNumber
-    ArrayList<String> phoneList = new ArrayList<String>();
-
     // SMS-Manager
     private SmsManager smsManager = SmsManager.getDefault();
     private final int MAX_SMS_LENGTH = 160;
-    private ArrayList<Boolean> smsSentSuccessfullyList;
+    private ArrayList<String> smsSentSuccessfullyList;
+    private int numberOfContactPersons;
 
     // Timer witch start the SOS procedure
     private CountDownTimer sosModeStartTimer;
@@ -58,12 +55,13 @@ public class SosModeManager extends Service {
     public void onCreate() {
         super.onCreate();
 
+        Log.d(TAG, "onCreate: ");
+
         // initialize BroadcastReceiver
         initActivityReceiver();
 
         sosModeStartTimer = new CountDownTimer(WAIT_TIME_IN_SECONDS * SECOND_IN_MILLISECONDS, SECOND_IN_MILLISECONDS) {
             int restTime = (int) WAIT_TIME_IN_SECONDS;
-            ;
 
             @Override
             public void onTick(long millisUntilFinished) {
@@ -86,52 +84,53 @@ public class SosModeManager extends Service {
         }.start();
 
         // list for sms
-        smsSentSuccessfullyList = new ArrayList<>();
+        smsSentSuccessfullyList = new ArrayList<String>();
+
     }
 
     private void sendSms(ArrayList<Contact> contactList, boolean falseAlarm) {
 
         MessageBuilder messageBuilder = new MessageBuilder(this);
 
+        smsSentSuccessfullyList = new ArrayList<String>();
+        numberOfContactPersons = 0;
+
         if (falseAlarm) {
-            smsSentSuccessfullyList = new ArrayList<>();
             for (Contact contact : contactList) {
-                sendSmsToContact(contact.getPhoneNumber(), messageBuilder.buildFalseAlarmMessage(contact.getFirstName() + " " + contact.getLastName()));
-                // TODO Name instead of Number
-            }
-            boolean successful = true;
-            for (Boolean each : smsSentSuccessfullyList) {
-                if (!each) {
-                    // TODO sendBroadcast not successful
-                    successful = false;
-                    break;
-                }
-            }
-            if (successful) {
-                Log.d(TAG, "Alles hat geklappt");
-            } else {
-                Log.d(TAG, "Irgendwas ist schiefgelaufen");
+                sendSmsToContact(contact.getPhoneNumber(), splitMessageToSmsFormat(messageBuilder.buildFalseAlarmMessage(contact.getFirstName() + " " + contact.getLastName())), falseAlarm);
             }
 
         } else {
             for (Contact contact : contactList) {
                 String[] message = messageBuilder.buildSosMessage(contact.getFirstName() + " " + contact.getLastName());
-                sendSmsToContact(contact.getPhoneNumber(), message[0]);
-                sendSmsToContact(contact.getPhoneNumber(), message[1]);
-                // TODO Name instead of Number
+                sendSmsToContact(contact.getPhoneNumber(), splitMessageToSmsFormat(message[0] + message[1]), falseAlarm);
             }
         }
     }
 
-    private void sendSmsToContact(String phoneNumber, String message) {
-        PendingIntent sentIntent = PendingIntent.getBroadcast(this, 0, new Intent("SMS_SENT"), 0);
-//        PendingIntent deliveredIntent = PendingIntent.getBroadcast(this, 0, new Intent("SMS_DELIVERED"), 0);
+    private void sendSmsToContact(String phoneNumber, ArrayList<String> smsList, boolean falseAlarm) {
 
-        if (message.length() <= 160) {
-            smsManager.sendTextMessage(phoneNumber, null, message, sentIntent, null);
-        } else {
-            String part1 = message.substring(0, MAX_SMS_LENGTH);
-            String part2 = message.substring(MAX_SMS_LENGTH);
+        Intent lastPart = new Intent("LAST_PART");
+        Intent normalSmsPart = new Intent("SMS_SENT");
+
+        PendingIntent sentIntent = PendingIntent.getBroadcast(this, 0, normalSmsPart, 0);
+        for (int i = 0; i < smsList.size(); i++) {
+            if (i == smsList.size() - 1) {
+                sentIntent = PendingIntent.getBroadcast(this, 0, lastPart, 0);
+            }
+            smsManager.sendTextMessage(phoneNumber, null, smsList.get(i), sentIntent, null);
+        }
+    }
+
+    private ArrayList<String> splitMessageToSmsFormat(String message) {
+        ArrayList<String> smsList = new ArrayList<String>();
+
+        String messageText = message;
+
+        while (messageText.length() > MAX_SMS_LENGTH) {
+
+            String part1 = messageText.substring(0, MAX_SMS_LENGTH);
+            String part2 = messageText.substring(MAX_SMS_LENGTH);
 
             int indexOfBlank = 0;
 
@@ -149,9 +148,15 @@ public class SosModeManager extends Service {
                 part1 = part1.substring(0, indexOfBlank);
             }
 
-            smsManager.sendTextMessage(phoneNumber, null, part1, null, null);
-            sendSmsToContact(phoneNumber, part2);
+            smsList.add(part1);
+            messageText = part2;
+//
+//           Log.d(TAG, "splitMessageToSmsFormat: " + part1);
+//           Log.d(TAG, "splitMessageToSmsFormat: " + part2);
         }
+        smsList.add(messageText);
+
+        return smsList;
     }
 
     /**
@@ -160,43 +165,91 @@ public class SosModeManager extends Service {
      */
     private void initActivityReceiver() {
         receiver = new BroadcastReceiver() {
-
             @Override
             public void onReceive(Context context, Intent intent) {
                 switch (intent.getAction()) {
                     case "android.intent.action.SEND_FALSE_ALARM_SMS": {
-
                         sendSms(contactList, true);
                         break;
                     }
                     case "SMS_SENT": {
-                        boolean successful = false;
+                        boolean successful;
+
                         switch (getResultCode()) {
-                            case Activity.RESULT_OK:
+                            case Activity.RESULT_OK: {
                                 successful = true;
                                 break;
-//                            case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-//                                s = "Generic Failure Error";
-//                                break;
-//                            case SmsManager.RESULT_ERROR_NO_SERVICE:
-//                                s = "Error : No Service Available";
-//                                break;
-//                            case SmsManager.RESULT_ERROR_NULL_PDU:
-//                                s = "Error : Null PDU";
-//                                break;
-//                            case SmsManager.RESULT_ERROR_RADIO_OFF:
-//                                s = "Error : Radio is off";
-//                                break;
-                            default:
+                            }
+                            case SmsManager.RESULT_ERROR_GENERIC_FAILURE: {
                                 successful = false;
                                 break;
-                        }
-                        if (successful) {
-                            smsSentSuccessfullyList.add(true);
-                        } else {
-                            smsSentSuccessfullyList.add(false);
+                            }
+                            case SmsManager.RESULT_ERROR_NO_SERVICE: {
+                                successful = false;
+                                break;
+                            }
+                            case SmsManager.RESULT_ERROR_NULL_PDU: {
+                                successful = false;
+                                break;
+                            }
+                            case SmsManager.RESULT_ERROR_RADIO_OFF: {
+                                successful = false;
+                                break;
+                            }
+                            default: {
+                                successful = false;
+                                break;
+                            }
                         }
 
+                        if (successful) {
+                            smsSentSuccessfullyList.add("true");
+                        } else {
+                            smsSentSuccessfullyList.add("false");
+                        }
+                        break;
+                    }
+                    case "LAST_PART": {
+                        boolean successful;
+                        switch (getResultCode()) {
+                            case Activity.RESULT_OK: {
+                                successful = true;
+                                break;
+                            }
+                            case SmsManager.RESULT_ERROR_GENERIC_FAILURE: {
+                                successful = false;
+                                break;
+                            }
+                            case SmsManager.RESULT_ERROR_NO_SERVICE: {
+                                successful = false;
+                                break;
+                            }
+                            case SmsManager.RESULT_ERROR_NULL_PDU: {
+                                successful = false;
+                                break;
+                            }
+                            case SmsManager.RESULT_ERROR_RADIO_OFF: {
+                                successful = false;
+                                break;
+                            }
+                            default: {
+                                successful = false;
+                                break;
+                            }
+                        }
+
+                        if (successful) {
+                            smsSentSuccessfullyList.add("true");
+                        } else {
+                            smsSentSuccessfullyList.add("false");
+                        }
+                        Log.d(TAG, "onReceive: " + smsSentSuccessfullyList.size());
+
+                        numberOfContactPersons++;
+
+                        if (numberOfContactPersons >= contactList.size()) {
+                            checkIfSendSmsSuccessful();
+                        }
                         break;
                     }
                     default: {
@@ -211,6 +264,7 @@ public class SosModeManager extends Service {
         IntentFilter filter = new IntentFilter();
 
         filter.addAction("SMS_SENT");
+        filter.addAction("LAST_PART");
         filter.addAction("android.intent.action.SEND_FALSE_ALARM_SMS");
 
         registerReceiver(receiver, filter);
@@ -226,6 +280,24 @@ public class SosModeManager extends Service {
         }.getType();
         contactList = new Gson().fromJson(contactsJSON, type);
         return contactList;
+    }
+
+    private void checkIfSendSmsSuccessful() {
+        Log.d(TAG, "Check SMS");
+        boolean successful = true;
+        Log.d(TAG, "checkIfSendSmsSuccessful size : " + smsSentSuccessfullyList.size());
+        for (String sentSms : smsSentSuccessfullyList) {
+            Log.d(TAG, "checkIfSendSmsSuccessful: " + sentSms);
+            if (sentSms == "false") {
+                Log.d(TAG, "checkIfSendSmsSuccessful:  smsSent == false");
+                sendBroadcast(new Intent("android.intent.action.SMS_SENT_STATUS").putExtra("status", false));
+                successful = false;
+            }
+        }
+        if (successful) {
+            Log.d(TAG, "Sending was successful!");
+            sendBroadcast(new Intent("android.intent.action.SMS_SENT_STATUS").putExtra("status", true));
+        }
     }
 
     @Override
