@@ -204,7 +204,8 @@ public class ActiveMode extends AppCompatActivity {
                 LayoutInflater inflater = getLayoutInflater();
                 View dialogLayout = inflater.inflate(R.layout.dialog_active_mode_notification, null);
 
-                Button dialogResetButton = dialogLayout.findViewById(R.id.activeMode_dialog_buttonReset);
+                Button dialogResetButton = dialogLayout.findViewById(R.id.activeMode_dialog_resetButton);
+                Button dialogSosButton = dialogLayout.findViewById(R.id.activeMode_dialog_sosButton);
 
                 dialogResetButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -212,6 +213,14 @@ public class ActiveMode extends AppCompatActivity {
                         sendBroadcast(new Intent("android.intent.action.RESET_TIMER"));
                         sendBroadcast(new Intent("android.intent.action.STOP_NOTIFICATION"));
                         currentDialog.dismiss();
+                    }
+                });
+
+                dialogSosButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(getApplicationContext(), SosMode.class));
+                        finish();
                     }
                 });
 
