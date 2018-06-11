@@ -17,9 +17,11 @@ import java.util.ArrayList;
 
 public class SettingsPreviewMessage extends AppCompatActivity {
 
+    // DEBUG
     private final String TAG = "PreviewMessage";
+    //
 
-    //MessageBuilder
+    // MessageBuilder
     MessageBuilder messageBuilder;
 
     @Override
@@ -50,7 +52,6 @@ public class SettingsPreviewMessage extends AppCompatActivity {
         String contactsJSON = savedContacts.getString(getString(R.string.sp_key_contacts_json), getString(R.string.default_contacts_json));
         Type type = new TypeToken<ArrayList<Contact>>() {
         }.getType();
-        ArrayList contactList = new Gson().fromJson(contactsJSON, type);
-        return contactList;
+        return new Gson().fromJson(contactsJSON, type);
     }
 }

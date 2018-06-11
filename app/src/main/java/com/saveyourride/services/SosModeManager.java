@@ -91,7 +91,7 @@ public class SosModeManager extends Service {
     }
 
     /**
-     * send for each contact a sms.
+     * Send for each contact a sms.
      *
      * @param contactList the list of contacts which will be contacted
      * @param falseAlarm  true if it is a false alarm
@@ -117,7 +117,7 @@ public class SosModeManager extends Service {
     }
 
     /**
-     * send a list of sms to a phoneNumber
+     * Send a list of sms to a phoneNumber
      * @param phoneNumber to this number the sms will be send
      * @param smsList
      * @param falseAlarm if it is true, it is a false alarm
@@ -145,9 +145,9 @@ public class SosModeManager extends Service {
     }
 
     /**
-     * a sms is limited to 160 characters
+     * A sms is limited to 160 characters
      * @param message text to split in 160 big parts
-     * @return
+     * @return list of split messages.
      */
     private ArrayList<String> splitMessageToSmsFormat(String message) {
         ArrayList<String> smsList = new ArrayList<String>();
@@ -160,7 +160,6 @@ public class SosModeManager extends Service {
             String part2 = messageText.substring(MAX_SMS_LENGTH);
 
             int indexOfBlank = 0;
-
 
             char[] part1AsCharArray = part1.toCharArray();
             for (int i = part1.length() - 1; i >= 0; i--) {
@@ -177,12 +176,8 @@ public class SosModeManager extends Service {
 
             smsList.add(part1);
             messageText = part2;
-//
-//           Log.d(TAG, "splitMessageToSmsFormat: " + part1);
-//           Log.d(TAG, "splitMessageToSmsFormat: " + part2);
         }
         smsList.add(messageText);
-
         return smsList;
     }
 
@@ -222,7 +217,6 @@ public class SosModeManager extends Service {
                         }
                         break;
                     }
-
                     case "SMS_FALSE_ALARM_SENT": {
                         readSmsStatus(getResultCode());
                         break;
@@ -244,7 +238,6 @@ public class SosModeManager extends Service {
                         }
                         break;
                     }
-
                     default: {
                         Log.d(TAG, "NO SUCH ACTION IN BROADCAST!");
                         break;
@@ -301,14 +294,14 @@ public class SosModeManager extends Service {
         } else {
             smsSentSuccessfullyList.add("false");
         }
-
     }
 
     private boolean checkIfSendSmsSuccessful() {
 
-        //Debug
+        // DEBUG
         Log.d(TAG, "Check SMS");
         Log.d(TAG, "checkIfSendSmsSuccessful size : " + smsSentSuccessfullyList.size());
+        //
 
         for (String sentSms : smsSentSuccessfullyList) {
             Log.d(TAG, "checkIfSendSmsSuccessful: " + sentSms);
@@ -342,7 +335,6 @@ public class SosModeManager extends Service {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receiver);
-
         if (sosModeStartTimer != null) {
             sosModeStartTimer.cancel();
         }

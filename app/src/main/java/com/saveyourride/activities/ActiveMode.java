@@ -149,6 +149,10 @@ public class ActiveMode extends AppCompatActivity {
                         currentDialog.dismiss();
                         break;
                     }
+                    case "android.intent.action.FINISH_MODE": {
+                        finish();
+                        break;
+                    }
                     default:
                         Log.d(TAG, "Unknown Broadcast received");
                         break;
@@ -165,6 +169,7 @@ public class ActiveMode extends AppCompatActivity {
         filter.addAction("android.intent.action.ITE_SHOW_DIALOG");
         filter.addAction("android.intent.action.AGP_SHOW_DIALOG");
         filter.addAction("android.intent.action.DISMISS_DIALOG");
+        filter.addAction("android.intent.action.FINISH_MODE");
 
         // register our receiver
         registerReceiver(receiver, filter);
@@ -315,11 +320,8 @@ public class ActiveMode extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         sendBroadcast(new Intent("android.intent.action.STOP_TIMER"));
-
         unregisterReceiver(receiver);
-
         stopService(notificationService);
         stopService(ammService);
     }

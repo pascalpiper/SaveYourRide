@@ -295,6 +295,10 @@ public class PassiveMode extends AppCompatActivity {
                         }
                         break;
                     }
+                    case "android.intent.action.FINISH_MODE": {
+                        finish();
+                        break;
+                    }
                     default:
                         Log.d(TAG, "Unknown Broadcast received");
                         break;
@@ -312,6 +316,7 @@ public class PassiveMode extends AppCompatActivity {
         filter.addAction("android.intent.action.LOCATION_PROVIDER_STATUS_UPDATE");
         filter.addAction("android.intent.action.LOCATION_PROVIDER_DISABLED");
         filter.addAction("android.intent.action.LOCATION_PROVIDER_ENABLED");
+        filter.addAction("android.intent.action.FINISH_MODE");
 
         // register our receiver
         registerReceiver(receiver, filter);
@@ -524,12 +529,10 @@ public class PassiveMode extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         // DEBUG
         Log.d(TAG, "onDestroy!");
         //
         unregisterReceiver(receiver);
-
         stopService(notificationService);
         stopService(pmmService);
     }

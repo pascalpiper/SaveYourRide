@@ -10,7 +10,6 @@ public class SettingsMain extends AppCompatActivity {
     // Debug
     private final String TAG = "SettingsMain";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

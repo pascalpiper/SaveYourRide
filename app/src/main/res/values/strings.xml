@@ -138,6 +138,7 @@
     <string name="pref_custom_message">pref_custom_message</string>
     <string name="pref_allergies">pref_allergies</string>
     <string name="pref_drugs">pref_drugs</string>
+    <string name="pref_contacts">pref_contacts</string>
     <string name="pref_included_information">pref_included_information</string>
 
     <!-- preview message -->
