@@ -125,14 +125,10 @@
 
     <string name="title_enable_custom_message">Custom Message</string>
     <string name="summary_enable_custom_message">Use custom text as SOS-Message instead of the default message</string>
-
     <string name="title_custom_message">Custom Message</string>
-
-
     <string name="title_accident_time">Accident Time</string>
-    <string name="pref_included_information">Information included in message</string>
-
     <string name="title_preview">Preview</string>
+    <string name="title_included_information">Included information</string>
 
     <!-- keys -->
     <string name="pref_preview_message">pref_preview_message</string>
@@ -142,17 +138,21 @@
     <string name="pref_custom_message">pref_custom_message</string>
     <string name="pref_allergies">pref_allergies</string>
     <string name="pref_drugs">pref_drugs</string>
+    <string name="pref_included_information">pref_included_information</string>
 
     <!-- preview message -->
     <string name="test_contact">Test Contact</string>
 
     <!-- message -->
-    <string name="greeting">Hello</string>
-    <string name="sos_message">Das ist ein Notfall-Signal.Die App SaveYourRide hat einen Notfall registriet.
-    //Name/ is possible injured. Please try to contact him. So you can help or know if it is an false alarm or not.
-    If you can not reach //the person/ then please call the official emergency numbers</string>
+    <string name="greeting">Hello %1$s,</string>
+    <string name="sos_message">This is an emergency signal. The app SaveYourRide registered an emergency. %1$s is possible injured. Please try to contact %1$s. So, you can help or know if it is a false alarm or not. If you cannot reach %1$s, please call the official emergency numbers. </string>
+    <string name="false_alarm_message">The emergency sigal which was sent before, was a false alarm. Everything is okay. </string>
 
-    <string name="false_alarm_message">the emergency sigal wich was sent before, was a false alarm. Everything is okay. </string>
+    <!-- status in Sos mode -->
+    <string name="status_sent_sms_not_successful">Not all SOS signals have sent successful!</string>
+    <string name="status_sent_sms_successful">All SOS signals have sent successful!</string>
 
+    <string name="status_sent_false_alarm_sms_not_successful">Not all sigals for false alarm have sent successful!</string>
+    <string name="status_sent_false_alarm_sms_successful">All signals for false alarm have sent successful!</string>
 
 </resources>

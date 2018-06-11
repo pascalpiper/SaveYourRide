@@ -46,8 +46,8 @@ public class MessageBuilder {
 
 
     public String buildFalseAlarmMessage(String contact) {
-        String message = context.getString(R.string.greeting) + " "
-                + contact + ", \n"
+        String message = String.format(context.getString(R.string.greeting), contact)
+                + "\n"
                 + context.getString(R.string.false_alarm_message);
         return message;
     }
@@ -58,13 +58,13 @@ public class MessageBuilder {
         String messageContent;
 
         if (customMessageEnabled) {
-            messageContent = sharedPreferencesSettings.getString("pref_custom_message", "default");
+            messageContent = sharedPreferencesSettings.getString(context.getResources().getString(R.string.pref_custom_message), "default");
         } else {
-            messageContent = context.getString(R.string.sos_message);
+            messageContent = String.format(context.getString(R.string.sos_message), name);
         }
 
-        message = context.getString(R.string.greeting) + " "
-                + contact + ", \n"
+        message = String.format(context.getString(R.string.greeting), contact)
+                + "\n"
                 + messageContent
                 + "\n "
         ;
@@ -76,7 +76,7 @@ public class MessageBuilder {
     private String getImportantInformations() {
         String message = "Important information: ";
 
-        Set<String> included_information = sharedPreferencesSettings.getStringSet("pref_included_information", null);
+        Set<String> included_information = sharedPreferencesSettings.getStringSet(context.getResources().getString(R.string.pref_included_information), null);
         informationList = new String[6];
 
         for (String each : included_information) {
@@ -84,7 +84,7 @@ public class MessageBuilder {
         }
 
         for (int i = 0; i < informationList.length; i++) {
-            if (informationList[i] != null) {
+            if (informationList[i] != null && !informationList[i].isEmpty()) {
                 message = message + informationList[i];
             }
         }
@@ -130,7 +130,7 @@ public class MessageBuilder {
             default:
                 newInformation = null;
         }
-        if (newInformation != null && informationID >= 0) {
+        if (newInformation != null && !newInformation.isEmpty() && informationID >= 0) {
 //            informationList[informationID] = typeOfInformation + "- " + newInformation;
             informationList[informationID] = "\n->" + typeOfInformation + ":" + newInformation + " ";
         }
@@ -139,18 +139,21 @@ public class MessageBuilder {
 
     public void readPreferences() {
         sharedPreferencesSettings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences locationPreferences = context.getSharedPreferences(context.getString(R.string.sp_key_last_known_location), Context.MODE_PRIVATE);
 
 
-        latitude = "5456.666"; // TODO Location
-        longitude = "4156.24";
+        latitude = locationPreferences.getString(context.getResources().getString(R.string.sp_key_latitude), " ");
+        longitude = locationPreferences.getString(context.getResources().getString(R.string.sp_key_longitude), " ");
 
         SimpleDateFormat mdformat = new SimpleDateFormat("HH:mm");
         accidentTime = mdformat.format(Calendar.getInstance().getTime());
 
-        name = sharedPreferencesSettings.getString("pref_name", "default_name");
-        diseases = sharedPreferencesSettings.getString("pref_diseases", "default_name");
-        allergies = sharedPreferencesSettings.getString("pref_allergies", "default_name");
-        drugs = sharedPreferencesSettings.getString("pref_drugs", "default_name");
+
+        name = sharedPreferencesSettings.getString(context.getResources().getString(R.string.pref_name), " ");
+        diseases = sharedPreferencesSettings.getString(context.getResources().getString(R.string.pref_diseases), " ");
+        allergies = sharedPreferencesSettings.getString(context.getResources().getString(R.string.pref_allergies), " ");
+        drugs = sharedPreferencesSettings.getString(context.getResources().getString(R.string.pref_drugs), " ");
+
 
         for (Contact contact : readContacts()) {
 
@@ -165,7 +168,7 @@ public class MessageBuilder {
             }
         }
 
-        customMessageEnabled = sharedPreferencesSettings.getBoolean("pref_enable_custom_message", false);
+        customMessageEnabled = sharedPreferencesSettings.getBoolean(context.getResources().getString(R.string.pref_enable_custom_message), false);
 
     }
 
