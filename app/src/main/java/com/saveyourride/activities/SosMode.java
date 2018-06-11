@@ -119,8 +119,7 @@ public class SosMode extends AppCompatActivity {
                         } else {
                             textViewStatus.setText(getString(R.string.status_sent_false_alarm_sms_successful));
                             buttonFalseAlarm.setClickable(false);
-                            // TODO ETWAS SCHÖNER
-                            buttonFalseAlarm.setBackgroundColor(getResources().getColor(R.color.cardview_dark_background, null));
+                            buttonFalseAlarm.setBackground(getDrawable(R.drawable.round_button_grey));
                         }
 
                         break;
