@@ -80,8 +80,6 @@ public class SosModeManager extends Service {
                 // Set Ring Stream Volume to max for incoming Calls from Sos-Contacts
                 AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                 audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamMaxVolume(AudioManager.STREAM_RING), AudioManager.FLAG_VIBRATE);
-
-                smsManager.sendTextMessage("+491752847846", null, "Test", null, null);
             }
         }.start();
 

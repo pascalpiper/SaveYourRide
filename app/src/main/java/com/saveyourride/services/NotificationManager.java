@@ -230,6 +230,9 @@ public class NotificationManager extends Service {
 
     @Override
     public void onDestroy() {
+        // DEBUG
+        Log.d(TAG, "onDestroy!");
+        //
         super.onDestroy();
         unregisterReceiver(receiver);
         if(currentTimer != null){
