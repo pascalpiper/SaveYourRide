@@ -398,10 +398,8 @@ public class PassiveMode extends AppCompatActivity {
                 alert.setNegativeButton(R.string.sos, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // DEBUG
-                        Log.d(TAG, "AGP-DIALOG: SOS-Button was clicked!");
-                        //
-                        // TODO: Call SOS-MODE
+                        startActivity(new Intent(getApplicationContext(), SosMode.class));
+                        finish();
                     }
                 });
 
