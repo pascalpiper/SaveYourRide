@@ -3,23 +3,30 @@ package com.saveyourride.services;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.saveyourride.R;
+
 public class Location extends Service {
 
     // DEBUG
-    private static final String TAG = "LOCATION_SERVICE";
+    private static final String TAG = "Location";
     //
+
     private static final int LOCATION_INTERVAL = 1000;
-    private static final float LOCATION_DISTANCE = 5f;
-    private LocationManager mLocationManager;
+    private static final float LOCATION_DISTANCE = 1f;
     LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER),
             new LocationListener(LocationManager.NETWORK_PROVIDER)
     };
+    // SharedPreferences for last known location
+    private SharedPreferences lastKnownLocation;
+    // LocationManager
+    private LocationManager mLocationManager;
 
     @Override
     public void onCreate() {
@@ -28,6 +35,9 @@ public class Location extends Service {
         // DEBUG
         Log.d(TAG, "onCreate");
         //
+
+        // Set SharedPreferences
+        lastKnownLocation = getSharedPreferences(getString(R.string.sp_key_last_known_location), Context.MODE_PRIVATE);
 
         initializeLocationManager();
         try {
@@ -59,14 +69,26 @@ public class Location extends Service {
         }
     }
 
+    /**
+     * Save new or changed {@code location} to shared preferences.
+     *
+     * @param location new or changed {@code location}
+     */
+    private void saveLocation(android.location.Location location) {
+        SharedPreferences.Editor editor = lastKnownLocation.edit();
+        editor.putString(getString(R.string.sp_key_latitude), Double.toString(location.getLatitude()));
+        editor.putString(getString(R.string.sp_key_longitude), Double.toString(location.getLongitude()));
+        editor.apply();
+    }
+
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
         if (mLocationManager != null) {
-            for (int i = 0; i < mLocationListeners.length; i++) {
+            for (LocationListener each : mLocationListeners) {
                 try {
-                    mLocationManager.removeUpdates(mLocationListeners[i]);
+                    mLocationManager.removeUpdates(each);
                 } catch (Exception ex) {
                     Log.e(TAG, "fail to remove location listeners, ignore", ex);
                 }
@@ -79,40 +101,69 @@ public class Location extends Service {
         return null;
     }
 
+    /**
+     * Listener for location updates and provider changes.
+     */
     private class LocationListener implements android.location.LocationListener {
         android.location.Location mLastLocation;
 
-        public LocationListener(String provider) {
-            Log.d(TAG, "LocationListener: " + provider);
+        private LocationListener(String provider) {
+            // DEBUG
+            Log.d(TAG, "LocationListener constructor: " + provider);
+            //
             mLastLocation = new android.location.Location(provider);
         }
 
         @Override
         public void onLocationChanged(android.location.Location location) {
-            Log.d(TAG, "onLocationChanged: " + location + "Speed:" + location.getSpeed());
+            // DEBUG
+            Log.d(TAG, "onLocationChanged: " + location);
+            //
             mLastLocation.set(location);
 
-            //Send locationSpeed to PassiveModeManager
-            Intent locationSpeed = new Intent("android.intent.action.LOCATION")
-                    .putExtra("location_speed", location.getSpeed())
-                    .putExtra("location_latitude", location.getLatitude())
-                    .putExtra("location_longitude", location.getLongitude());
-            sendBroadcast(locationSpeed);
+            // Save new location to SharedPreferences
+            saveLocation(location);
+
+            //Send location update broadcast
+            Intent locationUpdate = new Intent("android.intent.action.LOCATION_UPDATE")
+                    .putExtra("latitude", location.getLatitude())
+                    .putExtra("longitude", location.getLongitude())
+                    .putExtra("locationProvider", location.getProvider());
+            sendBroadcast(locationUpdate);
         }
 
         @Override
         public void onProviderDisabled(String provider) {
+            // DEBUG
             Log.d(TAG, "onProviderDisabled: " + provider);
+            //
+            //Send broadcast
+            Intent providerDisabled = new Intent("android.intent.action.LOCATION_PROVIDER_DISABLED")
+                    .putExtra("locationProvider", provider);
+            sendBroadcast(providerDisabled);
         }
 
         @Override
         public void onProviderEnabled(String provider) {
+            //
             Log.d(TAG, "onProviderEnabled: " + provider);
+            //
+            //Send broadcast
+            Intent providerEnabled = new Intent("android.intent.action.LOCATION_PROVIDER_ENABLED")
+                    .putExtra("locationProvider", provider);
+            sendBroadcast(providerEnabled);
         }
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.d(TAG, "onStatusChanged: " + provider);
+            // DEBUG
+            Log.d(TAG, "onStatusChanged: Provider:" + provider + " Status: " + status + " (2 means AVAILABLE)");
+            //
+            //Send status update broadcast
+            Intent statusUpdate = new Intent("android.intent.action.LOCATION_PROVIDER_STATUS_UPDATE")
+                    .putExtra("locationProvider", provider)
+                    .putExtra("locationProviderStatus", status);
+            sendBroadcast(statusUpdate);
         }
     }
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -27,26 +28,25 @@ public class ActiveMode extends AppCompatActivity {
     private final String TAG = "ActiveMode";
     //
 
-    // TODO: Pick Up values for number of intervals and interval time
-    private final int numberOfIntervals = 6;
-    private final long intervalTime = 10000L;
-
-    //Dialog IDs
+    // Dialog IDs
     private final int BACK_PRESSED = 0;
     private final int INTERVAL_TIME_EXPIRED = 1;
+    private final int ACCIDENT_GUARANTEE_PROCEDURE = 2;
+    private final int SOS_BUTTON = 3;
 
-    //Dialog
+
+    // Dialog
     AlertDialog currentDialog;
 
-    // BroadcastReceiver for messages from ActiveModeManager (AMM)
+    // BroadcastReceiver
     private BroadcastReceiver receiver;
+
+    // Intents for Services | ActiveModeManager (AMM)
+    private Intent notificationService, ammService;
 
     // TextViews
     private TextView textViewIntervalNumber;
     private TextView textViewTime;
-
-    // Intents for Services | ActiveModeManager (AMM)
-    private Intent notificationService, ammService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,14 +56,13 @@ public class ActiveMode extends AppCompatActivity {
         setContentView(R.layout.activity_active_mode);
 
         // Views
-        Button buttonResetTimer = (Button) findViewById(R.id.buttonResetTimer);
-        Button buttonStopTimer = (Button) findViewById(R.id.buttonStopTimer);
-        textViewTime = (TextView) findViewById(R.id.textViewTimer);
-        textViewIntervalNumber = (TextView) findViewById(R.id.textViewIntervalCount);
+        Button buttonResetTimer = (Button) findViewById(R.id.activeMode_buttonReset);
+        Button buttonStopTimer = (Button) findViewById(R.id.activeMode_buttonStop);
+        textViewTime = (TextView) findViewById(R.id.activeMode_textViewTime);
+        textViewIntervalNumber = (TextView) findViewById(R.id.activeMode_textViewNumberOfIntervals);
 
         // Keeps Activity ON also on lock screen
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -92,11 +91,20 @@ public class ActiveMode extends AppCompatActivity {
                 finish();
             }
         });
+
+        Button buttonSos = (Button) findViewById(R.id.activeMode_buttonSos);
+
+        buttonSos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAlertDialog(SOS_BUTTON);
+            }
+        });
     }
 
     /**
-     * Creates new {@code BroadcastReceiver} and {@code IntentFilter} for messages from {@code ActiveModeManager} and registers them.
-     * {@code receiver} receives the broadcasts from the ActiveModeManager and Notification Manager
+     * Creates new {@code BroadcastReceiver} and {@code IntentFilter} and then registers them.
+     * {@code receiver} receives the broadcasts from the {@code ActiveModeManager} and {@code NotificationManager}.
      * It can receive following broadcasts:
      * - status, that the AMM-Service is ready
      * - intervalNumber
@@ -110,7 +118,12 @@ public class ActiveMode extends AppCompatActivity {
                 //extract our message from intent
                 switch (intent.getAction()) {
                     case "android.intent.action.AMM_SERVICE_READY": {
-                        sendBroadcast(new Intent("android.intent.action.START_TIMER").putExtra("numberOfIntervals", numberOfIntervals).putExtra("intervalTime", intervalTime));
+                        SharedPreferences timerValues = getSharedPreferences(getString(R.string.sp_key_timer_values), Context.MODE_PRIVATE);
+                        int numberOfIntervals = timerValues.getInt(getString(R.string.sp_key_number_of_interval), getResources().getInteger(R.integer.default_number_of_intervals));
+                        long timeOfInterval = timerValues.getLong(getString(R.string.sp_key_time_of_interval), getResources().getInteger(R.integer.default_time_of_interval));
+                        sendBroadcast(new Intent("android.intent.action.START_TIMER")
+                                .putExtra("numberOfIntervals", numberOfIntervals)
+                                .putExtra("timeOfInterval", timeOfInterval));
                         break;
                     }
                     case "android.intent.action.REST_INTERVAL_TIME": {
@@ -120,18 +133,21 @@ public class ActiveMode extends AppCompatActivity {
                     }
                     case "android.intent.action.INTERVAL_NUMBER": {
                         int intervalNumber = intent.getIntExtra("interval_number", -1);
-                        textViewIntervalNumber.setText(Integer.toString(intervalNumber) + " / " + numberOfIntervals);
+                        int numberOfIntervals = intent.getIntExtra("number_of_intervals", -1);
+                        textViewIntervalNumber.setText(intervalNumber + " / " + numberOfIntervals);
                         break;
                     }
-                    case "android.intent.action.ITM_SHOW_DIALOG": {
+                    case "android.intent.action.ITE_SHOW_DIALOG": {
                         showAlertDialog(INTERVAL_TIME_EXPIRED);
                         break;
                     }
+                    case "android.intent.action.AGP_SHOW_DIALOG": {
+                        showAlertDialog(ACCIDENT_GUARANTEE_PROCEDURE);
+                        break;
+                    }
                     case "android.intent.action.DISMISS_DIALOG": {
-                        // DEBUG
-                        Log.d(TAG, "'DISMISS_DIALOG' - broadcast was received!");
-                        //
                         currentDialog.dismiss();
+                        break;
                     }
                     default:
                         Log.d(TAG, "Unknown Broadcast received");
@@ -146,7 +162,8 @@ public class ActiveMode extends AppCompatActivity {
         filter.addAction("android.intent.action.AMM_SERVICE_READY");
         filter.addAction("android.intent.action.REST_INTERVAL_TIME");
         filter.addAction("android.intent.action.INTERVAL_NUMBER");
-        filter.addAction("android.intent.action.ITM_SHOW_DIALOG");
+        filter.addAction("android.intent.action.ITE_SHOW_DIALOG");
+        filter.addAction("android.intent.action.AGP_SHOW_DIALOG");
         filter.addAction("android.intent.action.DISMISS_DIALOG");
 
         // register our receiver
@@ -171,7 +188,6 @@ public class ActiveMode extends AppCompatActivity {
                         ActiveMode.super.onBackPressed();
                     }
                 });
-
                 alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -188,7 +204,7 @@ public class ActiveMode extends AppCompatActivity {
                 LayoutInflater inflater = getLayoutInflater();
                 View dialogLayout = inflater.inflate(R.layout.dialog_active_mode_notification, null);
 
-                Button dialogResetButton = dialogLayout.findViewById(R.id.dialogButtonResetTimer);
+                Button dialogResetButton = dialogLayout.findViewById(R.id.activeMode_dialog_buttonReset);
 
                 dialogResetButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -200,14 +216,71 @@ public class ActiveMode extends AppCompatActivity {
                 });
 
                 AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
                 // set the view from XML inside AlertDialog
                 alert.setView(dialogLayout);
+                alert.setCancelable(false);
 
                 currentDialog = alert.create();
                 currentDialog.show();
+                break;
             }
-            break;
+            case ACCIDENT_GUARANTEE_PROCEDURE: {
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                alert.setTitle(R.string.title_dialog_accident_guarantee_procedure_interval);
+                alert.setCancelable(false);
+
+                // Set up the buttons
+                alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        sendBroadcast(new Intent("android.intent.action.STOP_NOTIFICATION"));
+                        sendBroadcast(new Intent("android.intent.action.RESET_TIMER"));
+                        dialog.cancel();
+                    }
+                });
+                alert.setNegativeButton(R.string.sos, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // DEBUG
+                        Log.d(TAG, "AGP-DIALOG: SOS-Button was clicked!");
+                        //
+                        startActivity(new Intent(getApplicationContext(), SosMode.class));
+                        finish();
+                    }
+                });
+
+                currentDialog = alert.create();
+                currentDialog.show();
+                break;
+            }
+            case SOS_BUTTON: {
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                alert.setTitle(R.string.title_dialog_sos_button);
+                alert.setCancelable(false);
+
+                // Set up the buttons
+                alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(getApplicationContext(), SosMode.class));
+                        finish();
+                    }
+                });
+                alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                currentDialog = alert.create();
+                currentDialog.show();
+                break;
+            }
+            default: {
+                Log.d(TAG, "Unknown dialog!");
+                break;
+            }
         }
     }
 
@@ -240,8 +313,6 @@ public class ActiveMode extends AppCompatActivity {
 
         stopService(notificationService);
         stopService(ammService);
-
-        startActivity(new Intent(this.getApplicationContext(), MainScreen.class));
     }
 }
 

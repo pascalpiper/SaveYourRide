@@ -10,16 +10,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.saveyourride.activities.MainScreen;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
 public class PassiveModeManager extends Service {
 
     /// ONLY FOR DEBUG
@@ -37,112 +27,44 @@ public class PassiveModeManager extends Service {
     // Maximal time for which the probability of the accident is stored
     private final long MAX_WAIT_TIME = 120000L; // 120 seconds or 2 minutes
 
-    // Indices in ArrayLists
-    private final int PASSIVE_MODE_ACTIVITY = 0;
-    private final int ACCELEROMETER = 1;
-    private final int LOCATION = 2;
+    // probability of accident. Value in the range of 0.0 to 1.0 where 0.9 is 90%
+    private float accidentProbability = 0f;
+
+    // BroadcastReceiver
+    private BroadcastReceiver receiver;
+
+    // Intent for Service
+    private Intent accelerometerService;
 
     // CountDownTimers
     private CountDownTimer possibleAccidentTimer;
     private CountDownTimer noMovementTimer;
 
-    // ArrayLists
-    private ArrayList<BroadcastReceiver> broadcastReceivers;
-    private ArrayList<IntentFilter> intentFilters;
-    private ArrayList<Intent> serviceIntents;
-
-    // probability of accident. Value in the range of 0.0 to 1.0 where 0.9 is 90%
-    private float accidentProbability = 0f;
-
-    /// ONLY FOR TESTS
-    private File dataFileFirst;
-    private File dataFileSecond;
-    private String dataStringFirst;
-    private String dataStringSecond;
-    private String currentLocationString;
-    ///
-
     @Override
     public void onCreate() {
         super.onCreate();
 
-        /// ONLY FOR TESTS
-        dataFileFirst = getFile(1);
-        dataFileSecond = getFile(2);
+        // Initialize BroadcastReceiver
+        initReceiver();
 
-        dataStringFirst = "LAUNCH: " + getCurrentReadableDate() + "First Part";
-        dataStringSecond = "LAUNCH: " + getCurrentReadableDate() + " Second Part";
-        currentLocationString = "NO_LOCATION";
-        ///
+        // Create intent for service
+        accelerometerService = new Intent(this.getApplicationContext(), Accelerometer.class);
 
-        serviceIntents = new ArrayList<Intent>();
-        broadcastReceivers = new ArrayList<BroadcastReceiver>();
-        intentFilters = new ArrayList<IntentFilter>();
-
-        addAllServiceIntents();
-        addAllBroadcastReceivers();
-        addAllIntentFilters();
-
-        registerAllBroadcastReceivers();
-        startAllServices();
+        // Start Service
+        startService(accelerometerService);
     }
 
     /**
-     * Add all Intent of services to the ArrayList and specify this services.
+     * Creates new {@code BroadcastReceiver} and {@code IntentFilter} and then registers them.
+     * {@code receiver} receives the broadcasts from the {@code PassiveMode} activity,
+     * {@code Accelerometer} and {@code Location} services.
      */
-    private void addAllServiceIntents() {
-        serviceIntents.add(new Intent(this.getApplicationContext(), Accelerometer.class));
-        serviceIntents.add(new Intent(this.getApplicationContext(), Location.class));
-    }
-
-    /**
-     * Add all BroadcastReceivers to the ArrayList and assign the functionality to them.
-     */
-    private void addAllBroadcastReceivers() {
-        // Passive Mode Activity BroadcastReceiver // index = 0
-        broadcastReceivers.add(PASSIVE_MODE_ACTIVITY, new BroadcastReceiver() {
-
+    private void initReceiver() {
+        receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                // READ BUTTON PRESSED
-                System.out.println("Accelerometer Shake-Threshold under 100");
-                System.out.println("ACCELEROMETER DATA FILE: \n" + readAccelerometerDataFromFile(dataFileFirst));
-                System.out.println("");
-                System.out.println("-------------------------------------");
-                System.out.println("");
-                System.out.println("Accelerometer Shake-Threshold over 100");
-                System.out.println("ACCELEROMETER DATA FILE: \n" + readAccelerometerDataFromFile(dataFileSecond));
-
-            }
-        });
-
-        // Accelerometer BroadcastReceiver // index = 1
-        broadcastReceivers.add(ACCELEROMETER, new BroadcastReceiver() {
-
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                /// DEBUG
-                Log.d(TAG, "Broadcast from Accelerometer");
-                ///
                 switch (intent.getAction()) {
                     case "android.intent.action.ACCELEROMETER_POSSIBLE_ACCIDENT": {
-                        /// DEBUG
-                        Log.d(TAG, "Possible accident. acceleration was: " + intent.getFloatExtra("acceleration", -1f));
-                        ///
-                        /// ONLY FOR TESTS
-                        if (intent.getFloatExtra("acceleration", -1f) < 100f) {
-                            dataStringFirst = dataStringFirst + "\n" +
-                                    "Acceleration " + intent.getFloatExtra("acceleration", -1f) +
-                                    " " + currentLocationString +
-                                    " TimeStamp " + getCurrentReadableDate();
-                        } else {
-                            dataStringSecond = dataStringSecond + "\n" +
-                                    "Acceleration " + intent.getFloatExtra("acceleration", -1f) +
-                                    " " + currentLocationString +
-                                    " TimeStamp " + getCurrentReadableDate();
-                        }
-                        ///
-
                         // Before starting the new timer, cancel the old one
                         if (possibleAccidentTimer != null) {
                             possibleAccidentTimer.cancel();
@@ -155,27 +77,16 @@ public class PassiveModeManager extends Service {
                         break;
                     }
                     case "android.intent.action.ACCELEROMETER_NO_MOVEMENT": {
-                        /// DEBUG
-                        Log.d(TAG, "NO_MOVEMENT Broadcast received!");
-                        ///
                         long waitTime = calculateWaitTime(MIN_WAIT_TIME, MAX_WAIT_TIME, accidentProbability);
                         startNoMovementTimer(waitTime);
                         break;
                     }
                     case "android.intent.action.ACCELEROMETER_MOVEMENT_AGAIN": {
-                        /// DEBUG
-                        Log.d(TAG, "MOVEMENT_AGAIN Broadcast received!");
-                        ///
-
                         if (noMovementTimer != null) {
                             noMovementTimer.cancel();
-                            /// DEBUG
-                            Log.d(TAG, "NO_MOVEMENT_TIMER was canceled!");
-                            ///
                         }
-
-                        // TODO Cancel NotificationSound service or other services if they are started.
-
+                        sendBroadcast(new Intent("android.intent.action.STOP_NOTIFICATION"));
+                        Log.d(TAG, "Movement again, Stop Notification");
                         break;
                     }
                     default: {
@@ -184,82 +95,17 @@ public class PassiveModeManager extends Service {
                     }
                 }
             }
-        });
+        };
 
-        // Location BroadcastReceiver // index = 2
-        broadcastReceivers.add(LOCATION, new BroadcastReceiver() {
+        // IntentFilter filters messages received by BroadcastReceiver
+        IntentFilter filter = new IntentFilter();
 
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "Broadcast from Location");
-                Log.d(TAG, "Location Speed: " + intent.getFloatExtra("location_speed", -1f));
-                currentLocationString = "Location" +
-                        " Latitude " + intent.getDoubleExtra("location_latitude", -1d) +
-                        " Longitude " + intent.getDoubleExtra("location_longitude", -1d) +
-                        " Speed " + intent.getFloatExtra("location_speed", -1f);
-            }
-        });
-    }
+        filter.addAction("android.intent.action.ACCELEROMETER_POSSIBLE_ACCIDENT");
+        filter.addAction("android.intent.action.ACCELEROMETER_NO_MOVEMENT");
+        filter.addAction("android.intent.action.ACCELEROMETER_MOVEMENT_AGAIN");
 
-    /**
-     * Add all IntentFilters for BroadcastReceivers to the ArrayList and assign the actions to them.
-     */
-    private void addAllIntentFilters() {
-        // Passive Mode Activity IntentFilter
-        IntentFilter pmaFilter = new IntentFilter();
-        pmaFilter.addAction("android.intent.action.PASSIVE_MODE_ACTIVITY");
-        intentFilters.add(PASSIVE_MODE_ACTIVITY, pmaFilter); // index = 0
-
-        // Accelerometer IntentFilter
-        IntentFilter accelerometerFilter = new IntentFilter();
-        accelerometerFilter.addAction("android.intent.action.ACCELEROMETER_POSSIBLE_ACCIDENT");
-        accelerometerFilter.addAction("android.intent.action.ACCELEROMETER_NO_MOVEMENT");
-        accelerometerFilter.addAction("android.intent.action.ACCELEROMETER_MOVEMENT_AGAIN");
-        intentFilters.add(ACCELEROMETER, accelerometerFilter); // index = 1
-
-        // Location IntentFilter
-        IntentFilter locationFilter = new IntentFilter();
-        locationFilter.addAction("android.intent.action.LOCATION");
-        intentFilters.add(LOCATION, locationFilter); // index = 2
-    }
-
-    /**
-     * Register all BroadcastReceivers from the ArrayList with its IntentFilters in another ArrayList.
-     */
-    private void registerAllBroadcastReceivers() {
-        for (int i = 0; i < broadcastReceivers.size(); i++) {
-            registerReceiver(broadcastReceivers.get(i), intentFilters.get(i));
-        }
-    }
-
-    /**
-     * Unregister all BroadcastReceivers from this Service
-     */
-    private void unregisterAllBroadcastReceivers() {
-        for (int i = 0; i < broadcastReceivers.size(); i++) {
-            unregisterReceiver(broadcastReceivers.get(i));
-        }
-    }
-
-    /**
-     * Start all Services from the ArrayList
-     */
-    private void startAllServices() {
-        for (Intent service : serviceIntents) {
-            startService(service);
-        }
-    }
-
-    /**
-     * Stop all Services from the ArrayList
-     */
-    private void stopAllServices() {
-        for (Intent service : serviceIntents) {
-            // DEBUG
-            System.out.println("STOP SERVICE: " + service.toString());
-            //
-            stopService(service);
-        }
+        // register our receiver
+        registerReceiver(receiver, filter);
     }
 
     /**
@@ -275,7 +121,6 @@ public class PassiveModeManager extends Service {
                 Log.d(TAG, "POSSIBLE_ACCIDENT_TIMER_ON_TICK: probability of accident is: " + accidentProbability);
                 //
             }
-
             @Override
             public void onFinish() {
                 accidentProbability = 0f;
@@ -299,13 +144,12 @@ public class PassiveModeManager extends Service {
                 Log.d(TAG, "NO_MOVEMENT_TIMER_ON_TICK: wait for: " + millisUntilFinished + " milliseconds (in Seconds: " + ((int) millisUntilFinished / 1000) + ")");
                 //
             }
-
             @Override
             public void onFinish() {
                 // DEBUG
                 Log.d(TAG, "NO_MOVEMENT_TIMER_ON_FINISH: call NotificationSound Service");
                 //
-                // TODO: call the notification service
+                sendBroadcast(new Intent("android.intent.action.NO_MOVEMENT_DETECTED"));
             }
         }.start();
     }
@@ -366,48 +210,6 @@ public class PassiveModeManager extends Service {
         }
     }
 
-    /// ONLY FOR TESTS
-    private File getFile(int part) {
-        File path = getApplicationContext().getFilesDir();
-        if (part == 1) {
-            return new File(path, "accelerometer_data.txt");
-        } else {
-            return new File(path, "accelerometer_data_2.txt");
-        }
-    }
-
-    private void writeAccelerometerDataToFile(File file, String data) {
-        try {
-            FileOutputStream stream = new FileOutputStream(file);
-            stream.write(data.getBytes());
-            stream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String readAccelerometerDataFromFile(File file) {
-        int length = (int) file.length();
-        byte[] bytes = new byte[length];
-
-        try {
-            FileInputStream in = new FileInputStream(file);
-            in.read(bytes);
-            in.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return new String(bytes);
-    }
-
-    private String getCurrentReadableDate() {
-        long currentTimeMillis = System.currentTimeMillis();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        Date resultDate = new Date(currentTimeMillis);
-        return sdf.format(resultDate);
-    }
-    ///
-
     /**
      * Will be called after stopService(controlServiceIntent).
      */
@@ -415,7 +217,7 @@ public class PassiveModeManager extends Service {
     public void onDestroy() {
         super.onDestroy();
         // DEBUG
-        System.out.println("ON DESTROY " + TAG);
+        Log.d(TAG, "onDestroy");
         //
 
         if (possibleAccidentTimer != null) {
@@ -424,16 +226,9 @@ public class PassiveModeManager extends Service {
         if (noMovementTimer != null) {
             noMovementTimer.cancel();
         }
-        unregisterAllBroadcastReceivers();
-        stopAllServices();
+        unregisterReceiver(receiver);
 
-        Intent mainScreen = new Intent(this.getApplicationContext(), MainScreen.class);
-        startActivity(mainScreen);
-
-        /// ONLY FOR TESTS Write received broadcast into file
-        writeAccelerometerDataToFile(dataFileFirst, dataStringFirst);
-        writeAccelerometerDataToFile(dataFileSecond, dataStringSecond);
-        ///
+        stopService(accelerometerService);
     }
 
     @Nullable

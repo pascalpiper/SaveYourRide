@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/category_title_main_settings">
+        <EditTextPreference
+            android:icon="@drawable/ic_account_circle_black_24dp"
+            android:key="@string/pref_name"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/title_name" />
+
+        <EditTextPreference
+            android:icon="@drawable/ic_sentiment_very_dissatisfied_black_24dp"
+            android:key="@string/pref_diseases"
+            android:selectAllOnFocus="true"
+            android:singleLine="false"
+            android:title="@string/title_diseases" />
+
+        <EditTextPreference
+            android:icon="@drawable/ic_do_not_disturb_black_24dp"
+            android:key="@string/pref_allergies"
+            android:selectAllOnFocus="true"
+            android:singleLine="false"
+            android:title="@string/title_allergies" />
+
+        <EditTextPreference
+            android:icon="@drawable/ic_healing_black_24dp"
+            android:key="@string/pref_drugs"
+            android:selectAllOnFocus="true"
+            android:singleLine="false"
+            android:title="@string/title_drugs" />
+
+        <Preference
+            android:key="pref_contacts"
+            android:icon="@drawable/ic_group_black_24dp"
+            android:title="@string/title_activity_settings_contacts" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/category_title_sos_message">
+
+        <MultiSelectListPreference
+            android:defaultValue="@string/pref_included_information"
+            android:entries="@array/list_information_included_in_message"
+            android:entryValues="@array/list_information_included_in_message"
+            android:key="pref_included_information"
+            android:title="@string/title_included_information" />
+
+        <SwitchPreference
+            android:key="@string/pref_enable_custom_message"
+            android:summary="@string/summary_enable_custom_message"
+            android:title="@string/title_enable_custom_message" />
+
+        <EditTextPreference
+            android:key="@string/pref_custom_message"
+            android:selectAllOnFocus="true"
+            android:singleLine="false"
+            android:title="@string/title_custom_message"
+            android:enabled="false" />
+
+        <Preference
+            android:key="@string/pref_preview_message"
+            android:icon="@drawable/ic_tv_black_24dp"
+            android:title="@string/title_activity_settings_preview_message" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="list_information_included_in_message">
+        <item>GPS-Location</item>
+        <item>Time of Accident</item>
+        <item>Diseases</item>
+        <item>Allergies</item>
+        <item>Drugs</item>
+        <item>Informed contacts</item>
+    </string-array>
+
+</resources>
