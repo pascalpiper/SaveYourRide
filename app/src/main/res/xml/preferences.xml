@@ -31,7 +31,7 @@
             android:title="@string/title_drugs" />
 
         <Preference
-            android:key="pref_contacts"
+            android:key="@string/pref_contacts"
             android:icon="@drawable/ic_group_black_24dp"
             android:title="@string/title_activity_settings_contacts" />
 

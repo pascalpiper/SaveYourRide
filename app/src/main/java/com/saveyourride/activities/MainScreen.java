@@ -20,10 +20,6 @@ public class MainScreen extends AppCompatActivity {
     private final int PASSIVE_TAB = 0;
     private final int ACTIVE_TAB = 1;
 
-    /// TEST
-    private Intent activeIntent;
-    ///
-
     /**
      * Called when the activity is first created.
      */

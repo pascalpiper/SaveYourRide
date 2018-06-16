@@ -70,19 +70,16 @@ public class Accelerometer extends Service implements SensorEventListener {
                     noMovementBroadcastWasSent = false;
                 }
             }
-
             if (acceleration > ACCIDENT_THRESHOLD) {
                 Intent shake = new Intent("android.intent.action.ACCELEROMETER_POSSIBLE_ACCIDENT").putExtra("acceleration", acceleration);
                 sendBroadcast(shake);
                 noMovementCounter = 0;
             }
         }
-
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
     }
 
     @Override

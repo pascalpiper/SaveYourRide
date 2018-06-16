@@ -23,7 +23,6 @@ public class SosMode extends AppCompatActivity {
     // Intents for SosModeManager-Service (SMM)
     private Intent smmService;
 
-    //
     private BroadcastReceiver receiver;
     private Button buttonFalseAlarm;
     private Button buttonExit;
@@ -40,12 +39,12 @@ public class SosMode extends AppCompatActivity {
         //init Receiver
         initReceiver();
 
-
         // Views
         buttonFalseAlarm = (Button) findViewById(R.id.sosMode_buttonFalseAlarm);
         buttonExit = (Button) findViewById(R.id.sosMode_buttonExit);
         buttonStopSos = (Button) findViewById(R.id.sosMode_buttonStopSos);
         textViewStatus = (TextView) findViewById(R.id.sosMode_textView);
+
         // Set button invisible on start
         buttonFalseAlarm.setVisibility(View.INVISIBLE);
         buttonExit.setVisibility(View.INVISIBLE);
@@ -146,4 +145,3 @@ public class SosMode extends AppCompatActivity {
         unregisterReceiver(receiver);
     }
 }
-

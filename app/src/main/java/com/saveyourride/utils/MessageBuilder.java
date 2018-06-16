@@ -18,7 +18,7 @@ public class MessageBuilder {
     private Context context;
     private SharedPreferences sharedPreferencesSettings;
 
-    // Informations
+    // Information
     private String latitude;
     private String longitude;
     private String accidentTime;
@@ -62,14 +62,8 @@ public class MessageBuilder {
             messageContent = String.format(context.getString(R.string.sos_message), name);
         }
 
-        message = String.format(context.getString(R.string.greeting), contact)
-                + "\n"
-                + messageContent
-                + "\n "
-        ;
-
+        message = String.format(context.getString(R.string.greeting), contact) + "\n" + messageContent + "\n ";
         return new String[]{message, getImportantInformations()};
-
     }
 
     /**
@@ -190,8 +184,6 @@ public class MessageBuilder {
         String contactsJSON = savedContacts.getString(context.getString(R.string.sp_key_contacts_json), context.getString(R.string.default_contacts_json));
         Type type = new TypeToken<ArrayList<Contact>>() {
         }.getType();
-        ArrayList<Contact> contactList = new Gson().fromJson(contactsJSON, type);
-        return contactList;
+        return new Gson().fromJson(contactsJSON, type);
     }
-
 }

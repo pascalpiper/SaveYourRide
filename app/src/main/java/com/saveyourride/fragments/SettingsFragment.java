@@ -1,6 +1,5 @@
 package com.saveyourride.fragments;
 
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,32 +17,16 @@ import com.saveyourride.activities.SettingsPreviewMessage;
  */
 public class SettingsFragment extends PreferenceFragmentCompat {
 
-    private static final String KEY_PREF_CUSTOM_MESSAGE_SWITCH = "pref_enable_custom_message";
-    SharedPreferences sharedPref;
-    // Debug
+    // DEBUG
     private final String TAG = "SettingsFragment";
+    //
 
-    private SharedPreferences sharedPreferences;
-
-    // Information
-
-    private String latitude;
-    private String longitude;
-    private String accidentTime;
-    private String firstContact;
-    private String name;
-    private String diseases;
-    private String allergies;
-    private String drugs;
-    private String informedContacts;
-    private Boolean customMessageEnabled;
-    private String defaultMessage;
-
+    // SharedPreferences
+    private SharedPreferences sharedPref;
 
     public SettingsFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState,
@@ -53,17 +36,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         checkIfCustomMessageEnabled();
 
-        getPreferenceManager().getPreferenceScreen().findPreference("pref_enable_custom_message").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        getPreferenceManager().getPreferenceScreen().findPreference(getString(R.string.pref_enable_custom_message)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-
                 checkIfCustomMessageEnabled();
-
                 return false;
             }
         });
 
-        getPreferenceManager().getPreferenceScreen().findPreference("pref_contacts").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        getPreferenceManager().getPreferenceScreen().findPreference(getString(R.string.pref_contacts)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 startActivity(new Intent(getActivity(), SettingsContacts.class));
@@ -71,30 +52,23 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
-        getPreferenceManager().getPreferenceScreen().findPreference("pref_preview_message").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        getPreferenceManager().getPreferenceScreen().findPreference(getString(R.string.pref_preview_message)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 startActivity(new Intent(getActivity(), SettingsPreviewMessage.class));
                 return false;
             }
         });
-
     }
 
     private void checkIfCustomMessageEnabled() {
         Boolean switchPref = sharedPref.getBoolean
-                (KEY_PREF_CUSTOM_MESSAGE_SWITCH, false);
+                (getString(R.string.pref_enable_custom_message), false);
         if (!switchPref) {
-            getPreferenceManager().getPreferenceScreen().findPreference("pref_custom_message").setEnabled(false);
+            getPreferenceManager().getPreferenceScreen().findPreference(getString(R.string.pref_custom_message)).setEnabled(false);
         } else {
-            getPreferenceManager().getPreferenceScreen().findPreference("pref_custom_message").setEnabled(true);
+            getPreferenceManager().getPreferenceScreen().findPreference(getString(R.string.pref_custom_message)).setEnabled(true);
 
         }
     }
-
-
-
-
-
-
 }

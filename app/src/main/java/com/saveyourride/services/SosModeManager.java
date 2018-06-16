@@ -80,8 +80,6 @@ public class SosModeManager extends Service {
                 // Set Ring Stream Volume to max for incoming Calls from Sos-Contacts
                 AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                 audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamMaxVolume(AudioManager.STREAM_RING), AudioManager.FLAG_VIBRATE);
-
-                smsManager.sendTextMessage("+491752847846", null, "Test", null, null);
             }
         }.start();
 
@@ -148,8 +146,10 @@ public class SosModeManager extends Service {
     /**
      * A sms is limited to 160 characters
      *
+     * A sms is limited to 160 characters
      * @param message text to split in 160 big parts
      * @return list of the parts from the message
+     * @return list of split messages.
      */
     private ArrayList<String> splitMessageToSmsFormat(String message) {
         ArrayList<String> smsList = new ArrayList<String>();
@@ -162,7 +162,6 @@ public class SosModeManager extends Service {
             String part2 = messageText.substring(MAX_SMS_LENGTH);
 
             int indexOfBlank = 0;
-
 
             char[] part1AsCharArray = part1.toCharArray();
             for (int i = part1.length() - 1; i >= 0; i--) {
@@ -182,7 +181,6 @@ public class SosModeManager extends Service {
 
         }
         smsList.add(messageText);
-
         return smsList;
     }
 
@@ -306,7 +304,6 @@ public class SosModeManager extends Service {
 
                         break;
                     }
-
                     case "SMS_FALSE_ALARM_SENT": {
                         readSmsStatus(getResultCode());
                         break;
@@ -328,7 +325,6 @@ public class SosModeManager extends Service {
                         }
                         break;
                     }
-
                     default: {
                         Log.d(TAG, "NO SUCH ACTION IN BROADCAST!");
                         break;
@@ -353,7 +349,6 @@ public class SosModeManager extends Service {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receiver);
-
         if (sosModeStartTimer != null) {
             sosModeStartTimer.cancel();
         }

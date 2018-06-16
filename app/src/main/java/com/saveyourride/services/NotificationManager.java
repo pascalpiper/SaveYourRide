@@ -22,6 +22,7 @@ public class NotificationManager extends Service {
     // DEBUG
     private final String TAG = "NotificationManager";
     //
+
     /// Time of Notifications
     // ITE
     private final long ITE_NOTIFICATION_SOUND_TIME = 8000L;
@@ -41,11 +42,9 @@ public class NotificationManager extends Service {
     private CountDownTimer currentTimer;
     private int currentAudioVolume;
 
-
     @Override
     public void onCreate() {
         super.onCreate();
-
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         initReceiver();
     }
@@ -70,13 +69,10 @@ public class NotificationManager extends Service {
                         }
                         break;
                     }
-
-
                     case "android.intent.action.ACCIDENT_GUARANTEE_PROCEDURE": {
                         notificationAGP();
                         break;
                     }
-
                     case "android.intent.action.INTERVAL_TIME_EXPIRED": {
                         notificationITE();
                         break;
@@ -89,7 +85,6 @@ public class NotificationManager extends Service {
                         Log.d(TAG, "NO ACTION IN BROADCAST!");
                         break;
                 }
-
             }
         };
 
@@ -97,10 +92,8 @@ public class NotificationManager extends Service {
 
         notificationFilter.addAction("android.intent.action.STOP_NOTIFICATION");
         notificationFilter.addAction("android.intent.action.ACCIDENT_GUARANTEE_PROCEDURE");
-
         notificationFilter.addAction("android.intent.action.INTERVAL_TIME_EXPIRED");
         notificationFilter.addAction("android.intent.action.NO_MOVEMENT_DETECTED");
-
 
         registerReceiver(receiver, notificationFilter);
     }
@@ -172,17 +165,14 @@ public class NotificationManager extends Service {
                 }
             }
 
-
             @Override
             public void onFinish() {
                 sendBroadcast(new Intent("android.intent.action.DISMISS_DIALOG"));
                 mMediaPlayer.stop();
                 notificationAGP();
-
             }
         }.start();
     }
-
 
     /**
      * Control notification for the accident guarantee procedure from {@code NotificationManager}
@@ -211,13 +201,9 @@ public class NotificationManager extends Service {
             public void onFinish() {
                 mMediaPlayer.stop();
                 audioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAudioVolume, AudioManager.FLAG_VIBRATE);
-
                 sendBroadcast(new Intent("android.intent.action.DISMISS_DIALOG"));
-
                 startActivity(new Intent(getApplicationContext(), SosMode.class));
-
-                //TODO stop this service, and all other service
-
+                sendBroadcast(new Intent("android.intent.action.FINISH_MODE"));
             }
         }.start();
     }
@@ -233,10 +219,8 @@ public class NotificationManager extends Service {
             audioManager.setStreamVolume(AudioManager.STREAM_ALARM, audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM), AudioManager.FLAG_VIBRATE);
         }
 
-        // TODO remove line comment
-
         AudioAttributes.Builder b = new AudioAttributes.Builder();
-        b.setUsage(AudioAttributes.USAGE_ALARM); /// TODO CHANGE to USAGE_ALARM
+        b.setUsage(AudioAttributes.USAGE_ALARM);
         mMediaPlayer.setAudioAttributes(b.build());
 
         mMediaPlayer.setLooping(true);
@@ -246,6 +230,9 @@ public class NotificationManager extends Service {
 
     @Override
     public void onDestroy() {
+        // DEBUG
+        Log.d(TAG, "onDestroy!");
+        //
         super.onDestroy();
         unregisterReceiver(receiver);
         if(currentTimer != null){
@@ -254,7 +241,6 @@ public class NotificationManager extends Service {
         if(mMediaPlayer != null){
             mMediaPlayer.stop();
         }
-
     }
 
     @Override
