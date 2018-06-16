@@ -45,7 +45,7 @@ public class SosModeManager extends Service {
     private ArrayList<String> smsSentSuccessfullyList;
     private int numberOfContactPersons;
 
-    // Timer wich start the SOS procedure
+    // Timer which start the SOS procedure
     private CountDownTimer sosModeStartTimer;
     private final long WAIT_TIME_IN_SECONDS = 10;
     private final long SECOND_IN_MILLISECONDS = 1000;
@@ -115,8 +115,7 @@ public class SosModeManager extends Service {
     }
 
     /**
-     * send a list of sms to a phoneNumber
-     *
+     * Send a list of sms to a phoneNumber
      * @param phoneNumber to this number the sms will be send
      * @param smsList
      * @param falseAlarm  if it is true, it is a false alarm
@@ -145,11 +144,8 @@ public class SosModeManager extends Service {
 
     /**
      * A sms is limited to 160 characters
-     *
-     * A sms is limited to 160 characters
      * @param message text to split in 160 big parts
      * @return list of the parts from the message
-     * @return list of split messages.
      */
     private ArrayList<String> splitMessageToSmsFormat(String message) {
         ArrayList<String> smsList = new ArrayList<String>();
@@ -231,7 +227,6 @@ public class SosModeManager extends Service {
     /**
      * Check if all contacts are contact correctly. If one object in the list is a false-value,
      * not all contacts are contact correctly.
-     *
      * @return
      */
     private boolean checkIfContactAllContactsSuccessfully() {
