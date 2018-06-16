@@ -19,7 +19,6 @@ public class MessageBuilder {
     private SharedPreferences sharedPreferencesSettings;
 
     // Informations
-
     private String latitude;
     private String longitude;
     private String accidentTime;
@@ -73,16 +72,22 @@ public class MessageBuilder {
 
     }
 
+    /**
+     * Append the important information to one String, which are chosen in the preferences
+     * @return
+     */
     private String getImportantInformations() {
         String message = "Important information: ";
 
         Set<String> included_information = sharedPreferencesSettings.getStringSet(context.getResources().getString(R.string.pref_included_information), null);
         informationList = new String[6];
 
+        // look which information have to be in the message and save it in a list
         for (String each : included_information) {
             saveInInformationList(each);
         }
 
+        // make from all information one String
         for (int i = 0; i < informationList.length; i++) {
             if (informationList[i] != null && !informationList[i].isEmpty()) {
                 message = message + informationList[i];
@@ -91,8 +96,12 @@ public class MessageBuilder {
         return message;
     }
 
+    /**
+     * Save all important informations in a list
+     * @param typeOfInformation
+     */
     public void saveInInformationList(String typeOfInformation) {
-        String newInformation = null;
+        String newInformation;
         int informationID = -1;
 
         switch (typeOfInformation) {
@@ -131,12 +140,13 @@ public class MessageBuilder {
                 newInformation = null;
         }
         if (newInformation != null && !newInformation.isEmpty() && informationID >= 0) {
-//            informationList[informationID] = typeOfInformation + "- " + newInformation;
             informationList[informationID] = "\n->" + typeOfInformation + ":" + newInformation + " ";
         }
     }
 
-
+    /**
+     * read all informations from the sharedPreferences
+     */
     public void readPreferences() {
         sharedPreferencesSettings = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences locationPreferences = context.getSharedPreferences(context.getString(R.string.sp_key_last_known_location), Context.MODE_PRIVATE);

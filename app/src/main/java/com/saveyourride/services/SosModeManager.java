@@ -45,7 +45,7 @@ public class SosModeManager extends Service {
     private ArrayList<String> smsSentSuccessfullyList;
     private int numberOfContactPersons;
 
-    // Timer witch start the SOS procedure
+    // Timer wich start the SOS procedure
     private CountDownTimer sosModeStartTimer;
     private final long WAIT_TIME_IN_SECONDS = 10;
     private final long SECOND_IN_MILLISECONDS = 1000;
@@ -75,7 +75,7 @@ public class SosModeManager extends Service {
                 sendBroadcast(new Intent("android.intent.action.SOS_PROCEDURE_IS_RUNNING"));
                 contactList = readContacts();
 
-                sendSms(contactList, false);
+                sendSmsToAllContacts(contactList, false); // Send the sos-signal to all contacts
 
                 // Set Ring Stream Volume to max for incoming Calls from Sos-Contacts
                 AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -91,12 +91,12 @@ public class SosModeManager extends Service {
     }
 
     /**
-     * send for each contact a sms.
+     * Contact all contacts via sms
      *
      * @param contactList the list of contacts which will be contacted
      * @param falseAlarm  true if it is a false alarm
      */
-    private void sendSms(ArrayList<Contact> contactList, boolean falseAlarm) {
+    private void sendSmsToAllContacts(ArrayList<Contact> contactList, boolean falseAlarm) {
 
         MessageBuilder messageBuilder = new MessageBuilder(this);
 
@@ -105,24 +105,25 @@ public class SosModeManager extends Service {
 
         if (falseAlarm) {
             for (Contact contact : contactList) {
-                sendSmsToContact(contact.getPhoneNumber(), splitMessageToSmsFormat(messageBuilder.buildFalseAlarmMessage(contact.getFirstName() + " " + contact.getLastName())), falseAlarm);
+                sendSmsToSingleContact(contact.getPhoneNumber(), splitMessageToSmsFormat(messageBuilder.buildFalseAlarmMessage(contact.getFirstName() + " " + contact.getLastName())), falseAlarm);
             }
 
         } else {
             for (Contact contact : contactList) {
                 String[] message = messageBuilder.buildSosMessage(contact.getFirstName() + " " + contact.getLastName());
-                sendSmsToContact(contact.getPhoneNumber(), splitMessageToSmsFormat(message[0] + message[1]), falseAlarm);
+                sendSmsToSingleContact(contact.getPhoneNumber(), splitMessageToSmsFormat(message[0] + message[1]), falseAlarm);
             }
         }
     }
 
     /**
      * send a list of sms to a phoneNumber
+     *
      * @param phoneNumber to this number the sms will be send
      * @param smsList
-     * @param falseAlarm if it is true, it is a false alarm
+     * @param falseAlarm  if it is true, it is a false alarm
      */
-    private void sendSmsToContact(String phoneNumber, ArrayList<String> smsList, boolean falseAlarm) {
+    private void sendSmsToSingleContact(String phoneNumber, ArrayList<String> smsList, boolean falseAlarm) {
 
         Intent normalSmsPart, lastPart;
 
@@ -145,9 +146,10 @@ public class SosModeManager extends Service {
     }
 
     /**
-     * a sms is limited to 160 characters
+     * A sms is limited to 160 characters
+     *
      * @param message text to split in 160 big parts
-     * @return
+     * @return list of the parts from the message
      */
     private ArrayList<String> splitMessageToSmsFormat(String message) {
         ArrayList<String> smsList = new ArrayList<String>();
@@ -177,9 +179,7 @@ public class SosModeManager extends Service {
 
             smsList.add(part1);
             messageText = part2;
-//
-//           Log.d(TAG, "splitMessageToSmsFormat: " + part1);
-//           Log.d(TAG, "splitMessageToSmsFormat: " + part2);
+
         }
         smsList.add(messageText);
 
@@ -187,85 +187,11 @@ public class SosModeManager extends Service {
     }
 
     /**
-     * Creates new {@code BroadcastReceiver} and {@code IntentFilter} and then registers them.
-     * {@code receiver} receives the broadcasts from the {@code SosMode} activity.
+     * Read the resultCode from a sent sms. If the sending was successful,
+     * it will be add a true-value to the smsSentSuccessfullyList. If not, it will be a false-value.
+     *
+     * @param resultCode
      */
-    private void initActivityReceiver() {
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                switch (intent.getAction()) {
-                    case "android.intent.action.SEND_FALSE_ALARM_SMS": {
-                        sendSms(contactList, true);
-                        break;
-                    }
-                    case "SMS_SENT": {
-                        readSmsStatus(getResultCode());
-                        break;
-                    }
-                    case "LAST_SMS_SENT": {
-
-                        readSmsStatus(getResultCode());
-
-                        Log.d(TAG, "onReceive: " + smsSentSuccessfullyList.size());
-
-                        numberOfContactPersons++;
-
-                        if (numberOfContactPersons >= contactList.size()) {
-                            if (numberOfContactPersons >= contactList.size()) {
-                                if (checkIfSendSmsSuccessful()) {
-                                    sendBroadcast(new Intent("android.intent.action.SMS_SENT_STATUS").putExtra("status", true));
-                                } else {
-                                    sendBroadcast(new Intent("android.intent.action.SMS_SENT_STATUS").putExtra("status", false));
-                                }
-                            }
-                        }
-                        break;
-                    }
-
-                    case "SMS_FALSE_ALARM_SENT": {
-                        readSmsStatus(getResultCode());
-                        break;
-                    }
-                    case "LAST_SMS_FALSE_ALARM_SENT": {
-
-                        readSmsStatus(getResultCode());
-
-                        Log.d(TAG, "onReceive: " + smsSentSuccessfullyList.size());
-
-                        numberOfContactPersons++;
-
-                        if (numberOfContactPersons >= contactList.size()) {
-                            if (checkIfSendSmsSuccessful()) {
-                                sendBroadcast(new Intent("android.intent.action.SMS_FALSE_ALARM_SENT_STATUS").putExtra("status", true));
-                            } else {
-                                sendBroadcast(new Intent("android.intent.action.SMS_FALSE_ALARM_SENT_STATUS").putExtra("status", false));
-                            }
-                        }
-                        break;
-                    }
-
-                    default: {
-                        Log.d(TAG, "NO SUCH ACTION IN BROADCAST!");
-                        break;
-                    }
-                }
-            }
-        };
-
-        // IntentFilter filters broadcasts received by BroadcastReceiver
-        IntentFilter filter = new IntentFilter();
-
-        filter.addAction("SMS_SENT");
-        filter.addAction("LAST_SMS_SENT");
-        filter.addAction("SMS_FALSE_ALARM_SENT");
-        filter.addAction("LAST_SMS_FALSE_ALARM_SENT");
-        filter.addAction("android.intent.action.SEND_FALSE_ALARM_SMS");
-
-        registerReceiver(receiver, filter);
-    }
-
-
     private void readSmsStatus(int resultCode) {
 
         boolean successful;
@@ -304,16 +230,22 @@ public class SosModeManager extends Service {
 
     }
 
-    private boolean checkIfSendSmsSuccessful() {
+    /**
+     * Check if all contacts are contact correctly. If one object in the list is a false-value,
+     * not all contacts are contact correctly.
+     *
+     * @return
+     */
+    private boolean checkIfContactAllContactsSuccessfully() {
 
         //Debug
         Log.d(TAG, "Check SMS");
-        Log.d(TAG, "checkIfSendSmsSuccessful size : " + smsSentSuccessfullyList.size());
+        Log.d(TAG, "checkIfContactAllContactsSuccessfully size : " + smsSentSuccessfullyList.size());
 
         for (String sentSms : smsSentSuccessfullyList) {
-            Log.d(TAG, "checkIfSendSmsSuccessful: " + sentSms);
+            Log.d(TAG, "checkIfContactAllContactsSuccessfully: " + sentSms);
             if (sentSms == "false") {
-                Log.d(TAG, "checkIfSendSmsSuccessful:  smsSent == false");
+                Log.d(TAG, "checkIfContactAllContactsSuccessfully:  smsSent == false");
                 return false;
             }
         }
@@ -322,7 +254,7 @@ public class SosModeManager extends Service {
     }
 
     /**
-     * read contacts from SharedPreferences
+     * Read contacts from SharedPreferences
      *
      * @return ArrayList of Contacts
      */
@@ -336,6 +268,85 @@ public class SosModeManager extends Service {
         }.getType();
         contactList = new Gson().fromJson(contactsJSON, type);
         return contactList;
+    }
+
+    /**
+     * Creates new {@code BroadcastReceiver} and {@code IntentFilter} and then registers them.
+     * {@code receiver} receives the broadcasts from the {@code SosMode} activity.
+     */
+    private void initActivityReceiver() {
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                switch (intent.getAction()) {
+                    case "android.intent.action.SEND_FALSE_ALARM_SMS": {
+                        sendSmsToAllContacts(contactList, true);
+                        break;
+                    }
+                    case "SMS_SENT": {
+                        readSmsStatus(getResultCode());
+                        break;
+                    }
+                    case "LAST_SMS_SENT": {
+
+                        readSmsStatus(getResultCode());
+
+                        Log.d(TAG, "onReceive: " + smsSentSuccessfullyList.size());
+
+                        numberOfContactPersons++;
+
+
+                        if (numberOfContactPersons >= contactList.size()) {
+                            if (checkIfContactAllContactsSuccessfully()) {
+                                sendBroadcast(new Intent("android.intent.action.SMS_SENT_STATUS").putExtra("status", true));
+                            } else {
+                                sendBroadcast(new Intent("android.intent.action.SMS_SENT_STATUS").putExtra("status", false));
+                            }
+                        }
+
+                        break;
+                    }
+
+                    case "SMS_FALSE_ALARM_SENT": {
+                        readSmsStatus(getResultCode());
+                        break;
+                    }
+                    case "LAST_SMS_FALSE_ALARM_SENT": {
+
+                        readSmsStatus(getResultCode());
+
+                        Log.d(TAG, "onReceive: " + smsSentSuccessfullyList.size());
+
+                        numberOfContactPersons++;
+
+                        if (numberOfContactPersons >= contactList.size()) {
+                            if (checkIfContactAllContactsSuccessfully()) {
+                                sendBroadcast(new Intent("android.intent.action.SMS_FALSE_ALARM_SENT_STATUS").putExtra("status", true));
+                            } else {
+                                sendBroadcast(new Intent("android.intent.action.SMS_FALSE_ALARM_SENT_STATUS").putExtra("status", false));
+                            }
+                        }
+                        break;
+                    }
+
+                    default: {
+                        Log.d(TAG, "NO SUCH ACTION IN BROADCAST!");
+                        break;
+                    }
+                }
+            }
+        };
+
+        // IntentFilter filters broadcasts received by BroadcastReceiver
+        IntentFilter filter = new IntentFilter();
+
+        filter.addAction("SMS_SENT");
+        filter.addAction("LAST_SMS_SENT");
+        filter.addAction("SMS_FALSE_ALARM_SENT");
+        filter.addAction("LAST_SMS_FALSE_ALARM_SENT");
+        filter.addAction("android.intent.action.SEND_FALSE_ALARM_SMS");
+
+        registerReceiver(receiver, filter);
     }
 
     @Override

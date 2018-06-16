@@ -149,10 +149,10 @@
     <string name="false_alarm_message">The emergency sigal which was sent before, was a false alarm. Everything is okay. </string>
 
     <!-- status in Sos mode -->
-    <string name="status_sent_sms_not_successful">Not all SOS signals have sent successful!</string>
-    <string name="status_sent_sms_successful">All SOS signals have sent successful!</string>
+    <string name="status_sent_sms_not_successful">Not all SOS signals were sent successful!</string>
+    <string name="status_sent_sms_successful">All SOS signals were sent successful!</string>
 
-    <string name="status_sent_false_alarm_sms_not_successful">Not all sigals for false alarm have sent successful!</string>
-    <string name="status_sent_false_alarm_sms_successful">All signals for false alarm have sent successful!</string>
+    <string name="status_sent_false_alarm_sms_not_successful">Not all sigals for false alarm were sent successfully!</string>
+    <string name="status_sent_false_alarm_sms_successful">All signals for false alarm were sent successfully!</string>
 
 </resources>
